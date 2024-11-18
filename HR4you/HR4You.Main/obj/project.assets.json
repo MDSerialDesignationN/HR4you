@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\ale002\\source\\repos\\zh-tech\\HR4you\\HR4You.Lib\\HR4You.Lib.csproj",
-      "projectName": "HR4You.Lib",
-      "projectPath": "C:\\Users\\ale002\\source\\repos\\zh-tech\\HR4you\\HR4You.Lib\\HR4You.Lib.csproj",
+      "projectUniqueName": "C:\\Users\\ale002\\source\\repos\\zh-tech\\HR4you\\HR4you\\HR4You.Main\\HR4You.Main.csproj",
+      "projectName": "HR4You.Main",
+      "projectPath": "C:\\Users\\ale002\\source\\repos\\zh-tech\\HR4you\\HR4you\\HR4You.Main\\HR4You.Main.csproj",
       "packagesPath": "C:\\Users\\ale002\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\ale002\\source\\repos\\zh-tech\\HR4you\\HR4You.Lib\\obj\\",
+      "outputPath": "C:\\Users\\ale002\\source\\repos\\zh-tech\\HR4you\\HR4you\\HR4You.Main\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -62,6 +62,9 @@
         "assetTargetFallback": true,
         "warn": true,
         "frameworkReferences": {
+          "Microsoft.AspNetCore.App": {
+            "privateAssets": "none"
+          },
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HR4You.Lib")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+21e5c9928f14fcf0c5271986ae36482a3fe13f8c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2bc0bb53da48795b2873a45242d79e9bb5f8daac")]
 [assembly: System.Reflection.AssemblyProductAttribute("HR4You.Lib")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HR4You.Lib")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
