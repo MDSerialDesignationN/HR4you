@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HR4You.Lib", "HR4You.Lib\HR4You.Lib.csproj", "{72E4DAA6-24DD-42EE-B2EA-6DF7B7260DFB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HR4You.Model.Base", "HR4You.Model.Base\HR4You.Model.Base.csproj", "{72E4DAA6-24DD-42EE-B2EA-6DF7B7260DFB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HR4You.Main", "HR4You.Main\HR4You.Main.csproj", "{D43145B0-1478-4116-8452-CE62337F4591}"
 EndProject
