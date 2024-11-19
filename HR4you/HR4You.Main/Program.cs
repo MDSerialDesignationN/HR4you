@@ -1,6 +1,12 @@
 using HR4You.Components;
+using NLog.Extensions.Logging;
+using NLog.Web;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Logging.ClearProviders();
+NLog.LogManager.Configuration = new NLogLoggingConfiguration(builder.Configuration.GetSection("NLog"));
+builder.Host.UseNLog();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
