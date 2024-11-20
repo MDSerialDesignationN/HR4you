@@ -1,0 +1,6 @@
+﻿services:
+  hr4you.main:
+    image: hr4you.main
+    build:
+      context: .
+      dockerfile: HR4You.Main/Dockerfile
