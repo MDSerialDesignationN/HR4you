@@ -1,4 +1,7 @@
 using HR4You.Components;
+using HR4You.Data;
+using Microsoft.EntityFrameworkCore;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using NLog.Extensions.Logging;
 using NLog.Web;
 
@@ -11,6 +14,12 @@ builder.Host.UseNLog();
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+    
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        new MySqlServerVersion(new Version(8, 0, 33)) // Setze hier deine MySQL- oder MariaDB-Version ein
+    ));
 
 var app = builder.Build();
 
