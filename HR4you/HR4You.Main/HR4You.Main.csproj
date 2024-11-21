@@ -12,12 +12,39 @@
       <PackageReference Include="NLog" Version="5.3.4" />
       <PackageReference Include="NLog.Extensions.Logging" Version="5.3.14" />
       <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.14" />
+      <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="7.0.0" />
+      <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="7.0.0" />
+      <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="7.0.0" />
     </ItemGroup>
 
     <ItemGroup>
       <Content Include="..\.dockerignore">
         <Link>.dockerignore</Link>
       </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Blazor\" />
+      <Folder Include="Controllers\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Blazor\Components\App.razor" />
+      <AdditionalFiles Include="Blazor\Components\Layout\MainLayout.razor" />
+      <AdditionalFiles Include="Blazor\Components\Layout\NavMenu.razor" />
+      <AdditionalFiles Include="Blazor\Components\Pages\Counter.razor" />
+      <AdditionalFiles Include="Blazor\Components\Pages\Error.razor" />
+      <AdditionalFiles Include="Blazor\Components\Pages\Home.razor" />
+      <AdditionalFiles Include="Blazor\Components\Pages\Weather.razor" />
+      <AdditionalFiles Include="Blazor\Components\Routes.razor" />
+      <AdditionalFiles Include="Blazor\Components\_Imports.razor" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\app.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\bootstrap\bootstrap.min.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\bootstrap\bootstrap.min.css.map" />
+      <_ContentIncludedByDefault Remove="wwwroot\favicon.png" />
     </ItemGroup>
 
 </Project>
