@@ -1,4 +1,4 @@
-﻿using HR4You.Main.Models;
+﻿using HR4You.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
@@ -13,6 +13,11 @@ namespace HR4You.Data
 
         // DbSets für Entitäten, z.B. User, Product, etc.
         public DbSet<User> Users { get; set; }
+        public DbSet<Entry> Entries { get; set; }
+        public DbSet<UserGroup> UserGroups { get; set; }
+        public DbSet<Test> Tests { get; set; }
+
+
     }
     
     public class ContractContextDesignTimeFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
@@ -20,8 +25,8 @@ namespace HR4You.Data
         public ApplicationDbContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-
-            optionsBuilder.UseMySql(args[0], ServerVersion.AutoDetect(args[0]));
+            var connectionString = "Server=localhost;Port=3306;User ID=hr4you;Password=password;Database=hr4you";
+            optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
             return new ApplicationDbContext(optionsBuilder.Options);
         }
     }

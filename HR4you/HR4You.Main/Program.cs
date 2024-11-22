@@ -18,10 +18,17 @@ builder.Services.AddRazorComponents()
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
-        new MySqlServerVersion(new Version(8, 0, 33)) // Setze hier deine MySQL- oder MariaDB-Version ein
+        new MySqlServerVersion(new Version(11, 5, 2)) // Setze hier deine MySQL- oder MariaDB-Version ein
     ));
 
 var app = builder.Build();
+
+// Database migration
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    dbContext.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

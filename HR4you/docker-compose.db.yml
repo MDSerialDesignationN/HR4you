@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   database:
     image: mariadb:latest
@@ -8,12 +6,14 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: "password"
       MYSQL_DATABASE: "hr4you"
-      MYSQL_USER: root
+      MYSQL_USER: "hr4you"
       MYSQL_PASSWORD: "password"
     volumes:
       - db_data:/var/lib/mysql
     ports:
       - "3306:3306"
+    networks:
+      - hr4you_network
 
   phpmyadmin:
     image: phpmyadmin:latest
@@ -22,10 +22,16 @@ services:
     environment:
       PMA_HOST: database
       PMA_PORT: 3306
-      PMA_USER: root
-      PMA_PASSWORD: rootpass
+      PMA_USER: "hr4you"
+      PMA_PASSWORD: "password"
     ports:
       - "8080:80"
+    networks:
+      - hr4you_network
 
 volumes:
   db_data:
+
+networks:
+  hr4you_network:
+    driver: bridge
