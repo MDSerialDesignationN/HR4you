@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 using HR4You.Blazor.Components;
-using HR4You.Data;
+using HR4You.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using NLog.Extensions.Logging;
@@ -28,12 +28,30 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-    
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        new MySqlServerVersion(new Version(11, 5, 2)) // Setze hier deine MySQL- oder MariaDB-Version ein
-    ));
+
+void AddDbContext<TContext>(WebApplicationBuilder builder) where TContext : DbContext
+{
+    builder.Services.AddDbContext<TContext>(options =>
+        options.UseMySql(
+            builder.Configuration.GetConnectionString("DefaultConnection"),
+            ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))));
+}
+
+void ApplyMigrations<TContext>(IServiceProvider serviceProvider) where TContext : DbContext
+{
+    using (var scope = serviceProvider.CreateScope())
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<TContext>();
+        dbContext.Database.Migrate();
+    }
+}
+
+AddDbContext<DepartmentContext>(builder);
+AddDbContext<EntryContext>(builder);
+AddDbContext<RoleContext>(builder);
+AddDbContext<User_GroupContext>(builder);
+AddDbContext<UserContext>(builder);
+
 
 //Configure MVC services -> https://learn.microsoft.com/en-us/dotnet/api/microsoft.extensions.dependencyinjection.mvcservicecollectionextensions.addcontrollers?view=aspnetcore-9.0&viewFallbackFrom=net-8.0
 builder.Services.AddControllers().AddJsonOptions(opts =>
@@ -77,11 +95,11 @@ var app = builder.Build();
 //TODO add authentication system for user management
 
 // Database migration
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    dbContext.Database.Migrate();
-}
+ApplyMigrations<DepartmentContext>(app.Services);
+ApplyMigrations<EntryContext>(app.Services);
+ApplyMigrations<RoleContext>(app.Services);
+ApplyMigrations<User_GroupContext>(app.Services);
+ApplyMigrations<UserContext>(app.Services);
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -91,11 +109,12 @@ if (!app.Environment.IsDevelopment())
 }
 
 var logger = app.Services.GetService<ILogger<Program>>()!;
-app.UseStatusCodePages(context => 
+app.UseStatusCodePages(context =>
 {
     var code = context.HttpContext.Response.StatusCode;
-    if (code == 404) {
-        logger.LogError("Resource not found - {Path}",context.HttpContext.Request.Path);
+    if (code == 404)
+    {
+        logger.LogError("Resource not found - {Path}", context.HttpContext.Request.Path);
     }
 
     return Task.CompletedTask;

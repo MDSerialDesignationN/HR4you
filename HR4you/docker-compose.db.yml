@@ -4,10 +4,10 @@ services:
     container_name: mariadb
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: "password"
+      MYSQL_ROOT_PASSWORD: rootpass
       MYSQL_DATABASE: "hr4you"
-      MYSQL_USER: "hr4you"
-      MYSQL_PASSWORD: "password"
+      MYSQL_USER: root
+      MYSQL_PASSWORD: rootpass
     volumes:
       - db_data:/var/lib/mysql
     ports:
@@ -22,8 +22,8 @@ services:
     environment:
       PMA_HOST: database
       PMA_PORT: 3306
-      PMA_USER: "hr4you"
-      PMA_PASSWORD: "password"
+      PMA_USER: root
+      PMA_PASSWORD: rootpass
     ports:
       - "8080:80"
     networks:

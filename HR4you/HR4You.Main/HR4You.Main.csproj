@@ -102,4 +102,8 @@
       <_ContentIncludedByDefault Remove="wwwroot\favicon.png" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\HR4You.Model.Base\HR4You.Model.Base.csproj" />
+    </ItemGroup>
+
 </Project>
