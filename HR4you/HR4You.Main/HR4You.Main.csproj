@@ -36,13 +36,13 @@
       <PackageReference Include="NLog" Version="5.3.4" />
       <PackageReference Include="NLog.Extensions.Logging" Version="5.3.14" />
       <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.14" />
-<<<<<<< HEAD
+
       <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.0" />
-=======
+
       <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="7.0.0" />
       <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="7.0.0" />
       <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="7.0.0" />
->>>>>>> refs/heads/HR_SetupBasicApiControllers
+
     </ItemGroup>
 
     <ItemGroup>
