@@ -1,7 +1,6 @@
 using System.Text.Json.Serialization;
-using HR4You.Blazor.Components;
 using HR4You.Context;
-using Microsoft.EntityFrameworkCore;
+using HR4You.Razor.Components;
 using Microsoft.OpenApi.Models;
 using NLog.Extensions.Logging;
 using NLog.Web;
@@ -28,29 +27,6 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-
-void AddDbContext<TContext>(WebApplicationBuilder builder) where TContext : DbContext
-{
-    builder.Services.AddDbContext<TContext>(options =>
-        options.UseMySql(
-            builder.Configuration.GetConnectionString("DefaultConnection"),
-            ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))));
-}
-
-void ApplyMigrations<TContext>(IServiceProvider serviceProvider) where TContext : DbContext
-{
-    using (var scope = serviceProvider.CreateScope())
-    {
-        var dbContext = scope.ServiceProvider.GetRequiredService<TContext>();
-        dbContext.Database.Migrate();
-    }
-}
-
-AddDbContext<DepartmentContext>(builder);
-AddDbContext<EntryContext>(builder);
-AddDbContext<RoleContext>(builder);
-AddDbContext<User_GroupContext>(builder);
-AddDbContext<UserContext>(builder);
 
 
 //Configure MVC services -> https://learn.microsoft.com/en-us/dotnet/api/microsoft.extensions.dependencyinjection.mvcservicecollectionextensions.addcontrollers?view=aspnetcore-9.0&viewFallbackFrom=net-8.0
@@ -89,17 +65,21 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+//Configure db models + contexts with EF migrations
+var connectionString = builder.Configuration.GetConnectionString("Db");
+ModelContextHelper.ConfigureModelContexts(builder, connectionString);
+
+
+
+
 var app = builder.Build();
-//TODO DB migration model
+
+//Trigger DB migration
+ModelContextHelper.MigrateModelDb(app);
+
 //TODO rewrite rules if needed
 //TODO add authentication system for user management
-
-// Database migration
-ApplyMigrations<DepartmentContext>(app.Services);
-ApplyMigrations<EntryContext>(app.Services);
-ApplyMigrations<RoleContext>(app.Services);
-ApplyMigrations<User_GroupContext>(app.Services);
-ApplyMigrations<UserContext>(app.Services);
+//TODO add and register audit service
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

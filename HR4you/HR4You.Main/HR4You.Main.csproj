@@ -15,8 +15,8 @@
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
       <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.8" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.8" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.8">
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
@@ -36,8 +36,7 @@
       <PackageReference Include="NLog" Version="5.3.4" />
       <PackageReference Include="NLog.Extensions.Logging" Version="5.3.14" />
       <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.14" />
-
-      <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.0" />
+      <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2" />
 
       <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="7.0.0" />
       <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="7.0.0" />
@@ -52,20 +51,20 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Blazor\" />
+      <Folder Include="Razor\" />
       <Folder Include="Controllers\" />
     </ItemGroup>
 
     <ItemGroup>
-      <AdditionalFiles Include="Blazor\Components\App.razor" />
-      <AdditionalFiles Include="Blazor\Components\Layout\MainLayout.razor" />
-      <AdditionalFiles Include="Blazor\Components\Layout\NavMenu.razor" />
-      <AdditionalFiles Include="Blazor\Components\Pages\Counter.razor" />
-      <AdditionalFiles Include="Blazor\Components\Pages\Error.razor" />
-      <AdditionalFiles Include="Blazor\Components\Pages\Home.razor" />
-      <AdditionalFiles Include="Blazor\Components\Pages\Weather.razor" />
-      <AdditionalFiles Include="Blazor\Components\Routes.razor" />
-      <AdditionalFiles Include="Blazor\Components\_Imports.razor" />
+      <AdditionalFiles Include="Razor\Components\App.razor" />
+      <AdditionalFiles Include="Razor\Components\Layout\MainLayout.razor" />
+      <AdditionalFiles Include="Razor\Components\Layout\NavMenu.razor" />
+      <AdditionalFiles Include="Razor\Components\Pages\Counter.razor" />
+      <AdditionalFiles Include="Razor\Components\Pages\Error.razor" />
+      <AdditionalFiles Include="Razor\Components\Pages\Home.razor" />
+      <AdditionalFiles Include="Razor\Components\Pages\Weather.razor" />
+      <AdditionalFiles Include="Razor\Components\Routes.razor" />
+      <AdditionalFiles Include="Razor\Components\_Imports.razor" />
     </ItemGroup>
 
     <ItemGroup>
@@ -79,20 +78,20 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Blazor\" />
+      <Folder Include="Razor\" />
       <Folder Include="Controllers\" />
     </ItemGroup>
 
     <ItemGroup>
-      <AdditionalFiles Include="Blazor\Components\App.razor" />
-      <AdditionalFiles Include="Blazor\Components\Layout\MainLayout.razor" />
-      <AdditionalFiles Include="Blazor\Components\Layout\NavMenu.razor" />
-      <AdditionalFiles Include="Blazor\Components\Pages\Counter.razor" />
-      <AdditionalFiles Include="Blazor\Components\Pages\Error.razor" />
-      <AdditionalFiles Include="Blazor\Components\Pages\Home.razor" />
-      <AdditionalFiles Include="Blazor\Components\Pages\Weather.razor" />
-      <AdditionalFiles Include="Blazor\Components\Routes.razor" />
-      <AdditionalFiles Include="Blazor\Components\_Imports.razor" />
+      <AdditionalFiles Include="Razor\Components\App.razor" />
+      <AdditionalFiles Include="Razor\Components\Layout\MainLayout.razor" />
+      <AdditionalFiles Include="Razor\Components\Layout\NavMenu.razor" />
+      <AdditionalFiles Include="Razor\Components\Pages\Counter.razor" />
+      <AdditionalFiles Include="Razor\Components\Pages\Error.razor" />
+      <AdditionalFiles Include="Razor\Components\Pages\Home.razor" />
+      <AdditionalFiles Include="Razor\Components\Pages\Weather.razor" />
+      <AdditionalFiles Include="Razor\Components\Routes.razor" />
+      <AdditionalFiles Include="Razor\Components\_Imports.razor" />
     </ItemGroup>
 
     <ItemGroup>
