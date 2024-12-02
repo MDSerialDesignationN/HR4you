@@ -14,8 +14,8 @@
         
         public string? Description { get; set; } = string.Empty;
         
-        bool IsHoliday { get; set; }
-        bool IsBillable { get; set; }
+        public bool IsHoliday { get; set; }
+        public bool IsBillable { get; set; }
 
         public override void Set(ModelBase model)
         {

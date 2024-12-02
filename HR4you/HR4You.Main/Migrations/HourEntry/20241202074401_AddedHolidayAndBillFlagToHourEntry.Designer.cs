@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HR4You.Migrations.HourEntry
 {
     [DbContext(typeof(HourEntryContext))]
-    [Migration("20241202065729_AddedHolidayAndBillFlagToHourEntry")]
+    [Migration("20241202074401_AddedHolidayAndBillFlagToHourEntry")]
     partial class AddedHolidayAndBillFlagToHourEntry
     {
         /// <inheritdoc />
@@ -53,6 +53,12 @@ namespace HR4You.Migrations.HourEntry
 
                     b.Property<int?>("FlagId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsBillable")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsHoliday")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<DateTime?>("LastModifiedAt")
                         .HasColumnType("datetime(6)");

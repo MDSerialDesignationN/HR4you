@@ -51,6 +51,12 @@ namespace HR4You.Migrations.HourEntry
                     b.Property<int?>("FlagId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsBillable")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsHoliday")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<DateTime?>("LastModifiedAt")
                         .HasColumnType("datetime(6)");
 
