@@ -1,4 +1,5 @@
-﻿using HR4You.Contexts.HourEntry;
+﻿using HR4You.Contexts.Customer;
+using HR4You.Contexts.HourEntry;
 using HR4You.Contexts.WorkTime;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,6 +27,14 @@ public class ModelContextHelper
             
             return new WorkTimeContext(optionsBuilder.Options, sp.GetService<ILogger<WorkTimeContext>>()!, sp);
         });
+        //CustomerContext
+        webApplicationBuilder.Services.AddScoped(sp =>
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<ModelBaseContext<Model.Base.Models.Customer>>();
+            optionsBuilder.UseMySql(connectionString!, ServerVersion.AutoDetect(connectionString));
+            
+            return new CustomerContext(optionsBuilder.Options, sp.GetService<ILogger<CustomerContext>>()!, sp);
+        });
 
         
         //Register remaining handler
@@ -39,5 +48,11 @@ public class ModelContextHelper
         
         var hc = scope.ServiceProvider.GetService<HourEntryContext>()!;
         hc.Database.Migrate();
+        
+        var wt = scope.ServiceProvider.GetService<WorkTimeContext>()!;
+        wt.Database.Migrate();
+        
+        var c = scope.ServiceProvider.GetService<CustomerContext>()!;
+        c.Database.Migrate();
     }
 }
