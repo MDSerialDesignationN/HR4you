@@ -1,4 +1,5 @@
 ﻿using HR4You.Contexts.HourEntry;
+using HR4You.Contexts.WorkTime;
 using Microsoft.EntityFrameworkCore;
 
 namespace HR4You.Contexts;
@@ -16,6 +17,14 @@ public class ModelContextHelper
             optionsBuilder.UseMySql(connectionString!, ServerVersion.AutoDetect(connectionString));
             
             return new HourEntryContext(optionsBuilder.Options, sp.GetService<ILogger<HourEntryContext>>()!, sp);
+        });
+        //WorkTimeContext
+        webApplicationBuilder.Services.AddScoped(sp =>
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<ModelBaseContext<Model.Base.Models.WorkTime>>();
+            optionsBuilder.UseMySql(connectionString!, ServerVersion.AutoDetect(connectionString));
+            
+            return new WorkTimeContext(optionsBuilder.Options, sp.GetService<ILogger<WorkTimeContext>>()!, sp);
         });
 
         

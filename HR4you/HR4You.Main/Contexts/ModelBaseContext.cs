@@ -1,5 +1,8 @@
-﻿using HR4You.Model.Base;
+﻿using System.Reflection;
+using System.Text.Json;
+using HR4You.Model.Base;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace HR4You.Contexts;
 
@@ -8,7 +11,8 @@ public class ModelBaseContext<T> : DbContext where T : ModelBase
     private readonly ILogger<ModelBaseContext<T>> _logger;
     protected DbSet<T> Entities => Set<T>();
 
-    public ModelBaseContext(DbContextOptions<ModelBaseContext<T>> options, ILogger<ModelBaseContext<T>> logger): base(options)
+    public ModelBaseContext(DbContextOptions<ModelBaseContext<T>> options, ILogger<ModelBaseContext<T>> logger) :
+        base(options)
     {
         _logger = logger;
     }
@@ -17,6 +21,26 @@ public class ModelBaseContext<T> : DbContext where T : ModelBase
     {
         modelBuilder.Entity<T>().ToTable($"hr4you_{typeof(T).Name}");
         modelBuilder.Entity<T>().Property(e => e.Id).ValueGeneratedOnAdd();
+
+        var entityType = modelBuilder.Entity<T>();
+        var properties = typeof(T).GetProperties();
+
+        foreach (var property in properties)
+        {
+            var jsonBlobAttribute = property.GetCustomAttribute<JsonBlobAttribute>();
+            if (jsonBlobAttribute != null)
+            {
+                // JSON-Konverter
+                var converter = new ValueConverter<object, string>(
+                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                    v => JsonSerializer.Deserialize<object>(v, (JsonSerializerOptions?)null));
+
+                // Conversion anwenden
+                entityType.Property(property.Name)
+                    .HasConversion(converter)
+                    .HasColumnType("json"); // MySQL JSON-Typ
+            }
+        }
     }
 
     public async Task<ModelResult<T>> Create(T data)
@@ -26,14 +50,14 @@ public class ModelBaseContext<T> : DbContext where T : ModelBase
         data.LastModifiedAt = null;
         var e = Entities.Add(data);
         await SaveChangesAsync();
-        
+
         return new ModelResult<T>()
         {
             Entity = e.Entity,
             Error = MasterDataError.None
         };
     }
-    
+
     public async Task<ModelResult<T>> Edit(int id, T data)
     {
         var result = await Get(id);
@@ -41,7 +65,7 @@ public class ModelBaseContext<T> : DbContext where T : ModelBase
         {
             return result;
         }
-        
+
         result.Entity!.Set(data);
         Entry(result.Entity).State = EntityState.Modified;
         _ = await SaveChangesAsync();
@@ -60,11 +84,12 @@ public class ModelBaseContext<T> : DbContext where T : ModelBase
         {
             result.Entity!.LastModifiedAt = DateTime.Now;
         }
+
         result.Entity!.Deleted = deleted;
         await SaveChangesAsync();
         return result;
     }
-    
+
     public async Task<ModelResult<T>> Get(int id, bool addDeleted = true)
     {
         var linq = Entities.AsQueryable();
@@ -72,17 +97,17 @@ public class ModelBaseContext<T> : DbContext where T : ModelBase
         {
             linq = linq.Where(e => e.Deleted != true);
         }
-        
+
         var entity = await linq.FirstOrDefaultAsync(j => j.Id == id);
         if (entity == null)
         {
-            _logger.LogError("Entity with ID {Id} was not found",id);
+            _logger.LogError("Entity with ID {Id} was not found", id);
             return ModelResult<T>.NotFound();
         }
 
         return ModelResult<T>.Ok(entity);
     }
-    
+
     public async Task<ModelResult<List<T>>> GetAll(bool addDeleted = true)
     {
         var linq = Entities.AsQueryable();
@@ -90,9 +115,8 @@ public class ModelBaseContext<T> : DbContext where T : ModelBase
         {
             linq = linq.Where(e => e.Deleted != true);
         }
+
         var result = await linq.OrderByDescending(x => x.Id).ToListAsync();
         return ModelResult<List<T>>.Ok(result);
     }
-
-   
 }
