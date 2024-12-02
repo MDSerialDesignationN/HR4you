@@ -22,7 +22,7 @@ namespace HR4You.Migrations.Customer
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
-            modelBuilder.Entity("HR4You.Model.Base.Models.Customer", b =>
+            modelBuilder.Entity("HR4You.Model.Base.Models.Customer.Customer", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()

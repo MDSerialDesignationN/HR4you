@@ -28,6 +28,8 @@ namespace HR4You.Migrations.WorkTime
                     MinFriHours = table.Column<int>(type: "int", nullable: false),
                     MinSatHours = table.Column<int>(type: "int", nullable: false),
                     MinSunHours = table.Column<int>(type: "int", nullable: false),
+                    Holidays = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     CreationDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     LastModifiedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     Deleted = table.Column<bool>(type: "tinyint(1)", nullable: false)

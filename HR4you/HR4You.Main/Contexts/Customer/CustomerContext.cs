@@ -3,17 +3,17 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace HR4You.Contexts.Customer
 {
-    public class CustomerContext : ModelBaseContext<Model.Base.Models.Customer>
+    public class CustomerContext : ModelBaseContext<Model.Base.Models.Customer.Customer>
     {
         private readonly IServiceProvider _serviceProvider;
 
-        public CustomerContext(DbContextOptions<ModelBaseContext<Model.Base.Models.Customer>> options,
+        public CustomerContext(DbContextOptions<ModelBaseContext<Model.Base.Models.Customer.Customer>> options,
             ILogger<CustomerContext> logger, IServiceProvider serviceProvider) : base(options, logger)
         {
             _serviceProvider = serviceProvider;
         }
 
-        public async Task<List<Model.Base.Models.Customer>> GetCustomers(int? customerNumber, string? name,
+        public async Task<List<Model.Base.Models.Customer.Customer>> GetCustomers(int? customerNumber, string? name,
             string? description, string? address, string? email, string? website, string? phoneNumber)
         {
             using var scope = _serviceProvider.CreateScope();
@@ -64,7 +64,7 @@ namespace HR4You.Contexts.Customer
         {
             public CustomerContext CreateDbContext(string[] args)
             {
-                var builder = new DbContextOptionsBuilder<ModelBaseContext<Model.Base.Models.Customer>>();
+                var builder = new DbContextOptionsBuilder<ModelBaseContext<Model.Base.Models.Customer.Customer>>();
 
                 builder.UseMySql(args[0], ServerVersion.AutoDetect(args[0]));
                 return new CustomerContext(builder.Options, null!, null!);

@@ -3,17 +3,17 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace HR4You.Contexts.HourEntry
 {
-    public class HourEntryContext : ModelBaseContext<Model.Base.Models.HourEntry>
+    public class HourEntryContext : ModelBaseContext<Model.Base.Models.HourEntry.HourEntry>
     {
         private readonly IServiceProvider _serviceProvider;
 
-        public HourEntryContext(DbContextOptions<ModelBaseContext<Model.Base.Models.HourEntry>> options,
+        public HourEntryContext(DbContextOptions<ModelBaseContext<Model.Base.Models.HourEntry.HourEntry>> options,
             ILogger<HourEntryContext> logger, IServiceProvider serviceProvider) : base(options, logger)
         {
             _serviceProvider = serviceProvider;
         }
 
-        public async Task<List<Model.Base.Models.HourEntry>> GetHourEntries(bool addDeleted, string userId, int? customerId,
+        public async Task<List<Model.Base.Models.HourEntry.HourEntry>> GetHourEntries(bool addDeleted, string userId, int? customerId,
             int? projectId, int? taskId, int? flagId)
         {
             using var scope = _serviceProvider.CreateScope();
@@ -49,7 +49,7 @@ namespace HR4You.Contexts.HourEntry
         {
             public HourEntryContext CreateDbContext(string[] args)
             {
-                var builder = new DbContextOptionsBuilder<ModelBaseContext<Model.Base.Models.HourEntry>>();
+                var builder = new DbContextOptionsBuilder<ModelBaseContext<Model.Base.Models.HourEntry.HourEntry>>();
 
                 builder.UseMySql(args[0], ServerVersion.AutoDetect(args[0]));
                 return new HourEntryContext(builder.Options, null!, null!);

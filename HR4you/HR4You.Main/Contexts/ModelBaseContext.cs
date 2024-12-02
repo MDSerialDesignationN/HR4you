@@ -21,26 +21,6 @@ public class ModelBaseContext<T> : DbContext where T : ModelBase
     {
         modelBuilder.Entity<T>().ToTable($"hr4you_{typeof(T).Name}");
         modelBuilder.Entity<T>().Property(e => e.Id).ValueGeneratedOnAdd();
-
-        var entityType = modelBuilder.Entity<T>();
-        var properties = typeof(T).GetProperties();
-
-        foreach (var property in properties)
-        {
-            var jsonBlobAttribute = property.GetCustomAttribute<JsonBlobAttribute>();
-            if (jsonBlobAttribute != null)
-            {
-                // JSON-Konverter
-                var converter = new ValueConverter<object, string>(
-                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
-                    v => JsonSerializer.Deserialize<object>(v, (JsonSerializerOptions?)null));
-
-                // Conversion anwenden
-                entityType.Property(property.Name)
-                    .HasConversion(converter)
-                    .HasColumnType("json"); // MySQL JSON-Typ
-            }
-        }
     }
 
     public async Task<ModelResult<T>> Create(T data)
@@ -51,7 +31,7 @@ public class ModelBaseContext<T> : DbContext where T : ModelBase
         var e = Entities.Add(data);
         await SaveChangesAsync();
 
-        return new ModelResult<T>()
+        return new ModelResult<T>
         {
             Entity = e.Entity,
             Error = MasterDataError.None

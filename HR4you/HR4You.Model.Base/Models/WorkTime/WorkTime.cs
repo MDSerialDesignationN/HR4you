@@ -1,4 +1,4 @@
-﻿namespace HR4You.Model.Base.Models
+﻿namespace HR4You.Model.Base.Models.WorkTime
 {
     public class WorkTime : ModelBase
     {
@@ -9,7 +9,7 @@
         public int MinFriHours { get; set; }
         public int MinSatHours { get; set; }
         public int MinSunHours { get; set; }
-        //[JsonBlob] public List<HolidayEntry>? Holidays { get; set; }
+        [JsonBlob] public List<HolidayEntry> Holidays { get; set; } = [];
 
         public override void Set(ModelBase model)
         {
@@ -26,14 +26,7 @@
             MinFriHours = data.MinFriHours;
             MinSatHours = data.MinSatHours;
             MinSunHours = data.MinSunHours;
-            //Holidays = data.Holidays;
-        }
-
-        public class HolidayEntry
-        {
-            public DateOnly Date { get; set; }
-            public string Name { get; set; }
-            public bool HalfDay { get; set; }
+            Holidays = data.Holidays;
         }
     }
 }

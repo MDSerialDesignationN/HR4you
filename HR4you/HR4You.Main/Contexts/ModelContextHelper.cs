@@ -14,7 +14,7 @@ public class ModelContextHelper
         //HourEntryContext
         webApplicationBuilder.Services.AddScoped(sp =>
         {
-            var optionsBuilder = new DbContextOptionsBuilder<ModelBaseContext<Model.Base.Models.HourEntry>>();
+            var optionsBuilder = new DbContextOptionsBuilder<ModelBaseContext<Model.Base.Models.HourEntry.HourEntry>>();
             optionsBuilder.UseMySql(connectionString!, ServerVersion.AutoDetect(connectionString));
             
             return new HourEntryContext(optionsBuilder.Options, sp.GetService<ILogger<HourEntryContext>>()!, sp);
@@ -22,7 +22,7 @@ public class ModelContextHelper
         //WorkTimeContext
         webApplicationBuilder.Services.AddScoped(sp =>
         {
-            var optionsBuilder = new DbContextOptionsBuilder<ModelBaseContext<Model.Base.Models.WorkTime>>();
+            var optionsBuilder = new DbContextOptionsBuilder<ModelBaseContext<Model.Base.Models.WorkTime.WorkTime>>();
             optionsBuilder.UseMySql(connectionString!, ServerVersion.AutoDetect(connectionString));
             
             return new WorkTimeContext(optionsBuilder.Options, sp.GetService<ILogger<WorkTimeContext>>()!, sp);
@@ -30,7 +30,7 @@ public class ModelContextHelper
         //CustomerContext
         webApplicationBuilder.Services.AddScoped(sp =>
         {
-            var optionsBuilder = new DbContextOptionsBuilder<ModelBaseContext<Model.Base.Models.Customer>>();
+            var optionsBuilder = new DbContextOptionsBuilder<ModelBaseContext<Model.Base.Models.Customer.Customer>>();
             optionsBuilder.UseMySql(connectionString!, ServerVersion.AutoDetect(connectionString));
             
             return new CustomerContext(optionsBuilder.Options, sp.GetService<ILogger<CustomerContext>>()!, sp);

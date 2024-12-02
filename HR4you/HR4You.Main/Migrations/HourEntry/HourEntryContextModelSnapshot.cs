@@ -22,7 +22,7 @@ namespace HR4You.Migrations.HourEntry
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
-            modelBuilder.Entity("HR4You.Model.Base.Models.HourEntry", b =>
+            modelBuilder.Entity("HR4You.Model.Base.Models.HourEntry.HourEntry", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()

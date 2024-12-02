@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HR4You.Migrations.HourEntry
 {
     [DbContext(typeof(HourEntryContext))]
-    [Migration("20241128095158_InitialHourEntry")]
+    [Migration("20241202131332_InitialHourEntry")]
     partial class InitialHourEntry
     {
         /// <inheritdoc />
@@ -25,7 +25,7 @@ namespace HR4You.Migrations.HourEntry
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
-            modelBuilder.Entity("HR4You.Model.Base.Models.HourEntry", b =>
+            modelBuilder.Entity("HR4You.Model.Base.Models.HourEntry.HourEntry", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -53,6 +53,12 @@ namespace HR4You.Migrations.HourEntry
 
                     b.Property<int?>("FlagId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsBillable")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsHoliday")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<DateTime?>("LastModifiedAt")
                         .HasColumnType("datetime(6)");

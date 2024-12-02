@@ -32,6 +32,8 @@ namespace HR4You.Migrations.HourEntry
                     FlagId = table.Column<int>(type: "int", nullable: true),
                     Description = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsHoliday = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    IsBillable = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CreationDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     LastModifiedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     Deleted = table.Column<bool>(type: "tinyint(1)", nullable: false)

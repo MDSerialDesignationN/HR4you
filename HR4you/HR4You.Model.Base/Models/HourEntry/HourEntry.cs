@@ -1,4 +1,4 @@
-﻿namespace HR4You.Model.Base.Models
+﻿namespace HR4You.Model.Base.Models.HourEntry
 {
     public class HourEntry : ModelBase
     {

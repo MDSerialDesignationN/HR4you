@@ -2,6 +2,7 @@
 using HR4You.Contexts.HourEntry;
 using HR4You.Model.Base;
 using HR4You.Model.Base.Models;
+using HR4You.Model.Base.Models.HourEntry;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
