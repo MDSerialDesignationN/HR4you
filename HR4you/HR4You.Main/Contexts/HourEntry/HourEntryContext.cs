@@ -13,13 +13,14 @@ namespace HR4You.Contexts.HourEntry
             _serviceProvider = serviceProvider;
         }
 
-        public async Task<List<Model.Base.Models.HourEntry>> GetHourEntries(string userId, int? customerId,
+        public async Task<List<Model.Base.Models.HourEntry>> GetHourEntries(bool addDeleted, string userId, int? customerId,
             int? projectId, int? taskId, int? flagId)
         {
             using var scope = _serviceProvider.CreateScope();
             var linq = Entities.AsQueryable();
             
             linq = linq.Where(he => he.UserId == userId);
+            linq = linq.Where(he => he.Deleted == addDeleted);
             
             if (customerId != null)
             {
