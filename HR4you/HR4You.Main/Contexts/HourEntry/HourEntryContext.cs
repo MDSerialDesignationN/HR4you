@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace HR4You.Context.HourEntry
+namespace HR4You.Contexts.HourEntry
 {
     public class HourEntryContext : ModelBaseContext<Model.Base.Models.HourEntry>
     {

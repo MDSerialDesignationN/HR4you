@@ -1,7 +1,7 @@
-﻿using HR4You.Context.HourEntry;
+﻿using HR4You.Contexts.HourEntry;
 using Microsoft.EntityFrameworkCore;
 
-namespace HR4You.Context;
+namespace HR4You.Contexts;
 
 public class ModelContextHelper
 {

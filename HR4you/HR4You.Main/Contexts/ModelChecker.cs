@@ -1,4 +1,4 @@
-﻿namespace HR4You.Context;
+﻿namespace HR4You.Contexts;
 
 public class ModelChecker
 {

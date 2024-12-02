@@ -1,7 +1,7 @@
 ﻿using HR4You.Model.Base;
 using Microsoft.EntityFrameworkCore;
 
-namespace HR4You.Context;
+namespace HR4You.Contexts;
 
 public class ModelBaseContext<T> : DbContext where T : ModelBase
 {
