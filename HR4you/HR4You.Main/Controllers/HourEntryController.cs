@@ -56,7 +56,7 @@ public class HourEntryController : ControllerBase
     //[Authorize(Policy = )]
     public async Task<IActionResult> CreateHourEntry([FromBody]HourEntry he)
     {
-        var checkResult = await _checker.CheckMasterData(he, null);
+        var checkResult = await _checker.CheckMasterData(he);
         if (checkResult.Error != ModelChecker.ModelCheckError.None)
         {
             return BadRequest(checkResult);

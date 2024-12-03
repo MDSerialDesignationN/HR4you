@@ -1,8 +1,6 @@
 ﻿using HR4You.Contexts;
-using HR4You.Contexts.HourEntry;
 using HR4You.Contexts.WorkTime;
 using HR4You.Model.Base;
-using HR4You.Model.Base.Models;
 using HR4You.Model.Base.Models.WorkTime;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -44,7 +42,7 @@ public class WorkTimeController : ControllerBase
     //[Authorize(Policy = )]
     public async Task<IActionResult> CreateWorkTime([FromBody]WorkTime wt)
     {
-        var checkResult = await _checker.CheckMasterData(wt, null);
+        var checkResult = await _checker.CheckMasterData(wt);
         if (checkResult.Error != ModelChecker.ModelCheckError.None)
         {
             return BadRequest(checkResult);

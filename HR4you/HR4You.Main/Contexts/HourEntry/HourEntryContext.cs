@@ -13,6 +13,11 @@ namespace HR4You.Contexts.HourEntry
             _serviceProvider = serviceProvider;
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+        }
+
         public async Task<List<Model.Base.Models.HourEntry.HourEntry>> GetHourEntries(bool addDeleted, string userId, int? customerId,
             int? projectId, int? taskId, int? flagId)
         {

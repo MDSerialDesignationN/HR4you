@@ -45,7 +45,7 @@ public class CustomerController : ControllerBase
     //[Authorize(Policy = )]
     public async Task<IActionResult> CreateCustomer([FromBody]Customer he)
     {
-        var checkResult = await _checker.CheckMasterData(he, null);
+        var checkResult = await _checker.CheckMasterData(he);
         if (checkResult.Error != ModelChecker.ModelCheckError.None)
         {
             return BadRequest(checkResult);
