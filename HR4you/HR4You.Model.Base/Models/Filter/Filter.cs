@@ -1,13 +1,8 @@
 ﻿namespace HR4You.Model.Base.Models.Filter
 {
-    public enum FilterType
-    {
-        Activity,
-        Flag
-    }
     public class Filter : ModelBase
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         
         public FilterType Type { get; set; }
 
@@ -22,5 +17,11 @@
             Name = data.Name;
             Type = data.Type;
         }
+    }
+    
+    public enum FilterType
+    {
+        Activity,
+        Flag
     }
 }

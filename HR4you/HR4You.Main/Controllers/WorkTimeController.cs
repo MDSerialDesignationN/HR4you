@@ -40,9 +40,9 @@ public class WorkTimeController : ControllerBase
     [HttpPost("create")]
     [SwaggerOperation("CreateWorkTime")]
     //[Authorize(Policy = )]
-    public async Task<IActionResult> CreateWorkTime([FromBody]WorkTime wt)
+    public async Task<IActionResult> CreateWorkTime([FromBody]WorkTime workTime)
     {
-        var checkResult = await _checker.CheckMasterData(wt);
+        var checkResult = await _checker.CheckMasterData(workTime);
         if (checkResult.Error != ModelChecker.ModelCheckError.None)
         {
             return BadRequest(checkResult);
@@ -51,7 +51,7 @@ public class WorkTimeController : ControllerBase
         using var scope = _serviceProvider.CreateScope();
         var sc = scope.ServiceProvider.GetService<WorkTimeContext>()!;
         
-        var result = await sc.Create(wt);
+        var result = await sc.Create(workTime);
         if (result.Error == MasterDataError.None)
         {
             return Ok(result.Entity);

@@ -1,17 +1,12 @@
 ﻿namespace HR4You.Model.Base.Models.Project
 {
-    public enum ProjectState
-    {
-        Open,
-        Closed
-    }
     public class Project : ModelBase
     {
         public int ProjectNumber { get; set; }
 
         public int CustomerId { get; set; }
 
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         
         public ProjectState State { get; set; }
         
@@ -31,5 +26,11 @@
             State = data.State;
             Description = data.Description;
         }
+    }
+    
+    public enum ProjectState
+    {
+        Open,
+        Closed
     }
 }

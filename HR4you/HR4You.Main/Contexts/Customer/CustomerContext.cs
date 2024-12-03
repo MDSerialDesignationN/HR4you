@@ -13,53 +13,6 @@ namespace HR4You.Contexts.Customer
             _serviceProvider = serviceProvider;
         }
 
-        public async Task<List<Model.Base.Models.Customer.Customer>> GetCustomers(int? customerNumber, string? name,
-            string? description, string? address, string? email, string? website, string? phoneNumber)
-        {
-            using var scope = _serviceProvider.CreateScope();
-            var linq = Entities.AsQueryable();
-            
-            if (customerNumber != null)
-            {
-                linq = linq.Where(he => he.CustomerNumber == customerNumber);
-            }
-            
-            if (name != null)
-            {
-                linq = linq.Where(he => he.Name == name);
-            }
-            
-            if (description != null)
-            {
-                linq = linq.Where(he => he.Description == description);
-            }
-            
-            if (address != null)
-            {
-                linq = linq.Where(he => he.Address == address);
-            }
-            
-            if (email != null)
-            {
-                linq = linq.Where(he => he.Email == email);
-            }
-            
-            if (website != null)
-            {
-                linq = linq.Where(he => he.Website == website);
-            }
-            
-            if (phoneNumber != null)
-            {
-                linq = linq.Where(he => he.PhoneNumber == phoneNumber);
-            }
-            
-            var list = await linq.ToListAsync();
-            list = list.OrderByDescending(he => he.LastModifiedAt ?? he.CreationDateTime).ToList();
-
-            return list;
-        }
-
         public class EntryContextDesignTimeFactory : IDesignTimeDbContextFactory<CustomerContext>
         {
             public CustomerContext CreateDbContext(string[] args)

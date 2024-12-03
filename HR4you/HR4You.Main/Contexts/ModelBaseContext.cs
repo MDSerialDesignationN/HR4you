@@ -1,8 +1,5 @@
-﻿using System.Reflection;
-using System.Text.Json;
-using HR4You.Model.Base;
+﻿using HR4You.Model.Base;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace HR4You.Contexts;
 

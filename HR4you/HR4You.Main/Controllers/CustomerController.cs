@@ -43,9 +43,9 @@ public class CustomerController : ControllerBase
     [HttpPost("create")]
     [SwaggerOperation("CreateCustomer")]
     //[Authorize(Policy = )]
-    public async Task<IActionResult> CreateCustomer([FromBody]Customer he)
+    public async Task<IActionResult> CreateCustomer([FromBody]Customer customer)
     {
-        var checkResult = await _checker.CheckMasterData(he);
+        var checkResult = await _checker.CheckMasterData(customer);
         if (checkResult.Error != ModelChecker.ModelCheckError.None)
         {
             return BadRequest(checkResult);
@@ -54,7 +54,7 @@ public class CustomerController : ControllerBase
         using var scope = _serviceProvider.CreateScope();
         var sc = scope.ServiceProvider.GetService<CustomerContext>()!;
         
-        var result = await sc.Create(he);
+        var result = await sc.Create(customer);
         if (result.Error == MasterDataError.None)
         {
             return Ok(result.Entity);

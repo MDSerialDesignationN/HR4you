@@ -1,5 +1,4 @@
-﻿using HR4You.Model.Base.Models.Project;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
 namespace HR4You.Contexts.Project
@@ -12,43 +11,6 @@ namespace HR4You.Contexts.Project
             ILogger<ProjectContext> logger, IServiceProvider serviceProvider) : base(options, logger)
         {
             _serviceProvider = serviceProvider;
-        }
-
-        public async Task<List<Model.Base.Models.Project.Project>> GetProjects(int? projectNumber, int? customerId,
-            string? name, ProjectState? state, string? description)
-        {
-            using var scope = _serviceProvider.CreateScope();
-            var linq = Entities.AsQueryable();
-
-            if (projectNumber != null)
-            {
-                linq = linq.Where(he => he.ProjectNumber == projectNumber);
-            }
-
-            if (customerId != null)
-            {
-                linq = linq.Where(he => he.CustomerId == customerId);
-            }
-
-            if (name != null)
-            {
-                linq = linq.Where(he => he.Name == name);
-            }
-
-            if (state != null)
-            {
-                linq = linq.Where(he => he.State == state);
-            }
-
-            if (description != null)
-            {
-                linq = linq.Where(he => he.Description == description);
-            }
-
-            var list = await linq.ToListAsync();
-            list = list.OrderByDescending(he => he.LastModifiedAt ?? he.CreationDateTime).ToList();
-
-            return list;
         }
 
         public class EntryContextDesignTimeFactory : IDesignTimeDbContextFactory<ProjectContext>

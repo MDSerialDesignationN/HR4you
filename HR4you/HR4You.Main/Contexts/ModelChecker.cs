@@ -1,4 +1,5 @@
 ﻿using HR4You.Model.Base;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace HR4You.Contexts;
 
@@ -42,7 +43,7 @@ public class ModelChecker
     private async Task<MasterDataCheckResult> CheckCustomer(Model.Base.Models.Customer.Customer customer)
     {
         _logger.LogDebug("Checking Customer");
-
+        return MasterDataCheckResult.Ok();
         throw new NotImplementedException();
     }
 

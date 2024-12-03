@@ -18,31 +18,13 @@ namespace HR4You.Contexts.HourEntry
             base.OnModelCreating(modelBuilder);
         }
 
-        public async Task<List<Model.Base.Models.HourEntry.HourEntry>> GetHourEntries(bool addDeleted, string userId, int? customerId,
-            int? projectId, int? taskId, int? flagId)
+        public async Task<List<Model.Base.Models.HourEntry.HourEntry>> GetHourEntries(bool addDeleted, string userId)
         {
             using var scope = _serviceProvider.CreateScope();
             var linq = Entities.AsQueryable();
             
             linq = linq.Where(he => he.UserId == userId);
             linq = linq.Where(he => he.Deleted == addDeleted);
-            
-            if (customerId != null)
-            {
-                linq = linq.Where(he => he.CustomerId == customerId);
-            }
-            if (projectId != null)
-            {
-                linq = linq.Where(he => he.ProjectId == projectId);
-            }
-            if (taskId != null)
-            {
-                linq = linq.Where(he => he.TaskId == taskId);
-            }
-            if (flagId != null)
-            {
-                linq = linq.Where(he => he.FlagId == flagId);
-            }
 
             var list = await linq.ToListAsync();
             list = list.OrderByDescending(he => he.LastModifiedAt ?? he.CreationDateTime).ToList();

@@ -38,14 +38,12 @@ public class FilterController : ControllerBase
         };
     }
     
-    
-    
     [HttpPost("create")]
     [SwaggerOperation("CreateFilter")]
     //[Authorize(Policy = )]
-    public async Task<IActionResult> CreateFilter([FromBody]Filter he)
+    public async Task<IActionResult> CreateFilter([FromBody]Filter filter)
     {
-        var checkResult = await _checker.CheckMasterData(he, null);
+        var checkResult = await _checker.CheckMasterData(filter);
         if (checkResult.Error != ModelChecker.ModelCheckError.None)
         {
             return BadRequest(checkResult);
@@ -54,7 +52,7 @@ public class FilterController : ControllerBase
         using var scope = _serviceProvider.CreateScope();
         var sc = scope.ServiceProvider.GetService<FilterContext>()!;
         
-        var result = await sc.Create(he);
+        var result = await sc.Create(filter);
         if (result.Error == MasterDataError.None)
         {
             return Ok(result.Entity);

@@ -43,9 +43,9 @@ public class ProjectController : ControllerBase
     [HttpPost("create")]
     [SwaggerOperation("CreateProject")]
     //[Authorize(Policy = )]
-    public async Task<IActionResult> CreateProject([FromBody]Project he)
+    public async Task<IActionResult> CreateProject([FromBody]Project project)
     {
-        var checkResult = await _checker.CheckMasterData(he, null);
+        var checkResult = await _checker.CheckMasterData(project);
         if (checkResult.Error != ModelChecker.ModelCheckError.None)
         {
             return BadRequest(checkResult);
@@ -54,7 +54,7 @@ public class ProjectController : ControllerBase
         using var scope = _serviceProvider.CreateScope();
         var sc = scope.ServiceProvider.GetService<ProjectContext>()!;
         
-        var result = await sc.Create(he);
+        var result = await sc.Create(project);
         if (result.Error == MasterDataError.None)
         {
             return Ok(result.Entity);

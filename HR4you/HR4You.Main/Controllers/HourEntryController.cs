@@ -41,22 +41,21 @@ public class HourEntryController : ControllerBase
     [HttpGet("get-user-all")]
     [SwaggerOperation("GetHourEntriesUser")]
     //[Authorize(Policy = )]
-    public async Task<IActionResult> GetHourEntriesUser(bool addDeleted, string userId, int? customerId,
-        int? projectId, int? taskId, int? flagId)
+    public async Task<IActionResult> GetHourEntriesUser(bool addDeleted, string userId)
     {
         using var scope = _serviceProvider.CreateScope();
         var sc = scope.ServiceProvider.GetService<HourEntryContext>()!;
         
-        var result = await sc.GetHourEntries(addDeleted, userId, customerId, projectId, taskId, flagId);
+        var result = await sc.GetHourEntries(addDeleted, userId);
         return Ok(result);
     }
     
     [HttpPost("create")]
     [SwaggerOperation("CreateHourEntry")]
     //[Authorize(Policy = )]
-    public async Task<IActionResult> CreateHourEntry([FromBody]HourEntry he)
+    public async Task<IActionResult> CreateHourEntry([FromBody]HourEntry hourEntry)
     {
-        var checkResult = await _checker.CheckMasterData(he);
+        var checkResult = await _checker.CheckMasterData(hourEntry);
         if (checkResult.Error != ModelChecker.ModelCheckError.None)
         {
             return BadRequest(checkResult);
@@ -65,7 +64,7 @@ public class HourEntryController : ControllerBase
         using var scope = _serviceProvider.CreateScope();
         var sc = scope.ServiceProvider.GetService<HourEntryContext>()!;
         
-        var result = await sc.Create(he);
+        var result = await sc.Create(hourEntry);
         if (result.Error == MasterDataError.None)
         {
             return Ok(result.Entity);
