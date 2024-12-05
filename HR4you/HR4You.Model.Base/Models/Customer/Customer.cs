@@ -1,22 +1,20 @@
-﻿namespace HR4You.Model.Base.Models.Customer
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+
+namespace HR4You.Model.Base.Models.Customer
 {
+    [Table("hr4you_customer")]
     public class Customer : ModelBase
     {
-        public int CustomerNumber { get; set; }
-
-        public string Name { get; set; }
-
+        [Required] public int CustomerNumber { get; set; }
+        [Required] public string Name { get; set; } = null!;
         public string? Description { get; set; }
-
         public string? Address { get; set; }
-
         public string? Email { get; set; }
-
         public string? Website { get; set; }
-
         public string? PhoneNumber { get; set; }
-
-
+        [JsonIgnore] public ICollection<Project.Project>? Projects { get; } = new List<Project.Project>();
 
         public override void Set(ModelBase model)
         {

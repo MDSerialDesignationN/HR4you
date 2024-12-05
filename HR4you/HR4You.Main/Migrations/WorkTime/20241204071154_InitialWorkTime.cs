@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace HR4You.Migrations.Customer
+namespace HR4You.Migrations.WorkTime
 {
     /// <inheritdoc />
-    public partial class InitialCustomer : Migration
+    public partial class InitialWorkTime : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,23 +16,19 @@ namespace HR4You.Migrations.Customer
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "hr4you_Customer",
+                name: "hr4you_worktime",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    CustomerNumber = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Description = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Address = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Email = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Website = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    PhoneNumber = table.Column<string>(type: "longtext", nullable: true)
+                    MinMonHours = table.Column<int>(type: "int", nullable: false),
+                    MinTueHours = table.Column<int>(type: "int", nullable: false),
+                    MinWedHours = table.Column<int>(type: "int", nullable: false),
+                    MinThuHours = table.Column<int>(type: "int", nullable: false),
+                    MinFriHours = table.Column<int>(type: "int", nullable: false),
+                    MinSatHours = table.Column<int>(type: "int", nullable: false),
+                    MinSunHours = table.Column<int>(type: "int", nullable: false),
+                    Holidays = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CreationDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     LastModifiedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
@@ -40,7 +36,7 @@ namespace HR4You.Migrations.Customer
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_hr4you_Customer", x => x.Id);
+                    table.PrimaryKey("PK_hr4you_worktime", x => x.Id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
         }
@@ -49,7 +45,7 @@ namespace HR4You.Migrations.Customer
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "hr4you_Customer");
+                name: "hr4you_worktime");
         }
     }
 }

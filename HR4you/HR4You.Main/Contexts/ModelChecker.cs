@@ -1,5 +1,4 @@
 ﻿using HR4You.Model.Base;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace HR4You.Contexts;
 
@@ -17,6 +16,8 @@ public class ModelChecker
     public async Task<MasterDataCheckResult> CheckMasterData(ModelBase data)
     {
         //TODO
+        
+        return MasterDataCheckResult.Ok();
         return data switch
         {
             Model.Base.Models.Customer.Customer customer => await CheckCustomer(customer),
@@ -30,21 +31,21 @@ public class ModelChecker
     {
         _logger.LogDebug("Checking WorkTime");
         
-        throw new NotImplementedException();
+        return MasterDataCheckResult.Ok();
     }
 
     private async Task<MasterDataCheckResult> CheckHourEntry(Model.Base.Models.HourEntry.HourEntry hourEntry)
     {
         _logger.LogDebug("Checking HourEntry");
 
-        throw new NotImplementedException();
+        return MasterDataCheckResult.Ok();
     }
 
     private async Task<MasterDataCheckResult> CheckCustomer(Model.Base.Models.Customer.Customer customer)
     {
         _logger.LogDebug("Checking Customer");
+        
         return MasterDataCheckResult.Ok();
-        throw new NotImplementedException();
     }
 
     public class MasterDataCheckResult

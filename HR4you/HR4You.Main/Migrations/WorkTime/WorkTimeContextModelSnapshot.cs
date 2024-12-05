@@ -66,7 +66,7 @@ namespace HR4You.Migrations.WorkTime
 
                     b.HasKey("Id");
 
-                    b.ToTable("hr4you_WorkTime", (string)null);
+                    b.ToTable("hr4you_worktime");
                 });
 #pragma warning restore 612, 618
         }

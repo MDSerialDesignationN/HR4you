@@ -13,7 +13,7 @@ namespace HR4You.Contexts.Project
             _serviceProvider = serviceProvider;
         }
 
-        public class EntryContextDesignTimeFactory : IDesignTimeDbContextFactory<ProjectContext>
+        public class ProjectContextDesignTimeFactory : IDesignTimeDbContextFactory<ProjectContext>
         {
             public ProjectContext CreateDbContext(string[] args)
             {

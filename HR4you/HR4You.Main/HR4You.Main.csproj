@@ -39,6 +39,8 @@
 
     <ItemGroup>
         <Folder Include="Migrations\" />
+        <Folder Include="Migrations\HourEntry\" />
+        <Folder Include="Migrations\WorkTime\" />
         <Folder Include="Razor\" />
     </ItemGroup>
 

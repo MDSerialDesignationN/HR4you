@@ -16,7 +16,6 @@ public class ModelBaseContext<T> : DbContext where T : ModelBase
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<T>().ToTable($"hr4you_{typeof(T).Name}");
         modelBuilder.Entity<T>().Property(e => e.Id).ValueGeneratedOnAdd();
     }
 
@@ -25,6 +24,7 @@ public class ModelBaseContext<T> : DbContext where T : ModelBase
         data.Id = default;
         data.CreationDateTime = DateTime.Now;
         data.LastModifiedAt = null;
+        data.Deleted = false;
         var e = Entities.Add(data);
         await SaveChangesAsync();
 

@@ -26,7 +26,7 @@ namespace HR4You.Contexts.WorkTime
                     l => l.ToList()));
         }
 
-        public class EntryContextDesignTimeFactory : IDesignTimeDbContextFactory<WorkTimeContext>
+        public class WorkTimeContextDesignTimeFactory : IDesignTimeDbContextFactory<WorkTimeContext>
         {
             public WorkTimeContext CreateDbContext(string[] args)
             {

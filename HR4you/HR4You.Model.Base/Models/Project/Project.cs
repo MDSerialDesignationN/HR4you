@@ -1,16 +1,25 @@
-﻿namespace HR4You.Model.Base.Models.Project
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+
+namespace HR4You.Model.Base.Models.Project
 {
+    [Table("hr4you_project")]
     public class Project : ModelBase
     {
-        public int ProjectNumber { get; set; }
+        [Required] public int ProjectNumber { get; set; }
 
-        public int CustomerId { get; set; }
+        [Required] public int CustomerId { get; set; }
 
-        public string Name { get; set; } = string.Empty;
-        
-        public ProjectState State { get; set; }
-        
+        [JsonIgnore]
+        [ForeignKey(nameof(CustomerId))]
+        public Customer.Customer? Customer { get; set; } = null!;
+
+        [Required] public string Name { get; set; } = string.Empty;
+        [Required] public ProjectState State { get; set; }
         public string? Description { get; set; }
+
+        [JsonIgnore] public ICollection<HourEntry.HourEntry>? HourEntries { get; } = new List<HourEntry.HourEntry>();
 
         public override void Set(ModelBase model)
         {
@@ -27,7 +36,7 @@
             Description = data.Description;
         }
     }
-    
+
     public enum ProjectState
     {
         Open,

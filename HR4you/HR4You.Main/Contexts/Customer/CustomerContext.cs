@@ -13,7 +13,7 @@ namespace HR4You.Contexts.Customer
             _serviceProvider = serviceProvider;
         }
 
-        public class EntryContextDesignTimeFactory : IDesignTimeDbContextFactory<CustomerContext>
+        public class CustomerContextDesignTimeFactory : IDesignTimeDbContextFactory<CustomerContext>
         {
             public CustomerContext CreateDbContext(string[] args)
             {

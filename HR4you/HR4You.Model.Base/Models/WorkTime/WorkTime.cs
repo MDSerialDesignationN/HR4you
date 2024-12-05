@@ -1,14 +1,18 @@
-﻿namespace HR4You.Model.Base.Models.WorkTime
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace HR4You.Model.Base.Models.WorkTime
 {
+    [Table("hr4you_worktime")]
     public class WorkTime : ModelBase
     {
-        public int MinMonHours { get; set; }
-        public int MinTueHours { get; set; }
-        public int MinWedHours { get; set; }
-        public int MinThuHours { get; set; }
-        public int MinFriHours { get; set; }
-        public int MinSatHours { get; set; }
-        public int MinSunHours { get; set; }
+        [Required] public int MinMonHours { get; set; }
+        [Required] public int MinTueHours { get; set; }
+        [Required] public int MinWedHours { get; set; }
+        [Required] public int MinThuHours { get; set; }
+        [Required] public int MinFriHours { get; set; }
+        [Required] public int MinSatHours { get; set; }
+        [Required] public int MinSunHours { get; set; }
         [JsonBlob] public List<HolidayEntry> Holidays { get; set; } = [];
 
         public override void Set(ModelBase model)

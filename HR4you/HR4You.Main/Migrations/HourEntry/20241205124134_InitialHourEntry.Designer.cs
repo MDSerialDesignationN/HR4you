@@ -4,6 +4,7 @@ using HR4You.Contexts.HourEntry;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HR4You.Migrations.HourEntry
 {
     [DbContext(typeof(HourEntryContext))]
-    partial class HourEntryContextModelSnapshot : ModelSnapshot
+    [Migration("20241205124134_InitialHourEntry")]
+    partial class InitialHourEntry
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

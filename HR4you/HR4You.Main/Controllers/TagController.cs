@@ -1,33 +1,32 @@
 ﻿using HR4You.Contexts;
-using HR4You.Contexts.Filter;
+using HR4You.Contexts.Tag;
 using HR4You.Model.Base;
-using HR4You.Model.Base.Models;
-using HR4You.Model.Base.Models.Filter;
+using HR4You.Model.Base.Models.Tag;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace HR4You.Controllers;
 
-[Route("/api/master-data/filter")]
+[Route("/api/master-data/tag")]
 [ApiController]
-public class FilterController : ControllerBase
+public class TagController : ControllerBase
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ModelChecker _checker;
 
-    public FilterController(IServiceProvider serviceProvider, ModelChecker checker)
+    public TagController(IServiceProvider serviceProvider, ModelChecker checker)
     {
         _serviceProvider = serviceProvider;
         _checker = checker;
     }
     
     [HttpGet("get-all")]
-    [SwaggerOperation("GetAllFilters")]
+    [SwaggerOperation("GetAllTags")]
     //[Authorize(Policy = )]
-    public async Task<IActionResult> GetAllFilters(bool addDeleted)
+    public async Task<IActionResult> GetAllTags(bool addDeleted)
     {
         using var scope = _serviceProvider.CreateScope();
-        var sc = scope.ServiceProvider.GetService<FilterContext>()!;
+        var sc = scope.ServiceProvider.GetService<TagContext>()!;
         
         var result = await sc.GetAll(addDeleted);
         return result.Error switch
@@ -39,20 +38,20 @@ public class FilterController : ControllerBase
     }
     
     [HttpPost("create")]
-    [SwaggerOperation("CreateFilter")]
+    [SwaggerOperation("CreateTag")]
     //[Authorize(Policy = )]
-    public async Task<IActionResult> CreateFilter([FromBody]Filter filter)
+    public async Task<IActionResult> CreateTag([FromBody]Tag tag)
     {
-        var checkResult = await _checker.CheckMasterData(filter);
+        var checkResult = await _checker.CheckMasterData(tag);
         if (checkResult.Error != ModelChecker.ModelCheckError.None)
         {
             return BadRequest(checkResult);
         }
         
         using var scope = _serviceProvider.CreateScope();
-        var sc = scope.ServiceProvider.GetService<FilterContext>()!;
+        var sc = scope.ServiceProvider.GetService<TagContext>()!;
         
-        var result = await sc.Create(filter);
+        var result = await sc.Create(tag);
         if (result.Error == MasterDataError.None)
         {
             return Ok(result.Entity);

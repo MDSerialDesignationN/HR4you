@@ -1,13 +1,13 @@
 ﻿using HR4You.Contexts.Customer;
-using HR4You.Contexts.Filter;
 using HR4You.Contexts.HourEntry;
 using HR4You.Contexts.Project;
+using HR4You.Contexts.Tag;
 using HR4You.Contexts.WorkTime;
 using Microsoft.EntityFrameworkCore;
 
 namespace HR4You.Contexts;
 
-public class ModelContextHelper
+public static class ModelContextHelper
 {
     public static void ConfigureModelContexts(WebApplicationBuilder webApplicationBuilder, string? connectionString)
     {
@@ -45,15 +45,14 @@ public class ModelContextHelper
             
             return new ProjectContext(optionsBuilder.Options, sp.GetService<ILogger<ProjectContext>>()!, sp);
         });
-        //FilterContext
+        //TagContext
         webApplicationBuilder.Services.AddScoped(sp =>
         {
-            var optionsBuilder = new DbContextOptionsBuilder<ModelBaseContext<Model.Base.Models.Filter.Filter>>();
+            var optionsBuilder = new DbContextOptionsBuilder<ModelBaseContext<Model.Base.Models.Tag.Tag>>();
             optionsBuilder.UseMySql(connectionString!, ServerVersion.AutoDetect(connectionString));
             
-            return new FilterContext(optionsBuilder.Options, sp.GetService<ILogger<FilterContext>>()!, sp);
+            return new TagContext(optionsBuilder.Options, sp.GetService<ILogger<TagContext>>()!, sp);
         });
-
         
         //Register remaining handler
         webApplicationBuilder.Services.AddSingleton<ModelChecker>();
@@ -64,19 +63,14 @@ public class ModelContextHelper
     {
         using var scope = webApplication.Services.CreateScope();
         
+        //Migrates HourEntry and all dependent tables!
         var hc = scope.ServiceProvider.GetService<HourEntryContext>()!;
         hc.Database.Migrate();
         
         var wt = scope.ServiceProvider.GetService<WorkTimeContext>()!;
         wt.Database.Migrate();
         
-        var c = scope.ServiceProvider.GetService<CustomerContext>()!;
-        c.Database.Migrate();
-        
-        var p = scope.ServiceProvider.GetService<ProjectContext>()!;
-        p.Database.Migrate();
-        
-        var f = scope.ServiceProvider.GetService<FilterContext>()!;
+        var f = scope.ServiceProvider.GetService<TagContext>()!;
         f.Database.Migrate();
     }
 }

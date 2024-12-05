@@ -1,21 +1,38 @@
-﻿namespace HR4You.Model.Base.Models.HourEntry
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+
+namespace HR4You.Model.Base.Models.HourEntry
 {
+    [Table("hr4you_hourEntry")]
     public class HourEntry : ModelBase
     {
-        public required string UserId { get; set; }
-        public TimeOnly? StartTime { get; set; }
+        [Required] public string UserId { get; set; } = null!;
+        [Required] public TimeOnly StartTime { get; set; }
         public TimeOnly? EndTime { get; set; }
         public int? Duration { get; set; }
-        
-        public int CustomerId { get; set; }
-        public int ProjectId { get; set; }
-        public int TaskId { get; set; }
-        public int? FlagId { get; set; }
-        
+        [Required] public ActivityType Type { get; set; }
+        [Required] public int CustomerId { get; set; }
+
+        [ForeignKey(nameof(CustomerId))]
+        [JsonIgnore]
+        public Customer.Customer? Customer { get; set; } = null!;
+
+        [Required] public int ProjectId { get; set; }
+
+        [ForeignKey(nameof(ProjectId))]
+        [JsonIgnore]
+        public Project.Project? Project { get; set; } = null!;
+
+        public int? TagId { get; set; }
+
+        [ForeignKey(nameof(TagId))]
+        [JsonIgnore]
+        public Tag.Tag? Tag { get; set; } = null!;
+
         public string? Description { get; set; } = string.Empty;
-        
-        public bool IsHoliday { get; set; }
-        public bool IsBillable { get; set; }
+        [Required] public bool IsHoliday { get; set; }
+        [Required] public bool IsBillable { get; set; }
 
         public override void Set(ModelBase model)
         {
@@ -30,16 +47,27 @@
             StartTime = data.StartTime;
             EndTime = data.EndTime;
             Duration = data.Duration;
-            
+
             CustomerId = data.CustomerId;
             ProjectId = data.ProjectId;
-            TaskId = data.TaskId;
-            FlagId = data.FlagId;
-            
+
+            Type = data.Type;
+            TagId = data.TagId;
+
             Description = data.Description;
 
             IsHoliday = data.IsHoliday;
             IsBillable = data.IsBillable;
         }
+    }
+
+    public enum ActivityType
+    {
+        General,
+        Apprentice,
+        Planning,
+        Documentation,
+        Hmi,
+        Plc
     }
 }
