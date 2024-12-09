@@ -38,6 +38,23 @@ public class CustomerController : ControllerBase
         };
     }
     
+    [HttpGet("get")]
+    [SwaggerOperation("GetCustomer")]
+    //[Authorize(Policy = )]
+    public async Task<IActionResult> GetCustomer(int id, bool addDeleted)
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var sc = scope.ServiceProvider.GetService<CustomerContext>()!;
+        
+        var result = await sc.Get(id, addDeleted);
+        return result.Error switch
+        {
+            MasterDataError.None => Ok(result.Entity),
+            MasterDataError.NotFound => NotFound(),
+            _ => BadRequest("something bad happened")
+        };
+    }
+    
     [HttpPost("create")]
     [SwaggerOperation("CreateCustomer")]
     //[Authorize(Policy = )]

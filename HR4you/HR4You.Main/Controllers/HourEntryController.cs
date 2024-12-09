@@ -49,6 +49,23 @@ public class HourEntryController : ControllerBase
         return Ok(result);
     }
     
+    [HttpGet("get")]
+    [SwaggerOperation("GetHourEntry")]
+    //[Authorize(Policy = )]
+    public async Task<IActionResult> GetHourEntry(int id, bool addDeleted)
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var sc = scope.ServiceProvider.GetService<HourEntryContext>()!;
+        
+        var result = await sc.Get(id, addDeleted);
+        return result.Error switch
+        {
+            MasterDataError.None => Ok(result.Entity),
+            MasterDataError.NotFound => NotFound(),
+            _ => BadRequest("something bad happened")
+        };
+    }
+    
     [HttpPost("create")]
     [SwaggerOperation("CreateHourEntry")]
     //[Authorize(Policy = )]

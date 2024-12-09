@@ -37,6 +37,23 @@ public class WorkTimeController : ControllerBase
         };
     }
     
+    [HttpGet("get")]
+    [SwaggerOperation("GetWorkTime")]
+    //[Authorize(Policy = )]
+    public async Task<IActionResult> GetWorkTime(int id, bool addDeleted)
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var sc = scope.ServiceProvider.GetService<WorkTimeContext>()!;
+        
+        var result = await sc.Get(id, addDeleted);
+        return result.Error switch
+        {
+            MasterDataError.None => Ok(result.Entity),
+            MasterDataError.NotFound => NotFound(),
+            _ => BadRequest("something bad happened")
+        };
+    }
+    
     [HttpPost("create")]
     [SwaggerOperation("CreateWorkTime")]
     //[Authorize(Policy = )]
