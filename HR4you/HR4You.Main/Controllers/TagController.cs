@@ -58,4 +58,44 @@ public class TagController : ControllerBase
         }
         return BadRequest("something bad happened");
     }
+    
+    [HttpPost("edit")]
+    [SwaggerOperation("EditTag")]
+    //[Authorize(Policy = )]
+    public async Task<IActionResult> EditTag(int id, [FromBody] Tag tag)
+    {
+        var checkResult = await _checker.CheckMasterData(tag);
+        if (checkResult.Error != ModelChecker.ModelCheckError.None)
+        {
+            return BadRequest(checkResult);
+        }
+
+        using var scope = _serviceProvider.CreateScope();
+        var sc = scope.ServiceProvider.GetService<TagContext>()!;
+        
+        var result = await sc.Edit(id, tag);
+        return result.Error switch
+        {
+            MasterDataError.None => Ok(result.Entity),
+            MasterDataError.NotFound => NotFound(id),
+            _ => BadRequest("something bad happened")
+        };
+    }
+
+    [HttpDelete("delete")]
+    [SwaggerOperation("DeleteTag")]
+    //[Authorize(Policy = )]
+    public async Task<IActionResult> DeleteTag(int id)
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var sc = scope.ServiceProvider.GetService<TagContext>()!;
+        
+        var result = await sc.SetDelete(id, true);
+        return result.Error switch
+        {
+            MasterDataError.None => Ok(result.Entity),
+            MasterDataError.NotFound => NotFound(id),
+            _ => BadRequest("something bad happened")
+        };
+    }
 }

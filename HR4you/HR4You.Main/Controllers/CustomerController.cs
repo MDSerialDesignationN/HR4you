@@ -38,8 +38,6 @@ public class CustomerController : ControllerBase
         };
     }
     
-    
-    
     [HttpPost("create")]
     [SwaggerOperation("CreateCustomer")]
     //[Authorize(Policy = )]
@@ -60,5 +58,45 @@ public class CustomerController : ControllerBase
             return Ok(result.Entity);
         }
         return BadRequest("something bad happened");
+    }
+
+    [HttpPost("edit")]
+    [SwaggerOperation("EditCustomer")]
+    //[Authorize(Policy = )]
+    public async Task<IActionResult> EditCustomer(int id, [FromBody] Customer customer)
+    {
+        var checkResult = await _checker.CheckMasterData(customer);
+        if (checkResult.Error != ModelChecker.ModelCheckError.None)
+        {
+            return BadRequest(checkResult);
+        }
+
+        using var scope = _serviceProvider.CreateScope();
+        var sc = scope.ServiceProvider.GetService<CustomerContext>()!;
+        
+        var result = await sc.Edit(id, customer);
+        return result.Error switch
+        {
+            MasterDataError.None => Ok(result.Entity),
+            MasterDataError.NotFound => NotFound(id),
+            _ => BadRequest("something bad happened")
+        };
+    }
+
+    [HttpDelete("delete")]
+    [SwaggerOperation("DeleteCustomer")]
+    //[Authorize(Policy = )]
+    public async Task<IActionResult> DeleteCustomer(int id)
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var sc = scope.ServiceProvider.GetService<CustomerContext>()!;
+        
+        var result = await sc.SetDelete(id, true);
+        return result.Error switch
+        {
+            MasterDataError.None => Ok(result.Entity),
+            MasterDataError.NotFound => NotFound(id),
+            _ => BadRequest("something bad happened")
+        };
     }
 }

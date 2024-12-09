@@ -70,4 +70,44 @@ public class HourEntryController : ControllerBase
         }
         return BadRequest("something bad happened");
     }
+    
+    [HttpPost("edit")]
+    [SwaggerOperation("EditHourEntry")]
+    //[Authorize(Policy = )]
+    public async Task<IActionResult> EditHourEntry(int id, [FromBody] HourEntry hourEntry)
+    {
+        var checkResult = await _checker.CheckMasterData(hourEntry);
+        if (checkResult.Error != ModelChecker.ModelCheckError.None)
+        {
+            return BadRequest(checkResult);
+        }
+
+        using var scope = _serviceProvider.CreateScope();
+        var sc = scope.ServiceProvider.GetService<HourEntryContext>()!;
+        
+        var result = await sc.Edit(id, hourEntry);
+        return result.Error switch
+        {
+            MasterDataError.None => Ok(result.Entity),
+            MasterDataError.NotFound => NotFound(id),
+            _ => BadRequest("something bad happened")
+        };
+    }
+
+    [HttpDelete("delete")]
+    [SwaggerOperation("DeleteHourEntry")]
+    //[Authorize(Policy = )]
+    public async Task<IActionResult> DeleteHourEntry(int id)
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var sc = scope.ServiceProvider.GetService<HourEntryContext>()!;
+        
+        var result = await sc.SetDelete(id, true);
+        return result.Error switch
+        {
+            MasterDataError.None => Ok(result.Entity),
+            MasterDataError.NotFound => NotFound(id),
+            _ => BadRequest("something bad happened")
+        };
+    }
 }

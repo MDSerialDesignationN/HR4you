@@ -58,4 +58,44 @@ public class WorkTimeController : ControllerBase
         }
         return BadRequest("something bad happened");
     }
+    
+    [HttpPost("edit")]
+    [SwaggerOperation("EditWorkTime")]
+    //[Authorize(Policy = )]
+    public async Task<IActionResult> EditWorkTime(int id, [FromBody] WorkTime workTime)
+    {
+        var checkResult = await _checker.CheckMasterData(workTime);
+        if (checkResult.Error != ModelChecker.ModelCheckError.None)
+        {
+            return BadRequest(checkResult);
+        }
+
+        using var scope = _serviceProvider.CreateScope();
+        var sc = scope.ServiceProvider.GetService<WorkTimeContext>()!;
+        
+        var result = await sc.Edit(id, workTime);
+        return result.Error switch
+        {
+            MasterDataError.None => Ok(result.Entity),
+            MasterDataError.NotFound => NotFound(id),
+            _ => BadRequest("something bad happened")
+        };
+    }
+
+    [HttpDelete("delete")]
+    [SwaggerOperation("DeleteWorkTime")]
+    //[Authorize(Policy = )]
+    public async Task<IActionResult> DeleteWorkTime(int id)
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var sc = scope.ServiceProvider.GetService<WorkTimeContext>()!;
+        
+        var result = await sc.SetDelete(id, true);
+        return result.Error switch
+        {
+            MasterDataError.None => Ok(result.Entity),
+            MasterDataError.NotFound => NotFound(id),
+            _ => BadRequest("something bad happened")
+        };
+    }
 }

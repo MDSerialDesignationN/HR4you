@@ -47,11 +47,11 @@ namespace HR4You.Model.Base.Models.HourEntry
             StartTime = data.StartTime;
             EndTime = data.EndTime;
             Duration = data.Duration;
+            Type = data.Type;
 
             CustomerId = data.CustomerId;
             ProjectId = data.ProjectId;
 
-            Type = data.Type;
             TagId = data.TagId;
 
             Description = data.Description;

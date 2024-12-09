@@ -38,8 +38,6 @@ public class ProjectController : ControllerBase
         };
     }
     
-    
-    
     [HttpPost("create")]
     [SwaggerOperation("CreateProject")]
     //[Authorize(Policy = )]
@@ -60,5 +58,45 @@ public class ProjectController : ControllerBase
             return Ok(result.Entity);
         }
         return BadRequest("something bad happened");
+    }
+    
+    [HttpPost("edit")]
+    [SwaggerOperation("EditProject")]
+    //[Authorize(Policy = )]
+    public async Task<IActionResult> EditProject(int id, [FromBody] Project project)
+    {
+        var checkResult = await _checker.CheckMasterData(project);
+        if (checkResult.Error != ModelChecker.ModelCheckError.None)
+        {
+            return BadRequest(checkResult);
+        }
+
+        using var scope = _serviceProvider.CreateScope();
+        var sc = scope.ServiceProvider.GetService<ProjectContext>()!;
+        
+        var result = await sc.Edit(id, project);
+        return result.Error switch
+        {
+            MasterDataError.None => Ok(result.Entity),
+            MasterDataError.NotFound => NotFound(id),
+            _ => BadRequest("something bad happened")
+        };
+    }
+
+    [HttpDelete("delete")]
+    [SwaggerOperation("DeleteProject")]
+    //[Authorize(Policy = )]
+    public async Task<IActionResult> DeleteProject(int id)
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var sc = scope.ServiceProvider.GetService<ProjectContext>()!;
+        
+        var result = await sc.SetDelete(id, true);
+        return result.Error switch
+        {
+            MasterDataError.None => Ok(result.Entity),
+            MasterDataError.NotFound => NotFound(id),
+            _ => BadRequest("something bad happened")
+        };
     }
 }
