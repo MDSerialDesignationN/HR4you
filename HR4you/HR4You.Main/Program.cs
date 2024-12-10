@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
+using HR4You.Components;
 using HR4You.Contexts;
-using HR4You.Razor.Components;
 using Microsoft.OpenApi.Models;
 using NLog.Extensions.Logging;
 using NLog.Web;
@@ -104,9 +104,11 @@ app.UseStatusCodePages(context =>
 app.UseCors();
 //app.UseHttpsRedirection(); TODO
 
-app.UseAntiforgery();
+
 app.UseStaticFiles();
 app.MapControllers();
+
+app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
