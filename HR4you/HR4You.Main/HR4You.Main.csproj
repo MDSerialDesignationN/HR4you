@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
@@ -7,6 +7,13 @@
         <RootNamespace>HR4You</RootNamespace>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
+
+    <ItemGroup>
+      <Compile Remove="Razor\**" />
+      <Content Remove="Razor\**" />
+      <EmbeddedResource Remove="Razor\**" />
+      <None Remove="Razor\**" />
+    </ItemGroup>
 
     <ItemGroup>
       <Content Remove="wwwroot\app.css" />
@@ -49,7 +56,6 @@
         <Folder Include="Migrations\" />
         <Folder Include="Migrations\HourEntry\" />
         <Folder Include="Migrations\WorkTime\" />
-        <Folder Include="Razor\" />
     </ItemGroup>
 
     <ItemGroup>
