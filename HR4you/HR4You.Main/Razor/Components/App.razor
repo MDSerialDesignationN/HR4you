@@ -7,8 +7,10 @@
     <base href="/"/>
     <link rel="stylesheet" href="../wwwroot/bootstrap/bootstrap.min.css"/>
     <link rel="stylesheet" href="../wwwroot/app.css"/>
-    <link rel="stylesheet" href="HR4You.styles.css"/>
+    <link rel="stylesheet" href="HR4You.Main.styles.css"/>
     <link rel="icon" type="image/png" href="favicon.png"/>
+    <script src="https://kit.fontawesome.com/6b7f9f412e.js" crossorigin="anonymous"></script>
+
     <HeadOutlet/>
 </head>
 
@@ -18,3 +20,19 @@
 </body>
 
 </html>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const dropdownButtons = document.querySelectorAll(".hr4you_dropdown-button");
+
+        dropdownButtons.forEach(button => {
+            button.addEventListener("click", () => {
+                const dropdown = button.closest(".hr4you_dropdown");
+                dropdown.classList.toggle("active");
+
+
+            });
+        });
+    });
+
+</script>

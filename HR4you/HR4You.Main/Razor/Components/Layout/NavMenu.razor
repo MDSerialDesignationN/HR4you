@@ -1,29 +1,68 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">HR4You.Main</a>
+﻿<aside class="hr4you_navbar">
+    <div class="hr4you_navbar-header">
+        <img src="/HR.png" alt="Logo" class="hr4you_navbar-logo" />
     </div>
-</div>
-
-<input type="checkbox" title="Navigation menu" class="navbar-toggler"/>
-
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
+    <div class="hr4you_navbar-content">
+        <div class="hr4you_dropdown">
+            <button class="hr4you_dropdown-button"><i class="fa-regular fa-calendar"></i>Time Tracking<i class="fa-solid fa-chevron-down"></i></button>
+            <ul class="hr4you_dropdown-menu">
+                <li class="hr4you_dropdown-link">
+                    <a href="MyTimes">
+                        <i class="fa-solid fa-hourglass-start"></i><span>My Times</span>
+                    </a>
+                </li>
+                <li class="hr4you_dropdown-link">
+                    <a href="WorkTime">
+                        <i class="fa-solid fa-calendar-days"></i><span>Work Time</span>
+                    </a>
+                </li>
+                <li class="hr4you_dropdown-link">
+                    <a href="AllTimes">
+                        <i class="fa-solid fa-chart-area"></i><span>All Times</span>
+                    </a>
+                </li>
+            </ul>
         </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
+        <hr>
+        <div class="hr4you_dropdown">
+            <button class="hr4you_dropdown-button"><i class="fa-solid fa-gear"></i>Administration<i class="fa-solid fa-chevron-down"></i></button>
+            <ul class="hr4you_dropdown-menu">
+                <li class="hr4you_dropdown-link">
+                    <a href="WorkTimeConfig">
+                        <i class="fa-solid fa-calendar-days"></i><span>Work Time Config</span>
+                    </a>
+                </li>
+                <li class="hr4you_dropdown-link">
+                    <a href="Customers">
+                        <i class="fa-solid fa-users"></i><span>Customers</span>
+                    </a>
+                </li>
+                <li class="hr4you_dropdown-link">
+                    <a href="Projects">
+                        <i class="fa-solid fa-sheet-plastic"></i><span>Projects</span>
+                    </a>
+                </li>
+                <li class="hr4you_dropdown-link">
+                    <a href="Filters">
+                        <i class="fa-solid fa-filter"></i><span>Filter</span>
+                    </a>
+                </li>
+                <li class="hr4you_dropdown-link">
+                    <a href="Audit">
+                        <i class="fa-solid fa-right-left"></i><span>Audit</span>
+                    </a>
+                </li>
+            </ul>
         </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
+        <div class="hr4you_dropdown">
+            <button class="hr4you_dropdown-button"><i class="fa-solid fa-gear"></i>System<i class="fa-solid fa-chevron-down"></i></button>
+            <ul class="hr4you_dropdown-menu">
+                <li class="hr4you_dropdown-link">
+                    <a href="Users">
+                        <i class="fa-solid fa-user"></i><span>Users</span>
+                    </a>
+                </li>
+            </ul>
         </div>
-    </nav>
-</div>
+    </div>
+</aside>
