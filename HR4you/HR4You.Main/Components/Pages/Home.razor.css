@@ -24,6 +24,21 @@
     background-color: #f4f4f4;
 }
 
-.Add_Time{
-    float: right;
+    .OverviewTable img {
+        height: 20px;
+        width: 20px;
+        
+    }
+
+.options {
+    padding: 0px !important;
+    text-align: center !important;
+}
+
+.searchAndAdd{
+    display: flex;
+    margin-top: 20px;
+}
+.Add_Time {
+    margin-left: auto;
 }
