@@ -1,0 +1,48 @@
+﻿<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>User Id</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Duration</th>
+            <th>Type</th>
+            <th>Project Id</th>
+            <th>Description</th>
+            <th>Is Holiday</th>
+            <th>Is Billable</th>
+            <th>Creation Date</th>
+            <th>Last Modified</th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var entry in entries)
+        {
+            <tr>
+                <td>@entry.Id</td>
+                <td>@entry.UserId</td>
+                <td>@entry.StartTime</td>
+                <td>@entry.EndTime</td>
+                <td>@entry.Duration</td>
+                <td>@entry.Type</td>
+                <td>@entry.ProjectId</td>
+                <td>@entry.Description</td>
+                <td>@(entry.IsHoliday ? "Yes" : "No")</td>
+                <td>@(entry.IsBillable ? "Yes" : "No")</td>
+                <td>@entry.CreationDateTime</td>
+                <td>@entry.LastModifiedAt</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+@code {
+
+    [Parameter]
+    public List<HourEntry> entries { get; set; }
+
+}
