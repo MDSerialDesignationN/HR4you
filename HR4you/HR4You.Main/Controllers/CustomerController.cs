@@ -1,7 +1,6 @@
 ﻿using HR4You.Contexts;
 using HR4You.Contexts.Customer;
 using HR4You.Model.Base;
-using HR4You.Model.Base.Models;
 using HR4You.Model.Base.Models.Customer;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;

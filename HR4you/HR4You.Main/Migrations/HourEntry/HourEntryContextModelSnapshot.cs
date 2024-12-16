@@ -77,8 +77,8 @@ namespace HR4You.Migrations.HourEntry
                     b.Property<DateTime>("CreationDateTime")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
 
                     b.Property<bool>("Deleted")
                         .HasColumnType("tinyint(1)");
@@ -86,10 +86,10 @@ namespace HR4You.Migrations.HourEntry
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
 
-                    b.Property<int?>("Duration")
-                        .HasColumnType("int");
+                    b.Property<float>("Duration")
+                        .HasColumnType("float");
 
-                    b.Property<TimeOnly?>("EndTime")
+                    b.Property<TimeOnly>("EndTime")
                         .HasColumnType("time(6)");
 
                     b.Property<bool>("IsBillable")
@@ -117,9 +117,10 @@ namespace HR4You.Migrations.HourEntry
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.HasKey("Id");
+                    b.Property<float>("WorktimeDiff")
+                        .HasColumnType("float");
 
-                    b.HasIndex("CustomerId");
+                    b.HasKey("Id");
 
                     b.HasIndex("ProjectId");
 
@@ -196,12 +197,6 @@ namespace HR4You.Migrations.HourEntry
 
             modelBuilder.Entity("HR4You.Model.Base.Models.HourEntry.HourEntry", b =>
                 {
-                    b.HasOne("HR4You.Model.Base.Models.Customer.Customer", "Customer")
-                        .WithMany()
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("HR4You.Model.Base.Models.Project.Project", "Project")
                         .WithMany("HourEntries")
                         .HasForeignKey("ProjectId")
@@ -211,8 +206,6 @@ namespace HR4You.Migrations.HourEntry
                     b.HasOne("HR4You.Model.Base.Models.Tag.Tag", "Tag")
                         .WithMany("HourEntries")
                         .HasForeignKey("TagId");
-
-                    b.Navigation("Customer");
 
                     b.Navigation("Project");
 

@@ -99,11 +99,12 @@ namespace HR4You.Migrations.HourEntry
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     UserId = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    Date = table.Column<DateOnly>(type: "date", nullable: false),
                     StartTime = table.Column<TimeOnly>(type: "time(6)", nullable: false),
-                    EndTime = table.Column<TimeOnly>(type: "time(6)", nullable: true),
-                    Duration = table.Column<int>(type: "int", nullable: true),
+                    EndTime = table.Column<TimeOnly>(type: "time(6)", nullable: false),
+                    Duration = table.Column<float>(type: "float", nullable: false),
+                    WorktimeDiff = table.Column<float>(type: "float", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false),
-                    CustomerId = table.Column<int>(type: "int", nullable: false),
                     ProjectId = table.Column<int>(type: "int", nullable: false),
                     TagId = table.Column<int>(type: "int", nullable: true),
                     Description = table.Column<string>(type: "longtext", nullable: true)
@@ -118,12 +119,6 @@ namespace HR4You.Migrations.HourEntry
                 {
                     table.PrimaryKey("PK_hr4you_hourEntry", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_hr4you_hourEntry_hr4you_customer_CustomerId",
-                        column: x => x.CustomerId,
-                        principalTable: "hr4you_customer",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_hr4you_hourEntry_hr4you_project_ProjectId",
                         column: x => x.ProjectId,
                         principalTable: "hr4you_project",
@@ -136,11 +131,6 @@ namespace HR4You.Migrations.HourEntry
                         principalColumn: "Id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_hr4you_hourEntry_CustomerId",
-                table: "hr4you_hourEntry",
-                column: "CustomerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_hr4you_hourEntry_ProjectId",

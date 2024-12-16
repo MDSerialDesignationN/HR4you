@@ -36,7 +36,7 @@ public class ModelChecker
 
     private async Task<MasterDataCheckResult> CheckHourEntry(Model.Base.Models.HourEntry.HourEntry hourEntry)
     {
-        _logger.LogDebug("Checking HourEntry");
+        _logger.LogDebug("Checking Entry");
 
         return MasterDataCheckResult.Ok();
     }

@@ -8,16 +8,18 @@ namespace HR4You.Model.Base.Models.HourEntry
     public class HourEntry : ModelBase
     {
         [Required] public string UserId { get; set; } = null!;
+        [Required] public DateOnly Date { get; set; }
         [Required] public TimeOnly StartTime { get; set; }
-        public TimeOnly? EndTime { get; set; }
-        public int? Duration { get; set; }
+        [Required] public TimeOnly EndTime { get; set; }
+        /// <summary>
+        /// format is hh.mm
+        /// </summary>
+        [Required] public float Duration { get; set; }
+        /// <summary>
+        /// format is hh.mm
+        /// </summary>
+        public float WorktimeDiff { get; set; }
         [Required] public ActivityType Type { get; set; }
-        [Required] public int CustomerId { get; set; }
-
-        [ForeignKey(nameof(CustomerId))]
-        [JsonIgnore]
-        public Customer.Customer? Customer { get; set; } = null!;
-
         [Required] public int ProjectId { get; set; }
 
         [ForeignKey(nameof(ProjectId))]
@@ -31,7 +33,7 @@ namespace HR4You.Model.Base.Models.HourEntry
         public Tag.Tag? Tag { get; set; } = null!;
 
         public string? Description { get; set; } = string.Empty;
-        [Required] public bool IsHoliday { get; set; }
+        public bool IsHoliday { get; set; }
         [Required] public bool IsBillable { get; set; }
 
         public override void Set(ModelBase model)
@@ -44,14 +46,14 @@ namespace HR4You.Model.Base.Models.HourEntry
 
             UserId = data.UserId;
 
+            Date = data.Date;
             StartTime = data.StartTime;
             EndTime = data.EndTime;
             Duration = data.Duration;
+            WorktimeDiff = data.WorktimeDiff;
             Type = data.Type;
 
-            CustomerId = data.CustomerId;
             ProjectId = data.ProjectId;
-
             TagId = data.TagId;
 
             Description = data.Description;
