@@ -1,5 +1,4 @@
-﻿using HR4You.Contexts;
-using HR4You.Contexts.HourEntry;
+﻿using HR4You.Contexts.HourEntry;
 using HR4You.Model.Base;
 using HR4You.Model.Base.Models.HourEntry;
 using Microsoft.AspNetCore.Mvc;
@@ -12,12 +11,10 @@ namespace HR4You.Controllers;
 public class HourEntryController : ControllerBase
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly ModelChecker _checker;
 
-    public HourEntryController(IServiceProvider serviceProvider, ModelChecker checker)
+    public HourEntryController(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
-        _checker = checker;
     }
     
     [HttpGet("get-all")]
@@ -71,21 +68,16 @@ public class HourEntryController : ControllerBase
     //[Authorize(Policy = )]
     public async Task<IActionResult> CreateHourEntry([FromBody]HourEntry hourEntry)
     {
-        var checkResult = await _checker.CheckMasterData(hourEntry);
-        if (checkResult.Error != ModelChecker.ModelCheckError.None)
-        {
-            return BadRequest(checkResult);
-        }
-        
         using var scope = _serviceProvider.CreateScope();
         var sc = scope.ServiceProvider.GetService<HourEntryContext>()!;
         
         var result = await sc.Create(hourEntry);
-        if (result.Error == MasterDataError.None)
+        if (result.Error == HourEntryError.None)
         {
-            return Ok(result.Entity);
+            return Ok(result.Entry);
         }
-        return BadRequest("something bad happened");
+        
+        return BadRequest(result.Error);
     }
     
     [HttpPost("edit")]
@@ -93,22 +85,16 @@ public class HourEntryController : ControllerBase
     //[Authorize(Policy = )]
     public async Task<IActionResult> EditHourEntry(int id, [FromBody] HourEntry hourEntry)
     {
-        var checkResult = await _checker.CheckMasterData(hourEntry);
-        if (checkResult.Error != ModelChecker.ModelCheckError.None)
-        {
-            return BadRequest(checkResult);
-        }
-
         using var scope = _serviceProvider.CreateScope();
         var sc = scope.ServiceProvider.GetService<HourEntryContext>()!;
         
         var result = await sc.Edit(id, hourEntry);
-        return result.Error switch
+        if (result.Error == HourEntryError.None)
         {
-            MasterDataError.None => Ok(result.Entity),
-            MasterDataError.NotFound => NotFound(id),
-            _ => BadRequest("something bad happened")
-        };
+            return Ok(result.Entry);
+        }
+        
+        return BadRequest(result.Error);
     }
 
     [HttpDelete("delete")]

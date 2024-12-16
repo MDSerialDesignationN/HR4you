@@ -10,7 +10,7 @@ namespace HR4You.Model.Base.Models.Tag
         [Required] public string Name { get; set; } = string.Empty;
 
         [JsonIgnore]
-        public ICollection<HourEntry.HourEntry>? HourEntries { get; set; } = new List<HourEntry.HourEntry>();
+        public ICollection<HourEntry.HourEntry>? HourEntries { get; } = new List<HourEntry.HourEntry>();
 
         public override void Set(ModelBase model)
         {

@@ -36,5 +36,11 @@ namespace HR4You.Contexts.WorkTime
                 return new WorkTimeContext(builder.Options, null!, null!);
             }
         }
+
+        public async Task<Model.Base.Models.WorkTime.WorkTime?> GetActiveConfig()
+        {
+            var entity = await Entities.FirstOrDefaultAsync(wt => wt.Deleted == false);
+            return entity;
+        }
     }
 }
