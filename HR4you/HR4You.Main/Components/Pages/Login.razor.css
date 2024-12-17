@@ -1,0 +1,25 @@
+﻿.loginContainer {
+    background: whitesmoke;
+    width: fit-content;
+    padding: 20px 50px;
+    box-sizing: border-box;
+    border: 2px solid #c1c1c1;
+    border-radius: 10px;
+}
+
+.loginContainer>h4{
+    text-align: center;
+}
+
+.loginBody {
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 10px;
+}
+
+.loginBody > input {
+    width: 350px;
+    border-radius: 5px;
+    border: 2px solid #c1c1c1;
+    padding: 3px;
+}

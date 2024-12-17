@@ -6,6 +6,7 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    box-sizing: border-box;
 }
 
 .hr4you_navbar-header {
@@ -24,6 +25,9 @@
     width: 100%;
     display: flex;
     flex-direction: column;
+    overflow-y: scroll;
+    box-sizing: border-box;
+    height: calc(100% - 168px);
 }
 
 .hr4you_dropdown {
@@ -97,4 +101,8 @@ i.fa-chevron-down {
 hr {
     border: 1px solid #444;
     margin: 10px 0;
+}
+
+::-webkit-scrollbar{
+    display: none;
 }
