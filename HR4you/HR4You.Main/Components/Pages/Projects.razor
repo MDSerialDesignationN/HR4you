@@ -1,10 +1,10 @@
-﻿@page "/AllTimes"
+﻿@page "/Projects"
 @attribute [StreamRendering]
 @inject HttpClient HttpClient
 
-<PageTitle>All Times</PageTitle>
+<PageTitle>Projects</PageTitle>
 
-<h1>All Times</h1>
+<h1>Projects</h1>
 
 @if (entries == null)
 {
@@ -14,23 +14,23 @@
 }
 else
 {
-    <AllTimesTable entries="entries">
-    </AllTimesTable>
+    <ProjectsTable entries="entries">
+    </ProjectsTable>
 }
 
 
 
 @code {
 
-    public List<HourEntry> entries;
+    public List<Project> entries;
 
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            entries = await HttpClient.GetFromJsonAsync<List<HourEntry>>("http://localhost:5001/api/master-data/hour-entry/get-all");
-            //Console.WriteLine(entries);
+            entries = await HttpClient.GetFromJsonAsync<List<Project>>("http://localhost:5001/api/master-data/project/get-all");
+            Console.WriteLine(entries);
         }
         catch (Exception ex)
         {
@@ -39,3 +39,4 @@ else
 
     }
 }
+

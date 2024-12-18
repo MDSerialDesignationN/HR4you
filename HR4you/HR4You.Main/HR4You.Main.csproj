@@ -21,6 +21,10 @@
       <Content Remove="wwwroot\bootstrap\bootstrap.min.css.map" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="Components\Pages\Customers.razor.css" />
+    </ItemGroup>
+
     
 
     <ItemGroup>
@@ -50,6 +54,7 @@
         <Content Include="..\.dockerignore">
             <Link>.dockerignore</Link>
         </Content>
+        <Content Include="Components\Pages\Customers.razor.css" />
     </ItemGroup>
 
     <ItemGroup>
@@ -62,7 +67,6 @@
         <AdditionalFiles Include="Components\App.razor" />
         <AdditionalFiles Include="Components\Layout\MainLayout.razor" />
         <AdditionalFiles Include="Components\Layout\NavMenu.razor" />
-        <AdditionalFiles Include="Components\Pages\Counter.razor" />
         <AdditionalFiles Include="Components\Pages\Error.razor" />
         <AdditionalFiles Include="Components\Pages\Home.razor" />
         <AdditionalFiles Include="Components\Pages\AllTimes.razor" />

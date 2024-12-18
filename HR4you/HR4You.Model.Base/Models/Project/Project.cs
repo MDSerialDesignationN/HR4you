@@ -16,6 +16,7 @@ namespace HR4You.Model.Base.Models.Project
         public Customer.Customer? Customer { get; set; } = null!;
 
         [Required] public string Name { get; set; } = string.Empty;
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         [Required] public ProjectState State { get; set; }
         public string? Description { get; set; }
 
