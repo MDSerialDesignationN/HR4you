@@ -30,7 +30,7 @@ else
         try
         {
             entries = await HttpClient.GetFromJsonAsync<List<HourEntry>>("http://localhost:5001/api/master-data/hour-entry/get-all");
-            Console.WriteLine(entries);
+            //Console.WriteLine(entries);
         }
         catch (Exception ex)
         {

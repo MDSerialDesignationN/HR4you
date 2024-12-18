@@ -1,7 +1,12 @@
 ﻿@page "/"
+@attribute [StreamRendering]
+@inject HttpClient HttpClient
+@rendermode InteractiveServer
 
 <PageTitle>Overview</PageTitle>
 <h2>Overview</h2>
+
+
 
 <div class="searchAndAdd" >
     <input id="Search_Box" type="text" />
@@ -12,43 +17,37 @@
 
 
 
+@if (entries == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <HomeTable entries="entries">
+    </HomeTable>
+}
 
 
-<div class="OverviewContainer">
-    <table class="OverviewTable">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Begin</th>
-                <th>End</th>
-                <th>Duration</th>
-                <th>Customer</th>
-                <th>Project</th>
-                <th>Activity</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>20.01.2024</td>
-                <td>20:20</td>
-                <td>20:30</td>
-                <td>00:10</td>
-                <td>Master Chief</td>
-                <td>Halo</td>
-                <td>Killing Sangheili</td>
-                <td class="options"><img src="images/three-dots.png" /></td>
-            </tr>
-            <tr>
-                <td>19.01.2024</td>
-                <td>10:30</td>
-                <td>14:30</td>
-                <td>04:00</td>
-                <td>Master Chief</td>
-                <td>Installation 04</td>
-                <td>Killing Grunts</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+
+@code {
+
+    public List<HourEntry> entries;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            entries = await HttpClient.GetFromJsonAsync<List<HourEntry>>("http://localhost:5001/api/master-data/hour-entry/get-user-all?userId=4e2a437c-879f-4b49-b216-0dc4b6470d67");
+            Console.WriteLine(entries);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching entries: {ex.Message}");
+        }
+
+    }
+}
 
