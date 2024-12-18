@@ -59,7 +59,7 @@ public class CustomerController : ControllerBase
     //[Authorize(Policy = )]
     public async Task<IActionResult> CreateCustomer([FromBody]Customer customer)
     {
-        var checkResult = await _checker.CheckMasterData(customer);
+        var checkResult = await _checker.CheckMasterData(customer, null);
         if (checkResult.Error != ModelChecker.ModelCheckError.None)
         {
             return BadRequest(checkResult);
@@ -81,7 +81,7 @@ public class CustomerController : ControllerBase
     //[Authorize(Policy = )]
     public async Task<IActionResult> EditCustomer(int id, [FromBody] Customer customer)
     {
-        var checkResult = await _checker.CheckMasterData(customer);
+        var checkResult = await _checker.CheckMasterData(customer, id);
         if (checkResult.Error != ModelChecker.ModelCheckError.None)
         {
             return BadRequest(checkResult);

@@ -1,4 +1,5 @@
-﻿using HR4You.Contexts.WorkTime;
+﻿using HR4You.Contexts.Holiday;
+using HR4You.Contexts.WorkTime;
 using HR4You.Model.Base;
 using HR4You.Model.Base.Models.HourEntry;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +22,7 @@ namespace HR4You.Contexts.HourEntry
         public new async Task<HourEntryResult> Create(
             Model.Base.Models.HourEntry.HourEntry hourEntry)
         {
-            var result = await CalcProperties(hourEntry, _serviceProvider);
+            var result = await CalcProperties(hourEntry);
             if (result.Error != HourEntryError.None)
             {
                 return result;
@@ -42,7 +43,7 @@ namespace HR4You.Contexts.HourEntry
                 return HourEntryResult.NotOk(HourEntryError.DbError, id.ToString());
             }
             
-            var result = await CalcProperties(hourEntry, _serviceProvider);
+            var result = await CalcProperties(hourEntry);
             if (result.Error != HourEntryError.None)
             {
                 return result;
@@ -69,10 +70,9 @@ namespace HR4You.Contexts.HourEntry
             return list;
         }
 
-        private async Task<HourEntryResult> CalcProperties(Model.Base.Models.HourEntry.HourEntry hourEntry,
-            IServiceProvider serviceProvider)
+        private async Task<HourEntryResult> CalcProperties(Model.Base.Models.HourEntry.HourEntry hourEntry)
         {
-            using var scope = serviceProvider.CreateScope();
+            using var scope = _serviceProvider.CreateScope();
             var workTimeContext = scope.ServiceProvider.GetService<WorkTimeContext>()!;
             var workTimeConfig = await workTimeContext.GetActiveConfig();
 
@@ -94,8 +94,10 @@ namespace HR4You.Contexts.HourEntry
                 DayOfWeek.Sunday => workTimeConfig.MinSunHours,
                 _ => throw new ArgumentOutOfRangeException()
             };
+            
+            var holidayContext = scope.ServiceProvider.GetService<HolidayContext>()!;
+            var holiday = await holidayContext.GetEntryForDate(hourEntry.Date);
 
-            var holiday = workTimeConfig.GetEntryForDate(hourEntry.Date);
             if (holiday == null)
             {
                 hourEntry.WorktimeDiff = hourEntry.Duration - hoursForDay;

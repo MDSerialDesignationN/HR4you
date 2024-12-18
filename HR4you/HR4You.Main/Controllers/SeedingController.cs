@@ -1,10 +1,12 @@
 ﻿using HR4You.Contexts.Customer;
+using HR4You.Contexts.Holiday;
 using HR4You.Contexts.HourEntry;
 using HR4You.Contexts.Project;
 using HR4You.Contexts.Tag;
 using HR4You.Contexts.WorkTime;
 using HR4You.Model.Base;
 using HR4You.Model.Base.Models.Customer;
+using HR4You.Model.Base.Models.Holiday;
 using HR4You.Model.Base.Models.HourEntry;
 using HR4You.Model.Base.Models.Project;
 using HR4You.Model.Base.Models.Tag;
@@ -69,6 +71,19 @@ public class SeedingController : ControllerBase
     public async Task<IActionResult> SeedWorkTime()
     {
         var ok = await SeedWorkTimes();
+        if (!ok)
+        {
+            return BadRequest("Error - if you read this good job :3");
+        }
+
+        return Ok();
+    }
+    
+    [HttpPost("seed-holiday")]
+    [SwaggerOperation("SeedHoliday")]
+    public async Task<IActionResult> SeedHoliday()
+    {
+        var ok = await SeedHolidays();
         if (!ok)
         {
             return BadRequest("Error - if you read this good job :3");
@@ -250,7 +265,6 @@ public class SeedingController : ControllerBase
 
     private async Task<bool> SeedWorkTimes()
     {
-        //currently only one is active but configs are stored per year meaning multiple entries are possible
         var workTimes = new List<WorkTime>
         {
             new()
@@ -261,22 +275,7 @@ public class SeedingController : ControllerBase
                 MinThuHours = 8,
                 MinFriHours = 8,
                 MinSatHours = 0,
-                MinSunHours = 0,
-                Holidays = new List<HolidayEntry>
-                {
-                    new()
-                    {
-                        Date = DateOnly.FromDateTime(DateTime.Now),
-                        Name = "heite",
-                        HalfDay = false
-                    },
-                    new()
-                    {
-                        Date = DateOnly.FromDateTime(DateTime.Now + TimeSpan.FromDays(1)),
-                        Name = "murgen",
-                        HalfDay = true
-                    }
-                }
+                MinSunHours = 0
             }
         };
 
@@ -285,6 +284,38 @@ public class SeedingController : ControllerBase
         foreach (var workTime in workTimes)
         {
             var result = await workTimeContext.Create(workTime);
+            if (result.Error != MasterDataError.None)
+            {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    private async Task<bool> SeedHolidays()
+    {
+        var holidays = new List<Holiday>
+        {
+            new()
+            {
+                Date = DateOnly.FromDateTime(DateTime.Now),
+                Name = "heite",
+                HalfDay = false
+            },
+            new()
+            {
+                Date = DateOnly.FromDateTime(DateTime.Now + TimeSpan.FromDays(1)),
+                Name = "murgen",
+                HalfDay = true
+            }
+        };
+
+        using var scope = _serviceProvider.CreateScope();
+        var holidayContext = scope.ServiceProvider.GetService<HolidayContext>()!;
+        foreach (var holiday in holidays)
+        {
+            var result = await holidayContext.Create(holiday);
             if (result.Error != MasterDataError.None)
             {
                 return false;

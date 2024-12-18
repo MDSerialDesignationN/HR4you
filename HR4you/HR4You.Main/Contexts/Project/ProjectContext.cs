@@ -5,12 +5,17 @@ namespace HR4You.Contexts.Project
 {
     public class ProjectContext : ModelBaseContext<Model.Base.Models.Project.Project>
     {
-        private readonly IServiceProvider _serviceProvider;
-
         public ProjectContext(DbContextOptions<ModelBaseContext<Model.Base.Models.Project.Project>> options,
             ILogger<ProjectContext> logger, IServiceProvider serviceProvider) : base(options, logger)
         {
-            _serviceProvider = serviceProvider;
+        }
+
+        public async Task<bool> IsProjectNumberFree(int projectNumber, int? id)
+        {
+            var exists = await Entities.Where(p => p.Deleted == false  && p.Id != id).Select(p => p.ProjectNumber)
+                .AnyAsync(number => number == projectNumber);
+            
+            return exists;
         }
 
         public class ProjectContextDesignTimeFactory : IDesignTimeDbContextFactory<ProjectContext>
