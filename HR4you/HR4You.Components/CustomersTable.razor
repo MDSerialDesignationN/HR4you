@@ -1,0 +1,64 @@
+﻿<PopupCustomers @ref="popupRef" />
+
+<table class="Table">
+    <thead>
+        <tr>
+            <th>Customer Number</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Address</th>
+            <th>Email</th>
+            <th>Website</th>
+            <th>Phone Number</th>
+            <th>Creation Date</th>
+            <th>Last Modified</th>
+            <th>Is Deleted</th>
+            <th> </th>
+            <th> </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var entry in entries)
+        {
+            
+            <tr>
+                <td>@entry.CustomerNumber</td>
+                <td>@entry.Name</td>
+                <td>@entry.Description</td>
+                <td>@entry.Address</td>
+                <td>@entry.Email</td>
+                <td>@entry.Website</td>
+                <td>@entry.PhoneNumber</td>
+                <td>@entry.CreationDateTime</td>
+                <td>@entry.LastModifiedAt</td>
+                <td>@(entry.Deleted ? "Yes" : "No")</td>
+                <button type="button" class="btn btn-outline-danger" @onclick="(() => DeleteEntry(entry.Id))"><i class="fa fa-trash"></i></button>
+                <button type="button" class="btn btn-outline-info" @onclick="(() => EditEntry(entry.Id))"><i class="fa fa-pencil"></i></button>
+
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@code {
+
+    [Parameter]
+    public List<Customer> entries { get; set; }
+
+    private PopupCustomers popupRef;
+
+    public string RequestURLEdit = "http://localhost:5001/api/master-data/customer/get?Id=";
+
+    private void EditEntry(int GivenId)
+    {
+        popupRef.Show(GivenId, RequestURLEdit, "Edit Customer");
+        //NavigationManager.NavigateTo($"edit-product/{GivenId}");
+    }
+
+        private void DeleteEntry(int GivenId)
+    {
+        //NavigationManager.NavigateTo($"edit-product/{GivenId}");
+    }
+
+}

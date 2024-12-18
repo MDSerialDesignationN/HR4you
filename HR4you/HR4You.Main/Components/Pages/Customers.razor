@@ -1,0 +1,53 @@
+﻿@page "/Customers"
+@attribute [StreamRendering]
+@rendermode InteractiveServer
+@inject HttpClient HttpClient
+
+<PopupCustomers OnCustomerUpdated="RefreshTable"/>
+
+<PageTitle>Customers</PageTitle>
+
+<h1>Customers</h1>
+
+@if (entries == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <CustomersTable entries="entries">
+    </CustomersTable>
+}
+
+
+
+@code {
+
+    public List<Customer> entries;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCustomers();
+    }
+
+    private async Task LoadCustomers()
+    {
+        try
+        {
+            entries = await HttpClient.GetFromJsonAsync<List<Customer>>("http://localhost:5001/api/master-data/customer/get-all");
+            Console.WriteLine(entries);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching entries: {ex.Message}");
+        }        
+    }
+
+    private async Task RefreshTable()
+    {
+        await LoadCustomers(); 
+        StateHasChanged();
+    }
+}

@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35514.174
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HR4You.Model.Base", "HR4You.Model.Base\HR4You.Model.Base.csproj", "{72E4DAA6-24DD-42EE-B2EA-6DF7B7260DFB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HR4You.Model.Base", "HR4You.Model.Base\HR4You.Model.Base.csproj", "{72E4DAA6-24DD-42EE-B2EA-6DF7B7260DFB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HR4You.Main", "HR4You.Main\HR4You.Main.csproj", "{D43145B0-1478-4116-8452-CE62337F4591}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HR4You.Main", "HR4You.Main\HR4You.Main.csproj", "{D43145B0-1478-4116-8452-CE62337F4591}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DD294E6F-12B2-4519-973A-3D75F0970FC4}"
 	ProjectSection(SolutionItems) = preProject
@@ -13,9 +13,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		docker-compose.yml = docker-compose.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HR4you.Security", "HR4you.Security\HR4you.Security.csproj", "{DFC1D425-A25F-40F4-84F8-4CB38E17A0E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HR4you.Security", "HR4you.Security\HR4you.Security.csproj", "{DFC1D425-A25F-40F4-84F8-4CB38E17A0E0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HR4You.Components", "HR4You.Components\HR4You.Components.csproj", "{F3E5F627-8543-4F2A-9EE4-ABCC9B89C2A6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HR4You.Components", "HR4You.Components\HR4You.Components.csproj", "{F3E5F627-8543-4F2A-9EE4-ABCC9B89C2A6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
