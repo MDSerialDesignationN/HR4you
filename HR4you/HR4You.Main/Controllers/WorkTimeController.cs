@@ -59,7 +59,7 @@ public class WorkTimeController : ControllerBase
     //[Authorize(Policy = )]
     public async Task<IActionResult> CreateWorkTime([FromBody]WorkTime workTime)
     {
-        var checkResult = await _checker.CheckMasterData(workTime);
+        var checkResult = await _checker.CheckMasterData(workTime, null);
         if (checkResult.Error != ModelChecker.ModelCheckError.None)
         {
             return BadRequest(checkResult);
@@ -81,7 +81,7 @@ public class WorkTimeController : ControllerBase
     //[Authorize(Policy = )]
     public async Task<IActionResult> EditWorkTime(int id, [FromBody] WorkTime workTime)
     {
-        var checkResult = await _checker.CheckMasterData(workTime);
+        var checkResult = await _checker.CheckMasterData(workTime, id);
         if (checkResult.Error != ModelChecker.ModelCheckError.None)
         {
             return BadRequest(checkResult);

@@ -1,4 +1,5 @@
 ﻿using HR4You.Contexts.Customer;
+using HR4You.Contexts.Holiday;
 using HR4You.Contexts.HourEntry;
 using HR4You.Contexts.Project;
 using HR4You.Contexts.Tag;
@@ -28,6 +29,14 @@ public static class ModelContextHelper
             optionsBuilder.UseMySql(connectionString!, ServerVersion.AutoDetect(connectionString));
             
             return new WorkTimeContext(optionsBuilder.Options, sp.GetService<ILogger<WorkTimeContext>>()!, sp);
+        });
+        //HolidayContext
+        webApplicationBuilder.Services.AddScoped(sp =>
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<ModelBaseContext<Model.Base.Models.Holiday.Holiday>>();
+            optionsBuilder.UseMySql(connectionString!, ServerVersion.AutoDetect(connectionString));
+            
+            return new HolidayContext(optionsBuilder.Options, sp.GetService<ILogger<HolidayContext>>()!, sp);
         });
         //CustomerContext
         webApplicationBuilder.Services.AddScoped(sp =>
@@ -64,13 +73,16 @@ public static class ModelContextHelper
         using var scope = webApplication.Services.CreateScope();
         
         //Migrates HourEntry and all dependent tables!
-        var hc = scope.ServiceProvider.GetService<HourEntryContext>()!;
-        hc.Database.Migrate();
+        var hourEntryContext = scope.ServiceProvider.GetService<HourEntryContext>()!;
+        hourEntryContext.Database.Migrate();
         
-        var wt = scope.ServiceProvider.GetService<WorkTimeContext>()!;
-        wt.Database.Migrate();
+        var workTimeContext = scope.ServiceProvider.GetService<WorkTimeContext>()!;
+        workTimeContext.Database.Migrate();
+
+        var holidayContext = scope.ServiceProvider.GetService<HolidayContext>()!;
+        holidayContext.Database.Migrate();
         
-        var f = scope.ServiceProvider.GetService<TagContext>()!;
-        f.Database.Migrate();
+        var tagContext = scope.ServiceProvider.GetService<TagContext>()!;
+        tagContext.Database.Migrate();
     }
 }

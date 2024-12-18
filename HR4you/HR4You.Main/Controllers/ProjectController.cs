@@ -59,7 +59,7 @@ public class ProjectController : ControllerBase
     //[Authorize(Policy = )]
     public async Task<IActionResult> CreateProject([FromBody]Project project)
     {
-        var checkResult = await _checker.CheckMasterData(project);
+        var checkResult = await _checker.CheckMasterData(project, null);
         if (checkResult.Error != ModelChecker.ModelCheckError.None)
         {
             return BadRequest(checkResult);
@@ -81,7 +81,7 @@ public class ProjectController : ControllerBase
     //[Authorize(Policy = )]
     public async Task<IActionResult> EditProject(int id, [FromBody] Project project)
     {
-        var checkResult = await _checker.CheckMasterData(project);
+        var checkResult = await _checker.CheckMasterData(project, id);
         if (checkResult.Error != ModelChecker.ModelCheckError.None)
         {
             return BadRequest(checkResult);
