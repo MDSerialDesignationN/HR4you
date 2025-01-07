@@ -20,15 +20,18 @@ public class TagController : ControllerBase
         _checker = checker;
     }
     
-    [HttpGet("get-all")]
-    [SwaggerOperation("GetAllTags")]
+    [HttpGet("get-all-paged")]
+    [SwaggerOperation("GetAllPagedTags")]
     //[Authorize(Policy = )]
-    public async Task<IActionResult> GetAllTags(bool addDeleted)
-    {
+    public async Task<IActionResult> GetAllPagedTags(bool addDeleted, int pageNumber = 1, int pageSize = 10)
+    { 
+        if (pageNumber <= 0 || pageSize <= 0)
+            return BadRequest($"{nameof(pageNumber)} and {nameof(pageSize)} size must be greater than 0");
+        
         using var scope = _serviceProvider.CreateScope();
         var sc = scope.ServiceProvider.GetService<TagContext>()!;
         
-        var result = await sc.GetAll(addDeleted);
+        var result = await sc.GetAllOffsetPaged(pageNumber, pageSize, addDeleted);
         return result.Error switch
         {
             MasterDataError.None => Ok(result.Entity),

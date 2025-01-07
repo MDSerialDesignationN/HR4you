@@ -20,15 +20,18 @@ public class HolidayController : ControllerBase
         _checker = checker;
     }
     
-    [HttpGet("get-all")]
-    [SwaggerOperation("GetAllHolidays")]
+    [HttpGet("get-all-paged")]
+    [SwaggerOperation("GetAllPagedHolidays")]
     //[Authorize(Policy = )]
-    public async Task<IActionResult> GetAllHolidays(bool addDeleted)
+    public async Task<IActionResult> GetAllPagedHolidays(bool addDeleted, int pageNumber = 1, int pageSize = 10)
     {
+        if (pageNumber <= 0 || pageSize <= 0)
+            return BadRequest($"{nameof(pageNumber)} and {nameof(pageSize)} size must be greater than 0");
+        
         using var scope = _serviceProvider.CreateScope();
         var sc = scope.ServiceProvider.GetService<HolidayContext>()!;
         
-        var result = await sc.GetAll(addDeleted);
+        var result = await sc.GetAllOffsetPaged(pageNumber, pageSize, addDeleted);
         return result.Error switch
         {
             MasterDataError.None => Ok(result.Entity),

@@ -2,8 +2,10 @@
 using HR4You.Contexts.WorkTime;
 using HR4You.Model.Base;
 using HR4You.Model.Base.Models.HourEntry;
+using HR4You.Model.Base.Pagination;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.IdentityModel.Tokens;
 
 namespace HR4You.Contexts.HourEntry
 {
@@ -56,18 +58,30 @@ namespace HR4You.Contexts.HourEntry
         }
 
 
-        public async Task<List<Model.Base.Models.HourEntry.HourEntry>> GetHourEntries(bool addDeleted, string userId)
+        public async Task<ModelResult<PagedResponseKeySet<Model.Base.Models.HourEntry.HourEntry>>> GetAllPagedEntries(
+            int reference, int pageSize, bool addDeleted, string? userId)
         {
-            using var scope = _serviceProvider.CreateScope();
-            var linq = Entities.AsQueryable();
+            if (userId.IsNullOrEmpty())
+            {
+                var modelResult = await GetAllKeyPaged(reference, pageSize, addDeleted);
+                return modelResult;
+            }
 
-            linq = linq.Where(he => he.UserId == userId);
-            linq = linq.Where(he => he.Deleted == addDeleted);
+            var linq = Entities.AsNoTracking().Where(he => he.UserId == userId).OrderBy(he => he.Id).AsQueryable();
+            if (!addDeleted)
+            {
+                linq = linq.Where(he => he.Deleted != true);
+            }
 
-            var list = await linq.ToListAsync();
-            list = list.OrderByDescending(he => he.LastModifiedAt ?? he.CreationDateTime).ToList();
+            var result = await linq.Where(he => he.Id > reference)
+                .Take(pageSize)
+                .OrderByDescending(he => he.LastModifiedAt ?? he.CreationDateTime)
+                .ToListAsync();
 
-            return list;
+            var newReference = result.Count != 0 ? result.Last().Id : 0;
+            var pagedResponse = new PagedResponseKeySet<Model.Base.Models.HourEntry.HourEntry>(result, newReference);
+
+            return ModelResult<PagedResponseKeySet<Model.Base.Models.HourEntry.HourEntry>>.Ok(pagedResponse);
         }
 
         private async Task<HourEntryResult> CalcProperties(Model.Base.Models.HourEntry.HourEntry hourEntry)
