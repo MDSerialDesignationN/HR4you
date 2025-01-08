@@ -3,11 +3,12 @@
 @rendermode InteractiveServer
 @inject HttpClient HttpClient
 
-<PopupCustomers OnCustomerUpdated="RefreshTable"/>
-
 <PageTitle>Customers</PageTitle>
 
 <h1>Customers</h1>
+
+<label>Show Deleted</label>
+<input type="checkbox" checked="@addDeleted" @oninput="CheckboxChanged">
 
 @if (entries == null)
 {
@@ -17,7 +18,7 @@
 }
 else
 {
-    <CustomersTable entries="entries">
+    <CustomersTable entries="entries" @ref="popupRef2" OnCustomerUpdated2="RefreshTable2">
     </CustomersTable>
 }
 
@@ -27,8 +28,26 @@ else
 
     public List<Customer> entries;
 
+    //public bool IsChecked = true;
+
+    public bool addDeleted;
+
+    public string RequestURL = "http://localhost:5001/api/master-data/customer/get-all?addDeleted=";
+
+    private CustomersTable popupRef2;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && popupRef2 != null)
+        {
+            popupRef2.OnCustomerUpdated2 = EventCallback.Factory.Create(this, RefreshTable2);
+        }
+    }
+
+
     protected override async Task OnInitializedAsync()
     {
+        addDeleted = false;
         await LoadCustomers();
     }
 
@@ -36,8 +55,8 @@ else
     {
         try
         {
-            entries = await HttpClient.GetFromJsonAsync<List<Customer>>("http://localhost:5001/api/master-data/customer/get-all");
-            Console.WriteLine(entries);
+            entries = await HttpClient.GetFromJsonAsync<List<Customer>>(RequestURL + addDeleted);
+            //Console.WriteLine(entries);
         }
         catch (Exception ex)
         {
@@ -45,9 +64,26 @@ else
         }        
     }
 
-    private async Task RefreshTable()
+    private async Task CheckboxChanged()
     {
+        if (addDeleted == false)
+        {
+            addDeleted = true;
+        }
+        else
+        {
+            addDeleted = false;
+        }
+
+        entries = await HttpClient.GetFromJsonAsync<List<Customer>>(RequestURL + addDeleted);
+        StateHasChanged();
+    }
+
+    private async Task RefreshTable2()
+    {
+        Console.WriteLine("RefreshTable2() was called from Customers");
         await LoadCustomers(); 
+
         StateHasChanged();
     }
 }

@@ -1,4 +1,7 @@
-﻿<PopupCustomers @ref="popupRef" />
+﻿@inject HttpClient HttpClient
+@rendermode InteractiveServer
+
+<PopupCustomers @ref="popupRef" OnCustomerUpdated="RefreshTable" />
 
 <table class="Table">
     <thead>
@@ -48,7 +51,19 @@
 
     private PopupCustomers popupRef;
 
-    public string RequestURLEdit = "http://localhost:5001/api/master-data/customer/get?Id=";
+    [Parameter]
+    public EventCallback OnCustomerUpdated2 { get; set; }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && popupRef != null)
+        {
+            popupRef.OnCustomerUpdated = EventCallback.Factory.Create(this, RefreshTable);
+        }
+    }
+
+    public string RequestURLEdit = "http://localhost:5001/api/master-data/customer/get?addDeleted=true&Id=";
+    public string RequestURLDelete = "http://localhost:5001/api/master-data/customer/delete?Id=";
 
     private void EditEntry(int GivenId)
     {
@@ -58,7 +73,22 @@
 
         private void DeleteEntry(int GivenId)
     {
-        //NavigationManager.NavigateTo($"edit-product/{GivenId}");
+        HttpClient.DeleteFromJsonAsync<Customer>(RequestURLDelete + GivenId);
     }
+
+
+    private async Task RefreshTable()
+    {
+        Console.WriteLine("RefreshTable() was called from CustomersTable");
+        if (OnCustomerUpdated2.HasDelegate)
+        {
+            await OnCustomerUpdated2.InvokeAsync(); // Notify the parent component
+        }
+        else
+        {
+            Console.WriteLine("OnCustomerUpdated has no delegate assigned.");
+        }
+    }
+
 
 }

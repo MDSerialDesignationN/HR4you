@@ -1,13 +1,10 @@
 ﻿@inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
+@rendermode InteractiveServer
 
 @{
     var showClass = IsVisible ? "d-block" : "d-none";
 }
-
-<EditForm Model="customer" OnValidSubmit="Submit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
 
     <div class="toast-container position-absolute @showClass" data-bs-autohide="true" data-bs-delay="50000"
     style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
@@ -19,6 +16,10 @@
                 <button type="button" class="btn-close" aria-label="Close" @onclick="Close"></button>
             </div>
 
+        <EditForm Model="customer" OnValidSubmit="Submit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+        
             <div class="toast-body" style="padding: 20px;">
                 <div class="container">
                     <div class="row">
@@ -65,9 +66,9 @@
                     </div>
                 </div>
             </div>
+        </EditForm>
         </div>
     </div>
-</EditForm>
 
 @code {
     [Parameter]
@@ -106,6 +107,7 @@
         IsVisible = true;
         isEdit = false;
         StateHasChanged();
+
     }
 
     private async Task Submit()
@@ -129,7 +131,14 @@
                 {
                     Console.WriteLine("Customer saved successfully.");
 
-                    await OnCustomerUpdated.InvokeAsync();
+                if (OnCustomerUpdated.HasDelegate)
+                {
+                    await OnCustomerUpdated.InvokeAsync(); // Notify the parent component
+                }
+                else
+                {
+                    Console.WriteLine("OnCustomerUpdated has no delegate assigned.");
+                }
 
                     Close();
                 }
@@ -164,6 +173,7 @@
         HeaderText = string.Empty;
         GivenId = null;
         IsVisible = false;
+
         StateHasChanged();
     }
 }
