@@ -19,6 +19,7 @@ namespace HR4You.Model.Base.Models.HourEntry
         /// format is hh.mm
         /// </summary>
         public float WorktimeDiff { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         [Required] public ActivityType Type { get; set; }
         [Required] public int ProjectId { get; set; }
 

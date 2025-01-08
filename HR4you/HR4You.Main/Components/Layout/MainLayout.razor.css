@@ -1,5 +1,5 @@
 body {
-    margin: 0;
+    
 }
 .page {
     position: relative;
@@ -8,10 +8,6 @@ body {
     flex-wrap: nowrap;
     min-height: 100vh;
     margin: 0;
-}
-
-main {
-    flex: 1;
 }
 
 .sidebar {
@@ -27,15 +23,68 @@ main {
     flex-grow: 1;
     background-color: #f4f4f4;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: left;
+    
 }
 
 .content {
-    text-align: center;
+    text-align: left;
     color: #333;
     font-family: Arial, sans-serif;
     padding: 20px;
+    width: 100%;
 }
 
 
+/* Container für die Benutzeranzeige */
+.user-display {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+    float: right;
+
+}
+
+/* Benutzerinformationen */
+.user-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    
+}
+
+.user-name {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+}
+
+
+/* Aktionen und Icon */
+.user-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
+.logout-text {
+    font-size: 14px;
+    
+    color: black;
+    text-align: center;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.logout-text:hover {
+    color: red; /* Farbe ändern beim Hover */
+}

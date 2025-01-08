@@ -69,6 +69,9 @@ builder.Services.AddSwaggerGen(c =>
 var connectionString = builder.Configuration.GetConnectionString("Db");
 ModelContextHelper.ConfigureModelContexts(builder, connectionString);
 
+
+builder.Services.AddHttpClient();
+
 var app = builder.Build();
 
 //Trigger DB migration

@@ -1,16 +1,10 @@
-﻿@page "/"
+﻿@page "/AllTimes"
 @attribute [StreamRendering]
 @inject HttpClient HttpClient
-@rendermode InteractiveServer
 
-<PageTitle>Overview</PageTitle>
-<h2>Overview</h2>
+<PageTitle>All Times</PageTitle>
 
-
-
-
-
-
+<h1>All Times</h1>
 
 @if (entries == null)
 {
@@ -20,8 +14,8 @@
 }
 else
 {
-    <HomeTable entries="entries">
-    </HomeTable>
+    <AllTimesTable entries="entries">
+    </AllTimesTable>
 }
 
 
@@ -35,8 +29,8 @@ else
     {
         try
         {
-            entries = await HttpClient.GetFromJsonAsync<List<HourEntry>>("http://localhost:5001/api/master-data/hour-entry/get-user-all?userId=4e2a437c-879f-4b49-b216-0dc4b6470d67");
-            Console.WriteLine(entries);
+            entries = await HttpClient.GetFromJsonAsync<List<HourEntry>>("http://localhost:5001/api/master-data/hour-entry/get-all");
+            //Console.WriteLine(entries);
         }
         catch (Exception ex)
         {
@@ -45,4 +39,3 @@ else
 
     }
 }
-
