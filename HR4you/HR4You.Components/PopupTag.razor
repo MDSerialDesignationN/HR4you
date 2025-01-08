@@ -67,9 +67,18 @@
         StateHasChanged();
     }
 
+    async public void ShowOverview(string requestURL, string headerText)
+    {
+        HeaderText = headerText;
+        //customer = await HttpClient.GetFromJsonAsync<Customer>(requestURL + GivenId);
+        IsVisible = true;
+        StateHasChanged();
+    }
+
     private void Submit()
     {
-        
+        var createURL = "http://localhost:5001/api/master-data/user/create";
+
     }
 
     private void Close()

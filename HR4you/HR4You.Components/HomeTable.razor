@@ -1,9 +1,21 @@
-﻿<PopupUser @ref="popupRefUser"></PopupUser>
+﻿<PopupTag @ref="popupRefTag"></PopupTag>
 <PopupProject @ref="popupRefProject"></PopupProject>
-@*HIER KOMMT popupRefCustomer*@
-<button class="btn btn-dark" @onclick="(() => CreateUser())">Add User</button>
-<button class="btn btn-dark" @onclick="(() => CreateProject())">Add Project</button>
-@*<button class="btn btn-dark" @onclick="(() => CreateCustomer())">Add Customer</button>*@
+<PopupCustomers @ref="popupRefCustomer"></PopupCustomers>
+
+
+<div class="addButtons">
+    <button class="btn btn-dark" @onclick="(() => CreateTag())">Add Tag</button>
+    <button class="btn btn-dark" @onclick="(() => CreateProject())">Add Project</button>
+    <button class="btn btn-dark" @onclick="(() => CreateCustomer())">Add Customer</button>
+</div>
+
+<div class="searchAndAdd">
+    <input id="Search_Box" type="text" />
+    <input id="Search" type="submit" value="Search" />
+
+    <input class="Add_Time" type="submit" value="+" />
+</div>
+
 <div class="OverviewContainer">
     <table class="OverviewTable">
         <thead>
@@ -45,19 +57,27 @@
     [Parameter]
     public List<HourEntry> entries { get; set; }
 
-    private PopupUser popupRefUser;
+    public List<Customer> customerEntries { get; set; }
+
+    private PopupTag popupRefTag;
     private PopupProject popupRefProject;
+    private PopupCustomers popupRefCustomer;
 
-    public string RequestURLUser = "http://localhost:5001/api/master-data/customer/get?Id=";
-    public string RequestURLProject = "http://localhost:5001/api/master-data/customer/get?Id=";
+    public string RequestURLUser = "http://localhost:5001/api/master-data/customer/get?Id="; //User
+    public string RequestURLProject = "http://localhost:5001/api/master-data/project/get?Id=";
+    public string RequestURLCustomer = "http://localhost:5001/api/master-data/customer/get?Id="; // ????
 
-    private void CreateUser()
+    private void CreateTag()
     {
-        popupRefUser.Show(RequestURLUser, "Add User");
+        popupRefTag.ShowOverview(RequestURLUser, "Add Tag");
         //NavigationManager.NavigateTo($"edit-product/{GivenId}");
     }
     private void CreateProject(){
         popupRefProject.Show(RequestURLProject, "Add Project");
+    }
+    private void CreateCustomer()
+    {
+        popupRefCustomer.ShowOverview("Add Customer");
     }
 }
 

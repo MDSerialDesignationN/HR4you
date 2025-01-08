@@ -10,10 +10,10 @@
     <ValidationSummary />
 
     <div class="toast-container position-absolute @showClass" data-bs-autohide="true" data-bs-delay="50000"
-         style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
+    style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
 
         <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true"
-             style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; background-color:white; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
+        style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; background-color:white; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
             <div class="toast-header">
                 <strong class="me-auto">@HeaderText</strong>
                 <button type="button" class="btn-close" aria-label="Close" @onclick="Close"></button>
@@ -88,7 +88,7 @@
 
     Customer customer = new Customer();
 
-
+    bool isEdit = false;
 
     async public void Show(int givenId, string requestURL, string headerText)
     {
@@ -96,40 +96,65 @@
         GivenId = givenId.ToString(); 
         customer = await HttpClient.GetFromJsonAsync<Customer>(requestURL + GivenId);
         IsVisible = true;
+        isEdit = true;
+        StateHasChanged();
+    }
+
+    async public void ShowOverview(string headerText)
+    {
+        HeaderText = headerText;
+        IsVisible = true;
+        isEdit = false;
         StateHasChanged();
     }
 
     private async Task Submit()
     {
         var editURL = "http://localhost:5001/api/master-data/customer/edit?Id=";
+        var createURL = "http://localhost:5001/api/master-data/customer/create";
 
-        try
+        if (isEdit == true)
         {
-            if (customer.CustomerNumber == 0 || string.IsNullOrEmpty(customer.Name))
+            try
             {
-                Console.WriteLine("Customer Number and Name are required.");
-                return;
-            }           
-            
-            var response = await HttpClient.PostAsJsonAsync(editURL + GivenId, customer);
+                if (customer.CustomerNumber == 0 || string.IsNullOrEmpty(customer.Name))
+                {
+                    Console.WriteLine("Customer Number and Name are required.");
+                    return;
+                }
 
+                var response = await HttpClient.PostAsJsonAsync(editURL + GivenId, customer);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("Customer saved successfully.");
+
+                    await OnCustomerUpdated.InvokeAsync();
+
+                    Close();
+                }
+                else
+                {
+                    Console.WriteLine("Error occurred while saving the customer: " + response.ReasonPhrase);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception occurred: " + ex.Message);
+            }
+        }
+        else if (isEdit == false)
+        {
+            var response = await HttpClient.PostAsJsonAsync(createURL, customer);
             if (response.IsSuccessStatusCode)
             {
                 Console.WriteLine("Customer saved successfully.");
 
-                await OnCustomerUpdated.InvokeAsync();                
-
                 Close();
             }
-            else
-            {
-                Console.WriteLine("Error occurred while saving the customer: " + response.ReasonPhrase);
-            }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Exception occurred: " + ex.Message);
-        }
+
+        
     }
 
 

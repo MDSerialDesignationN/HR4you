@@ -1,4 +1,18 @@
 ﻿
+
+
+.searchAndAdd {
+    display: flex;
+    margin-top: 20px;
+}
+
+
+.Add_Time {
+    float: right;
+    margin-left: auto;
+}
+
+
 .OverviewTable {
     border-collapse: collapse;
     position: relative;
@@ -21,3 +35,10 @@
         background-color: #f4f4f4;
     }
 
+.addButtons {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    width: 30%;
+    margin: 2px;
+}
