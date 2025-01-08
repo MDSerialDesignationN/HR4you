@@ -1,0 +1,149 @@
+﻿@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+@{
+    var showClass = IsVisible ? "d-block" : "d-none";
+}
+
+
+    <div class="toast-container position-absolute @showClass" data-bs-autohide="true" data-bs-delay="50000"
+         style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
+
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true"
+             style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; background-color:white; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
+            <div class="toast-header">
+                <strong class="me-auto">@HeaderText</strong>
+                <button type="button" class="btn-close" aria-label="Close" @onclick="Close"></button>
+            </div>
+
+        <EditForm Model="customer" OnValidSubmit="Submit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+        
+            <div class="toast-body" style="padding: 20px;">
+                <div class="container">
+                    <div class="row">
+                        <!-- Customer Number and Website -->
+                        <div class="col-sm-4">
+                            <label>Customer Number</label>
+                            <InputNumber @bind-Value="customer.CustomerNumber" class="form-control mb-2" />
+        
+                            <label>Website</label>
+                            <InputText @bind-Value="customer.Website" class="form-control mb-2" />
+                        </div>
+        
+                        <!-- Name and Address -->
+                        <div class="col-sm-4">
+                            <label>Name</label>
+                            <InputText @bind-Value="customer.Name" class="form-control mb-2" />
+        
+                            <label>Address</label>
+                            <InputText @bind-Value="customer.Address" class="form-control mb-2" />
+                        </div>
+        
+                        <!-- Email and Phone Number -->
+                        <div class="col-sm-4">
+                            <label>Email</label>
+                            <InputText @bind-Value="customer.Email" class="form-control mb-2" />
+        
+                            <label>Phone Number</label>
+                            <InputText @bind-Value="customer.PhoneNumber" class="form-control mb-2" />
+                        </div>
+        
+                        <!-- Description -->
+                        <div class="col-sm-8">
+                            <label>Description</label>
+                            <InputTextArea @bind-Value="customer.Description" rows="4" class="form-control mb-2" />
+                        </div>
+        
+                    </div>
+        
+                    <!-- Buttons -->
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <button type="submit" class="btn btn-dark">Save</button>
+                            <button type="button" class="btn btn-outline-secondary" @onclick="Close">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsVisibleChanged { get; set; }
+
+    [Parameter] 
+    public EventCallback OnCustomerUpdated { get; set; }
+
+    [Parameter]
+    public string? HeaderText { get; set; }
+
+    [Parameter]
+    public string? GivenId { get; set; }
+
+    Customer customer = new Customer();
+
+
+    async public void Show(int givenId, string requestURL, string headerText)
+    {
+        HeaderText = headerText;
+        GivenId = givenId.ToString(); 
+        customer = await HttpClient.GetFromJsonAsync<Customer>(requestURL + GivenId);
+        IsVisible = true;
+        StateHasChanged();
+
+    }
+
+    private async Task Submit()
+    {
+        var editURL = "http://localhost:5001/api/master-data/customer/edit?Id=";
+
+        try
+        {
+
+            var response = await HttpClient.PostAsJsonAsync(editURL + GivenId, customer);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Customer saved successfully.");
+
+                if (OnCustomerUpdated.HasDelegate)
+                {
+                    await OnCustomerUpdated.InvokeAsync(); // Notify the parent component
+                }
+                else
+                {
+                    Console.WriteLine("OnCustomerUpdated has no delegate assigned.");
+                }
+
+                Close();
+            }
+            else
+            {
+                Console.WriteLine("Error occurred while saving the customer: " + response.ReasonPhrase);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Exception occurred: " + ex.Message);
+        }
+    }
+
+
+    private void Close()
+    {
+        customer = new Customer();
+        HeaderText = string.Empty;
+        GivenId = null;
+        IsVisible = false;
+
+        StateHasChanged();
+    }
+}
