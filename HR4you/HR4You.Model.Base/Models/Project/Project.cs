@@ -7,7 +7,7 @@ namespace HR4You.Model.Base.Models.Project
     [Table("hr4you_project")]
     public class Project : ModelBase
     {
-        [Required] public int ProjectNumber { get; set; }
+        [Required] public int ProjectNumber { get; set; } //todo set constraint for unique
 
         [Required] public int CustomerId { get; set; }
 
@@ -16,7 +16,10 @@ namespace HR4You.Model.Base.Models.Project
         public Customer.Customer? Customer { get; set; } = null!;
 
         [Required] public string Name { get; set; } = string.Empty;
-        [Required] public ProjectState State { get; set; }
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        [Required]
+        public ProjectState State { get; set; }
         public string? Description { get; set; }
 
         [JsonIgnore] public ICollection<HourEntry.HourEntry>? HourEntries { get; } = new List<HourEntry.HourEntry>();

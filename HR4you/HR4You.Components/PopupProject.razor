@@ -1,0 +1,68 @@
+﻿@inject HttpClient HttpClient
+
+@{
+    var showClass = IsVisible ? "d-block" : "d-none";
+}
+
+<div class="toast-container position-absolute @showClass" data-bs-autohide="true" data-bs-delay="5000"
+     style="left: 50%;
+    position: fixed;
+    transform: translate(-50%, 0px);
+    z-index: 9999;
+    width: 80%;">
+
+    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true"
+         style="left: 50%;
+        position: fixed;
+        transform: translate(-50%, 0px);
+        z-index: 9999;
+        width: 80%;
+        background-color:white;">
+        <div class="toast-header">
+            <strong class="me-auto">@HeaderText</strong>
+            <button type="button" class="btn-close" aria-label="Close" @onclick="Close"></button>
+        </div>
+
+        <div class="toast-body" style="padding: 20px;">
+            <input id="UserID" type="text" />
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsVisibleChanged { get; set; }
+
+    [Parameter]
+    public string? HeaderText { get; set; }
+
+    [Parameter]
+    public string? GivenId { get; set; }
+
+    
+
+    async public void Show(string requestURL, string headerText)
+    {
+        HeaderText = headerText;
+        //customer = await HttpClient.GetFromJsonAsync<Customer>(requestURL + GivenId);
+        IsVisible = true;
+        StateHasChanged();
+    }
+
+    private void Submit()
+    {
+        
+    }
+
+    private void Close()
+    {
+        HeaderText = string.Empty;
+        GivenId = null;
+        IsVisible = false;
+        StateHasChanged();
+    }
+}

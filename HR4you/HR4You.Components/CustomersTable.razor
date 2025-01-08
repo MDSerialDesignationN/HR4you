@@ -68,9 +68,10 @@
     private void EditEntry(int GivenId)
     {
         popupRef.Show(GivenId, RequestURLEdit, "Edit Customer");
+        //NavigationManager.NavigateTo($"edit-product/{GivenId}");
     }
 
-    private void DeleteEntry(int GivenId)
+        private void DeleteEntry(int GivenId)
     {
         HttpClient.DeleteFromJsonAsync<Customer>(RequestURLDelete + GivenId);
     }

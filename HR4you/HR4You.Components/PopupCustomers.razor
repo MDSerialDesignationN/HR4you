@@ -6,6 +6,9 @@
     var showClass = IsVisible ? "d-block" : "d-none";
 }
 
+<EditForm Model="customer" OnValidSubmit="Submit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
 
     <div class="toast-container position-absolute @showClass" data-bs-autohide="true" data-bs-delay="50000"
          style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
@@ -28,29 +31,29 @@
                         <div class="col-sm-4">
                             <label>Customer Number</label>
                             <InputNumber @bind-Value="customer.CustomerNumber" class="form-control mb-2" />
-        
+
                             <label>Website</label>
                             <InputText @bind-Value="customer.Website" class="form-control mb-2" />
                         </div>
-        
+
                         <!-- Name and Address -->
                         <div class="col-sm-4">
                             <label>Name</label>
                             <InputText @bind-Value="customer.Name" class="form-control mb-2" />
-        
+
                             <label>Address</label>
                             <InputText @bind-Value="customer.Address" class="form-control mb-2" />
                         </div>
-        
+
                         <!-- Email and Phone Number -->
                         <div class="col-sm-4">
                             <label>Email</label>
                             <InputText @bind-Value="customer.Email" class="form-control mb-2" />
-        
+
                             <label>Phone Number</label>
                             <InputText @bind-Value="customer.PhoneNumber" class="form-control mb-2" />
                         </div>
-        
+
                         <!-- Description -->
                         <div class="col-sm-8">
                             <label>Description</label>
@@ -58,7 +61,7 @@
                         </div>
         
                     </div>
-        
+
                     <!-- Buttons -->
                     <div class="row">
                         <div class="col-sm-4">
@@ -69,8 +72,9 @@
                 </div>
             </div>
         </EditForm>
+        </div>
     </div>
-</div>
+</EditForm>
 
 @code {
     [Parameter]
@@ -88,7 +92,9 @@
     [Parameter]
     public string? GivenId { get; set; }
 
+
     Customer customer = new Customer();
+
 
 
     async public void Show(int givenId, string requestURL, string headerText)
@@ -107,7 +113,12 @@
 
         try
         {
-
+            if (customer.CustomerNumber == 0 || string.IsNullOrEmpty(customer.Name))
+            {
+                Console.WriteLine("Customer Number and Name are required.");
+                return;
+            }           
+            
             var response = await HttpClient.PostAsJsonAsync(editURL + GivenId, customer);
 
             if (response.IsSuccessStatusCode)

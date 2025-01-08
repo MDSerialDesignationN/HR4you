@@ -1,0 +1,41 @@
+﻿@page "/AllTimes"
+@attribute [StreamRendering]
+@inject HttpClient HttpClient
+
+<PageTitle>All Times</PageTitle>
+
+<h1>All Times</h1>
+
+@if (entries == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <AllTimesTable entries="entries">
+    </AllTimesTable>
+}
+
+
+
+@code {
+
+    public List<HourEntry> entries;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            entries = await HttpClient.GetFromJsonAsync<List<HourEntry>>("http://localhost:5001/api/master-data/hour-entry/get-all");
+            //Console.WriteLine(entries);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching entries: {ex.Message}");
+        }
+
+    }
+}

@@ -1,0 +1,41 @@
+﻿<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Project Number</th>
+            <th>Customer</th>
+            <th>Name</th>
+            <th>State</th>
+            <th>Description</th>
+            <th>Creation Date</th>
+            <th>Last Modified</th>
+            <th>Is Deleted</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var entry in entries)
+        {
+            <tr>
+                <td>@entry.Id</td>
+                <td>@entry.ProjectNumber</td>
+                <td>@entry.CustomerId</td>
+                <td>@entry.Name</td>
+                <td>@entry.State</td>
+                <td>@entry.Description</td>
+                <td>@entry.CreationDateTime</td>
+                <td>@entry.LastModifiedAt</td>
+                <td>@(entry.Deleted ? "Yes" : "No")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+@code {
+
+    [Parameter]
+    public List<Project> entries { get; set; }
+
+}
+

@@ -34,13 +34,6 @@ namespace HR4You.Model.Base.Models.WorkTime
         /// format is hh.mm
         /// </summary>
         [Required] public float MinSunHours { get; set; }
-        [JsonBlob] public List<HolidayEntry> Holidays { get; set; } = [];
-
-        public HolidayEntry? GetEntryForDate(DateOnly dateOnly)
-        {
-            var result = Holidays.FirstOrDefault(he => he.Date == dateOnly);
-            return result;
-        }
 
         public override void Set(ModelBase model)
         {
@@ -57,7 +50,6 @@ namespace HR4You.Model.Base.Models.WorkTime
             MinFriHours = data.MinFriHours;
             MinSatHours = data.MinSatHours;
             MinSunHours = data.MinSunHours;
-            Holidays = data.Holidays;
         }
     }
 }

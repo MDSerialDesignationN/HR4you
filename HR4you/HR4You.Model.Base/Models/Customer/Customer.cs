@@ -7,7 +7,7 @@ namespace HR4You.Model.Base.Models.Customer
     [Table("hr4you_customer")]
     public class Customer : ModelBase
     {
-        [Required] public int CustomerNumber { get; set; }
+        [Required] public int CustomerNumber { get; set; } //todo set constraint for unique
         [Required] public string Name { get; set; } = null!;
         public string? Description { get; set; }
         public string? Address { get; set; }

@@ -1,7 +1,10 @@
 ﻿@page "/Customers"
 @attribute [StreamRendering]
+@rendermode InteractiveServer
 @inject HttpClient HttpClient
 @rendermode InteractiveServer
+
+<PopupCustomers OnCustomerUpdated="RefreshTable"/>
 
 <PageTitle>Customers</PageTitle>
 
@@ -21,6 +24,7 @@ else
     <CustomersTable entries="entries" @ref="popupRef2" OnCustomerUpdated2="RefreshTable2">
     </CustomersTable>
 }
+
 
 
 @code {
@@ -81,7 +85,7 @@ else
     private async Task RefreshTable2()
     {
         Console.WriteLine("RefreshTable2() was called from Customers");
-        await LoadCustomers();
+        await LoadCustomers(); 
 
         StateHasChanged();
     }
