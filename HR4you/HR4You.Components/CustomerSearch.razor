@@ -1,0 +1,53 @@
+@using System.Net.Http
+@using System.Net.Http.Json
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
+@inject HttpClient HttpClient
+
+<div class="searchAndFilter">
+    <button title="Filteroptionen" id="FilterOptions"><i class="fa-solid fa-filter"></i></button>
+    <button title="Admin Filteroptionen" id="FilterOptions"><i class="fa-solid fa-user-tie"></i></button>
+
+    <input id="Search" type="text" placeholder="Search" />
+    <button id="Submit" type="submit" value="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+</div>
+<div class="FilterOptions active">
+    <div class="OptionRow">
+        <span><i class="fa-solid fa-"></i>Number</span><input type="number" name="Date" />
+    </div>
+    <div class="OptionRow">
+        <span><i class="fa-regular fa-text"></i>Name</span><input type="string" name="StartDate" />
+    </div>
+    <div class="OptionRow">
+        <span><i class="fa-regular fa-adress"></i>Adress</span><input type="string" name="EndDate" />
+    </div>
+    <div class="OptionRow">
+        <span><i class="fa-solid fa-mail"></i>Email</span><input type="string" name="Duration" />
+    </div>
+    <div class="OptionRow">
+        <span><i class="fa-solid fa-timeline"></i>Website</span><input type="string" name="Duration" />
+    </div>
+    <div class="OptionRow">
+        <span><i class="fa-solid fa-timeline"></i>Phone</span><input type="string" name="Duration" />
+    </div>
+</div>
+<div class="FilterOptions">
+    <div class="OptionRow">
+        <span><i class="fa-solid fa-id-card"></i>User Id</span><input type="string" name="UserId" />
+    </div>
+    <div class="OptionRow">
+        <span><i class="fa-solid fa-diagram-project"></i>Project</span><input type="string" name="Project" />
+    </div>
+    <div class="OptionRow">
+        <span><i class="fa-solid fa-tag"></i>Tag</span><input type="string" name="Tag" />
+    </div>
+    <div class="OptionRow">
+        <span><i class="fa-solid fa-mug-hot"></i>Holiday</span><input type="checkbox" name="Holiday" />
+    </div>
+    <div class="OptionRow">
+        <span><i class="fa-solid fa-money-bill"></i>Billable</span><input type="checkbox" name="Billable" />
+    </div>
+    <div class="OptionRow">
+        <span><i class="fa-solid fa-trash"></i>Deleted</span><input type="checkbox" name="Deleted" />
+    </div>
+</div>

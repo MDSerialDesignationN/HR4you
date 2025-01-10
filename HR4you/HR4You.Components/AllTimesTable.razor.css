@@ -1,19 +1,5 @@
-﻿
 
-
-.searchAndAdd {
-    display: flex;
-    margin-top: 20px;
-}
-
-
-.Add_Time {
-    float: right;
-    margin-left: auto;
-}
-
-
-.OverviewTable {
+.AllTimesTable {
     border-collapse: collapse;
     position: relative;
     margin-top: 20px;
@@ -24,22 +10,22 @@
     width: 100%;
 }
 
-    .OverviewTable th,
-    .OverviewTable td {
+    .AllTimesTable th,
+    .AllTimesTable td {
         padding: 8px;
         text-align: left;
         border: 1px solid gainsboro;
+        max-width: fit-content;
+/*        max-width: 200px;*/
+/*display: none;*/
     }
 
-    .OverviewTable th {
+    .AllTimesTable th {
         background-color: #f4f4f4;
+        white-space: nowrap;
     }
 
-.addButtons {
-    display: flex;
-    /*    justify-content: space-between;*/
-    gap: 10px;
-    flex-wrap: wrap;
-    width: 30%;
-    margin: 2px;
-}
+    .AllTimesTable td {
+        overflow: hidden;
+        white-space: nowrap;
+    }

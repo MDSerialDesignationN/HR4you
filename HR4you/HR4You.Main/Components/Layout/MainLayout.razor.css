@@ -20,11 +20,14 @@ body {
 }
 
 main {
-    flex-grow: 1;
+    /*    flex-grow: 1;*/
+    width: calc(100vw - 300px);
+    box-sizing: border-box;
     background-color: #f4f4f4;
-    display: flex;
+    /*    display: flex;*/
     justify-content: left;
-    
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 .content {
@@ -87,4 +90,8 @@ main {
 
 .logout-text:hover {
     color: red; /* Farbe ändern beim Hover */
+}
+
+::-webkit-scrollbar {
+    display: none;
 }

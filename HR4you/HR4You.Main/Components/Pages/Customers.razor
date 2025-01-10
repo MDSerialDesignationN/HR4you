@@ -6,6 +6,7 @@
 <PageTitle>Customers</PageTitle>
 
 <h1>Customers</h1>
+<CustomerSearch></CustomerSearch>
 
 <label>Show Deleted</label>
 <input type="checkbox" checked="@addDeleted" @oninput="CheckboxChanged">
@@ -27,6 +28,7 @@ else
 @code {
 
     public List<Customer> entries;
+    public List<Customer> filteredEntries;
 
     //public bool IsChecked = true;
 
@@ -56,6 +58,7 @@ else
         try
         {
             entries = await HttpClient.GetFromJsonAsync<List<Customer>>(RequestURL + addDeleted);
+            filteredEntries = entries;
             //Console.WriteLine(entries);
         }
         catch (Exception ex)
