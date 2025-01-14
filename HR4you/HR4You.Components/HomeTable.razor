@@ -1,6 +1,7 @@
 ﻿<PopupTag @ref="popupRefTag"></PopupTag>
 <PopupProject @ref="popupRefProject"></PopupProject>
 <PopupCustomers @ref="popupRefCustomer"></PopupCustomers>
+<PopupHourEntry @ref="popupRefHourEntry"></PopupHourEntry>
 
 
 <div class="addButtons">
@@ -13,7 +14,7 @@
     <input id="Search_Box" type="text" />
     <input id="Search" type="submit" value="Search" />
 
-    <input class="Add_Time" type="submit" value="+" />
+    <button class="btn btn-dark" @onclick="(() => CreateHourEntry())">+</button>
 </div>
 
 <div class="OverviewContainer">
@@ -62,10 +63,12 @@
     private PopupTag popupRefTag;
     private PopupProject popupRefProject;
     private PopupCustomers popupRefCustomer;
+    private PopupHourEntry popupRefHourEntry;
 
     public string RequestURLUser = "http://localhost:5001/api/master-data/customer/get?Id="; //User
     public string RequestURLProject = "http://localhost:5001/api/master-data/project/get?Id=";
     public string RequestURLCustomer = "http://localhost:5001/api/master-data/customer/get?Id="; // ????
+    public string RequestURLHourEntry = "http://localhost:5001/api/master-data/hour-entry/get?Id=";
 
     private void CreateTag()
     {
@@ -78,6 +81,12 @@
     private void CreateCustomer()
     {
         popupRefCustomer.ShowOverview("Add Customer");
+    }
+
+    private async Task CreateHourEntry()
+    {
+        await popupRefHourEntry.ShowOverview("Add Hour Entry");
+        
     }
 }
 

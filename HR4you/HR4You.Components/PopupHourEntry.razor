@@ -1,0 +1,156 @@
+﻿@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+@{
+    var showClass = IsVisible ? "d-block" : "d-none";
+}
+
+    <div class="toast-container position-absolute @showClass" data-bs-autohide="true" data-bs-delay="50000"
+    style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
+
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true"
+        style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; background-color:white; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
+            <div class="toast-header">
+                <strong class="me-auto">@HeaderText</strong>
+                <button type="button" class="btn-close" aria-label="Close" @onclick="Close"></button>
+            </div>
+
+        <EditForm Model="_hourEntry" OnValidSubmit="Submit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+        
+            <div class="toast-body" style="padding: 20px;">
+                <div class="container">
+                    <div class="row">
+                        <!-- Date and Project-->
+                        <div class="col-sm-4">
+                            <label>Date</label>
+                            <InputDate @bind-Value="_hourEntry.Date" class="form-control mb-2" />
+                            
+                            <label>Project</label>
+                            <InputSelect @bind-Value="_hourEntry.ProjectId" class="form-select">
+                                @foreach (var project in projects)
+                                {
+                                    <option value="@project.Id">@project.Name</option>
+                                }
+                            </InputSelect>
+                            
+                        </div>
+
+                        <!-- Name and Address -->
+                        <div class="col-sm-4">
+                            <label>Start Time</label>
+                            <InputDate @bind-Value="_hourEntry.StartTime" class="form-control mb-2" />
+
+                            <label>Tag</label>
+                            <InputSelect @bind-Value="_hourEntry.TagId" class="form-select">
+                                @foreach (var tag in tags)
+                                {
+                                    <option value="@tag.Id">@tag.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+
+                        <!-- Email and Phone Number -->
+                        <div class="col-sm-4">
+                            <label>End Time</label>
+                            <InputDate @bind-Value="_hourEntry.EndTime" class="form-control mb-2" />
+                            <label>Phone Number</label>
+                            @*<InputText @bind-Value="hourEntry.PhoneNumber" class="form-control mb-2" />*@
+                        </div>
+
+                        <!-- Description -->
+                        <div class="col-sm-8">
+                            <label>Description</label>
+                            <InputTextArea @bind-Value="_hourEntry.Description" rows="4" class="form-control mb-2" />
+                        </div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <button type="submit" class="btn btn-dark">Save</button>
+                            <button type="button" class="btn btn-outline-secondary" @onclick="Close">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </EditForm>
+        </div>
+    </div>
+
+@code {
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsVisibleChanged { get; set; }
+
+    [Parameter] 
+    public EventCallback OnCustomerUpdated { get; set; }
+
+    [Parameter]
+    public string? HeaderText { get; set; }
+
+    [Parameter]
+    public string? GivenId { get; set; }
+
+    private const string RefProjectUrl = "http://localhost:5001/api/master-data/project/get-all";
+    private const string RefTagUrl = "http://localhost:5001/api/master-data/tag/get-all";
+    
+    List<Project> projects = [];
+    List<Tag> tags = [];
+    HourEntry _hourEntry = new HourEntry();
+
+    bool isEdit = false;
+    bool gotProjectsList = false;
+
+    private async Task getProjects()
+    {
+        projects = await HttpClient.GetFromJsonAsync<List<Project>>(RefProjectUrl);
+    }
+
+    private async Task getTags()
+    {
+        tags = await HttpClient.GetFromJsonAsync<List<Tag>>(RefTagUrl);
+    }
+
+    public async Task Show(int givenId, string requestURL, string headerText)
+    {
+        
+        HeaderText = headerText;
+        GivenId = givenId.ToString(); 
+        //hourEntry = await HttpClient.GetFromJsonAsync<Customer>(requestURL + GivenId);
+        IsVisible = true;
+        isEdit = true;
+        await getProjects();
+        await getTags();
+        StateHasChanged();
+    }
+
+    public async Task ShowOverview(string headerText)
+    {
+        
+        HeaderText = headerText;
+        //customer = await HttpClient.GetFromJsonAsync<Customer>(requestURL + GivenId);
+        IsVisible = true;
+        isEdit = false;
+        await getProjects();
+        await getTags();
+        StateHasChanged();
+    }
+
+    private void Submit()
+    {
+        
+    }
+
+    private void Close()
+    {
+        HeaderText = string.Empty;
+        GivenId = null;
+        IsVisible = false;
+        StateHasChanged();
+    }
+}
