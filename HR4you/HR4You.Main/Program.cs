@@ -77,7 +77,6 @@ var app = builder.Build();
 //Trigger DB migration
 ModelContextHelper.MigrateModelDb(app);
 
-//TODO rewrite rules if needed
 //TODO add authentication system for user management
 //TODO add and register audit service
 
