@@ -3,36 +3,36 @@
     position: relative;
     display: flex;
     border: 1px solid #c1c1c1;
-    width: 350px;
+    width: fit-content;
     border-radius: 5px;
     height: 40px;
     box-sizing: border-box;
 }
 
-    .searchAndFilter > #Search {
-        padding: 5px;
-        border: none;
-        /*    width: 250px*/
-        flex: 1;
-    }
+.searchAndFilter > #Search {
+    padding: 5px;
+    border: none;
+    /*    width: 250px*/
+    flex: 1;
+}
 
-    .searchAndFilter > button {
-        width: 40px;
-        border: none;
-    }
+.searchAndFilter > button {
+    width: 40px;
+    border: none;
+}
 
-    .searchAndFilter > #FilterOptions {
-        border-right: 1px solid #c1c1c1;
-    }
+.searchAndFilter > #FilterOptions {
+    border-right: 1px solid #c1c1c1;
+}
 
-        .searchAndFilter > #FilterOptions:first-of-type {
-            border-radius: 5px 0 0 5px;
-        }
+.searchAndFilter > #FilterOptions:first-of-type {
+    border-radius: 5px 0 0 5px;
+}
 
-    .searchAndFilter > #Submit {
-        border-radius: 0 5px 5px 0;
-        border-left: 1px solid #c1c1c1;
-    }
+.searchAndFilter > #Submit {
+    border-radius: 0 5px 5px 0;
+    border-left: 1px solid #c1c1c1;
+}
 
 .FilterOptions {
     z-index: 1;
@@ -46,11 +46,11 @@
     height: fit-content;
 }
 
-    .FilterOptions.active {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
+.FilterOptions.active {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 
 .OptionRow {
     display: flex;

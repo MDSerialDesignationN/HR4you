@@ -5,49 +5,109 @@
 @inject HttpClient HttpClient
 
 <div class="searchAndFilter">
-    <button title="Filteroptionen" id="FilterOptions"><i class="fa-solid fa-filter"></i></button>
-    <button title="Admin Filteroptionen" id="FilterOptions"><i class="fa-solid fa-user-tie"></i></button>
+    <button title="Filteroptionen" id="FilterOptions" @onclick="ToggleFilterOptions"><i class="fa-solid fa-filter"></i></button>
+    <button id="Submit" type="submit" value="Search" @onclick="FilterEntries"><i class="fa-solid fa-magnifying-glass"></i></button>
+</div>
+<div class="FilterOptions @(showFilterOptions ? "active" : "")">
+    <div class="OptionRow">
+        <span><i class="fa-solid fa-hashtag"></i>Number</span><input type="number" name="CustomerNumber" @bind="customerNumber" />
+    </div>
+    <div class="OptionRow">
+        <span><i class="fa-solid fa-signature"></i>Name</span><input type="string" name="Name" @bind="name" />
+    </div>
+    <div class="OptionRow">
+        <span><i class="fa-solid fa-font"></i>Description</span><input type="string" name="Description" @bind="description"/>
+    </div>
+    <div class="OptionRow">
+        <span><i class="fa-solid fa-address-book"></i>Adress</span><input type="string" name="Address" @bind="address"/>
+    </div>
+    <div class="OptionRow">
+        <span><i class="fa-solid fa-envelope"></i>Email</span><input type="string" name="Email" @bind="email"/>
+    </div>
+    <div class="OptionRow">
+        <span><i class="fa-solid fa-timeline"></i>Website</span><input type="string" name="Website" @bind="website"/>
+    </div>
+    <div class="OptionRow">
+        <span><i class="fa-solid fa-phone"></i>Phone</span><input type="string" name="Phone" @bind="phone"/>
+    </div>
+    <div class="OptionRow">
+        <span><i class="fa-solid fa-trash"></i>Deleted</span><input type="checkbox" name="Deleted" @bind="deleted"/>
+    </div>
+</div>
 
-    <input id="Search" type="text" placeholder="Search" />
-    <button id="Submit" type="submit" value="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
-</div>
-<div class="FilterOptions active">
-    <div class="OptionRow">
-        <span><i class="fa-solid fa-"></i>Number</span><input type="number" name="Date" />
-    </div>
-    <div class="OptionRow">
-        <span><i class="fa-regular fa-text"></i>Name</span><input type="string" name="StartDate" />
-    </div>
-    <div class="OptionRow">
-        <span><i class="fa-regular fa-adress"></i>Adress</span><input type="string" name="EndDate" />
-    </div>
-    <div class="OptionRow">
-        <span><i class="fa-solid fa-mail"></i>Email</span><input type="string" name="Duration" />
-    </div>
-    <div class="OptionRow">
-        <span><i class="fa-solid fa-timeline"></i>Website</span><input type="string" name="Duration" />
-    </div>
-    <div class="OptionRow">
-        <span><i class="fa-solid fa-timeline"></i>Phone</span><input type="string" name="Duration" />
-    </div>
-</div>
-<div class="FilterOptions">
-    <div class="OptionRow">
-        <span><i class="fa-solid fa-id-card"></i>User Id</span><input type="string" name="UserId" />
-    </div>
-    <div class="OptionRow">
-        <span><i class="fa-solid fa-diagram-project"></i>Project</span><input type="string" name="Project" />
-    </div>
-    <div class="OptionRow">
-        <span><i class="fa-solid fa-tag"></i>Tag</span><input type="string" name="Tag" />
-    </div>
-    <div class="OptionRow">
-        <span><i class="fa-solid fa-mug-hot"></i>Holiday</span><input type="checkbox" name="Holiday" />
-    </div>
-    <div class="OptionRow">
-        <span><i class="fa-solid fa-money-bill"></i>Billable</span><input type="checkbox" name="Billable" />
-    </div>
-    <div class="OptionRow">
-        <span><i class="fa-solid fa-trash"></i>Deleted</span><input type="checkbox" name="Deleted" />
-    </div>
-</div>
+@code {
+    [Parameter] public List<Customer> Entries { get; set; }
+    [Parameter] public EventCallback<List<Customer>> OnFilterChanged { get; set; }
+    private int? customerNumber;
+    private string? name;
+    private string? description;
+    private string? address;
+    private string? email;
+    private string? website;
+    private string? phone;
+    private bool deleted;
+    private bool showFilterOptions = false;
+
+    private void FilterEntries()
+    {
+        var filteredEntries = Entries.Where(e =>
+            (!customerNumber.HasValue || e.CustomerNumber == customerNumber) && 
+            (string.IsNullOrWhiteSpace(name) || (e.Name != null && e.Name.Contains(name, StringComparison.OrdinalIgnoreCase))) &&
+            (string.IsNullOrWhiteSpace(description) || (e.Description != null && e.Description.Contains(description, StringComparison.OrdinalIgnoreCase))) &&
+            (string.IsNullOrWhiteSpace(address) || (e.Address != null && e.Address.Contains(address, StringComparison.OrdinalIgnoreCase))) &&
+            (string.IsNullOrWhiteSpace(email) || (e.Email != null && e.Email.Contains(email, StringComparison.OrdinalIgnoreCase))) &&
+            (string.IsNullOrWhiteSpace(website) || (e.Website != null && e.Website.Contains(website, StringComparison.OrdinalIgnoreCase))) &&
+            (string.IsNullOrWhiteSpace(phone) || (e.PhoneNumber != null && e.PhoneNumber.Contains(phone, StringComparison.OrdinalIgnoreCase))) &&
+            (!deleted || (e.Deleted == deleted || e.Deleted == false))
+
+
+
+
+
+
+
+    // (string.IsNullOrWhiteSpace(description) || (e.Description != null && e.Description.Contains(description, StringComparison.OrdinalIgnoreCase))) &&
+            // (!date.HasValue || e.Date == date.Value) &&
+            // (!startTime.HasValue || e.StartTime >= startTime.Value) &&
+            // (!endTime.HasValue || e.EndTime <= endTime.Value) &&
+            // (!duration.HasValue || e.Duration <= duration.Value) &&
+            // (!selectedActivityType.HasValue || e.Type == selectedActivityType.Value) &&
+            // (string.IsNullOrWhiteSpace(userId) || (e.UserId != null && e.UserId.Contains(userId, StringComparison.OrdinalIgnoreCase))) &&
+            // (string.IsNullOrWhiteSpace(project) || (e.ProjectId != null && e.ProjectId.ToString().Contains(project, StringComparison.OrdinalIgnoreCase))) &&
+            // (string.IsNullOrWhiteSpace(tag) || (e.TagId != null && e.TagId.ToString().Contains(tag, StringComparison.OrdinalIgnoreCase))) &&
+            // (!holiday || e.IsHoliday) &&
+            // (!billable || e.IsBillable) &&
+            // (!deleted || e.Deleted)
+        ).ToList();
+
+        OnFilterChanged.InvokeAsync(filteredEntries);
+    }
+
+    private void HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            FilterEntries();
+        }
+    }
+
+    private void ToggleFilterOptions()
+    {
+        showFilterOptions = !showFilterOptions;
+    }
+
+    // private void disableSpecificFilters()
+    // {
+    //     if (description == "")
+    //     {
+    //         isDateDisabled = false;
+
+    //     }
+    //     else
+    //     {
+    //         isDateDisabled = true;
+
+    //     }
+
+    // }
+}

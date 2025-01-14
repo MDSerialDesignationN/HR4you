@@ -6,7 +6,7 @@
 <PageTitle>Customers</PageTitle>
 
 <h1>Customers</h1>
-<CustomerSearch></CustomerSearch>
+<CustomerSearch Entries="entries" OnFilterChanged="UpdateFilteredEntries" />
 
 <label>Show Deleted</label>
 <input type="checkbox" checked="@addDeleted" @oninput="CheckboxChanged">
@@ -19,7 +19,7 @@
 }
 else
 {
-    <CustomersTable entries="entries" @ref="popupRef2" OnCustomerUpdated2="RefreshTable2">
+    <CustomersTable entries="filteredEntries" @ref="popupRef2" OnCustomerUpdated2="RefreshTable2">
     </CustomersTable>
 }
 
@@ -88,5 +88,10 @@ else
         await LoadCustomers(); 
 
         StateHasChanged();
+    }
+
+    private void UpdateFilteredEntries(List<Customer> filteredEntries)
+    {
+        this.filteredEntries = filteredEntries;
     }
 }

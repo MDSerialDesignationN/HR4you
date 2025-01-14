@@ -31,7 +31,7 @@
     {
         try
         {
-            entries = await HttpClient.GetFromJsonAsync<List<HourEntry>>("http://localhost:5001/api/master-data/hour-entry/get-all");
+            entries = await HttpClient.GetFromJsonAsync<List<HourEntry>>("http://localhost:5001/api/master-data/hour-entry/get-all-paged?reference=0&pageSize=10");
             filteredEntries = entries.Slice(1, 10);
         }
         catch (Exception ex)

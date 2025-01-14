@@ -8,12 +8,12 @@
     <button title="Filteroptionen" id="FilterOptions" @onclick="ToggleFilterOptions"><i class="fa-solid fa-filter"></i></button>
     <button title="Admin Filteroptionen" id="FilterOptions" @onclick="ToggleFilterOptionsAdmin"><i class="fa-solid fa-user-tie"></i></button>
 
-    <input id="Search" type="text" @bind="description" @bind:event="oninput" @onkeypress="HandleKeyPress" placeholder="Search" />
+    @* <input id="Search" type="text" @bind="description" @bind:event="oninput" @onkeypress="HandleKeyPress" @onchange="disableSpecificFilters" placeholder="Search" /> *@
     <button id="Submit" type="submit" value="Search" @onclick="FilterEntries"><i class="fa-solid fa-magnifying-glass"></i></button>
 </div>
 <div class="FilterOptions @(showFilterOptions ? "active" : "")">
     <div class="OptionRow">
-        <span><i class="fa-solid fa-calendar-days color-[blue]"></i>Datum</span><input type="date" name="Date" @bind="date" @bind:event="oninput" />
+        <span><i class="fa-solid fa-calendar-days color-[blue]"></i>Datum</span><input type="date" name="Date" @bind="date" @bind:event="oninput" disabled="@isDateDisabled" />
     </div>
     <div class="OptionRow">
         <span><i class="fa-regular fa-clock"></i>StartZeit</span><input type="time" name="StartDate" @bind="startTime" @bind:event="oninput" />
@@ -74,6 +74,7 @@
     private bool deleted;
     private bool showFilterOptions = false;
     private bool showFilterOptionsAdmin = false;
+    private bool isDateDisabled = false;
 
     private void FilterEntries()
     {
@@ -111,5 +112,20 @@
     private void ToggleFilterOptionsAdmin()
     {
         showFilterOptionsAdmin = !showFilterOptionsAdmin;
+    }
+
+    private void disableSpecificFilters()
+    {
+        // if (description == "")
+        // {
+        //     isDateDisabled = false;
+
+        // }
+        // else
+        // {
+        //     isDateDisabled = true;
+
+        // }
+
     }
 }

@@ -3,7 +3,8 @@
     position: relative;
     display: flex;
     border: 1px solid #c1c1c1;
-    width: 350px;
+    width: 300px;
+    justify-content: space-between;
     border-radius: 5px;
     height: 40px;
     box-sizing: border-box;

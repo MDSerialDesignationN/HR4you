@@ -1,9 +1,10 @@
-﻿body {
+﻿/*body {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 50px;
-    background: #12171e;
+    padding: 10px;
+    background: #f4f4f4;
     min-height: 100vh;
+    min-width: 100vw;
     box-sizing: border-box;
-}
+}*/
