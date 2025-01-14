@@ -1,6 +1,7 @@
 ﻿using HR4You.Contexts.HourEntry;
 using HR4You.Model.Base;
 using HR4You.Model.Base.Models.HourEntry;
+using HR4You.Model.Base.Pagination;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -20,7 +21,7 @@ public class HourEntryController : ControllerBase
     [HttpGet("get-all-paged")]
     [SwaggerOperation("GetAllPagedHourEntries")]
     //[Authorize(Policy = )]
-    public async Task<IActionResult> GetAllPagedHourEntries(bool addDeleted, string? userId, int reference = 0, int pageSize = 10)
+    public async Task<IActionResult> GetAllPagedHourEntries([FromQuery] List<ColumnFilter> columnFilters, bool addDeleted, int reference = 0, int pageSize = 10)
     {
         if (pageSize <= 0)
             return BadRequest($"{nameof(pageSize)} size must be greater than 0");
@@ -28,7 +29,27 @@ public class HourEntryController : ControllerBase
         using var scope = _serviceProvider.CreateScope();
         var sc = scope.ServiceProvider.GetService<HourEntryContext>()!;
         
-        var result = await sc.GetAllPagedEntries(reference, pageSize, addDeleted, userId);
+        var result = await sc.GetAllPagedEntries(columnFilters, reference, pageSize, addDeleted, null);
+        return result.Error switch
+        {
+            MasterDataError.None => Ok(result.Entity),
+            MasterDataError.NotFound => NotFound(),
+            _ => BadRequest("something bad happened")
+        };
+    }
+    
+    [HttpGet("get-user-all-paged")]
+    [SwaggerOperation("GetUserAllPagedHourEntries")]
+    //[Authorize(Policy = )]
+    public async Task<IActionResult> GetUserAllPagedHourEntries([FromQuery] List<ColumnFilter> columnFilters, bool addDeleted, string userId, int reference = 0, int pageSize = 10)
+    {
+        if (pageSize <= 0)
+            return BadRequest($"{nameof(pageSize)} size must be greater than 0");
+        
+        using var scope = _serviceProvider.CreateScope();
+        var sc = scope.ServiceProvider.GetService<HourEntryContext>()!;
+        
+        var result = await sc.GetAllPagedEntries(columnFilters, reference, pageSize, addDeleted, userId);
         return result.Error switch
         {
             MasterDataError.None => Ok(result.Entity),

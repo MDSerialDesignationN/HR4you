@@ -2,6 +2,7 @@
 using HR4You.Contexts.Project;
 using HR4You.Model.Base;
 using HR4You.Model.Base.Models.Project;
+using HR4You.Model.Base.Pagination;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -23,7 +24,7 @@ public class ProjectController : ControllerBase
     [HttpGet("get-all-paged")]
     [SwaggerOperation("GetAllPagedProjects")]
     //[Authorize(Policy = )]
-    public async Task<IActionResult> GetAllPagedProjects(bool addDeleted, int pageNumber = 1, int pageSize = 10)
+    public async Task<IActionResult> GetAllPagedProjects([FromQuery] List<ColumnFilter> columnFilters, bool addDeleted, int pageNumber = 1, int pageSize = 10)
     {
         if (pageNumber <= 0 || pageSize <= 0)
             return BadRequest($"{nameof(pageNumber)} and {nameof(pageSize)} size must be greater than 0");
@@ -31,7 +32,7 @@ public class ProjectController : ControllerBase
         using var scope = _serviceProvider.CreateScope();
         var sc = scope.ServiceProvider.GetService<ProjectContext>()!;
         
-        var result = await sc.GetAllOffsetPaged(pageNumber, pageSize, addDeleted);
+        var result = await sc.GetAllOffsetPaged(columnFilters, pageNumber, pageSize, addDeleted);
         return result.Error switch
         {
             MasterDataError.None => Ok(result.Entity),

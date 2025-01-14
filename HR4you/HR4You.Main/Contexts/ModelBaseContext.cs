@@ -1,6 +1,7 @@
 ﻿using HR4You.Model.Base;
 using HR4You.Model.Base.Pagination;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace HR4You.Contexts;
 
@@ -98,7 +99,8 @@ public class ModelBaseContext<T> : DbContext where T : ModelBase
         return ModelResult<List<T>>.Ok(result);
     }
 
-    protected async Task<ModelResult<PagedResponseKeySet<T>>> GetAllKeyPaged(int reference = 0, int pageSize = 10,
+    protected async Task<ModelResult<PagedResponseKeySet<T>>> GetAllKeyPaged(List<ColumnFilter>? columnFilters,
+        int reference, int pageSize,
         bool addDeleted = true)
     {
         var linq = Entities.AsNoTracking().OrderBy(e => e.Id).AsQueryable();
@@ -107,7 +109,17 @@ public class ModelBaseContext<T> : DbContext where T : ModelBase
             linq = linq.Where(e => e.Deleted != true);
         }
 
-        var result = await linq.Where(e => e.Id > reference)
+        //Go to reference in key set
+        linq = linq.Where(e => e.Id > reference);
+
+        if (!columnFilters.IsNullOrEmpty())
+        {
+            var customFilter = CustomExpressionFilter<T>.CreateFilter(columnFilters!);
+
+            linq = linq.Where(customFilter);
+        }
+
+        var result = await linq
             .Take(pageSize)
             .OrderByDescending(e => e.Id)
             .ToListAsync();
@@ -118,13 +130,21 @@ public class ModelBaseContext<T> : DbContext where T : ModelBase
         return ModelResult<PagedResponseKeySet<T>>.Ok(pagedResponse);
     }
 
-    public async Task<ModelResult<PagedResponseOffset<T>>> GetAllOffsetPaged(int pageNumber = 1, int pageSize = 10,
+    public async Task<ModelResult<PagedResponseOffset<T>>> GetAllOffsetPaged(List<ColumnFilter>? columnFilters,
+        int pageNumber, int pageSize,
         bool addDeleted = true)
     {
         var linq = Entities.AsNoTracking().OrderBy(e => e.Id).AsQueryable();
         if (!addDeleted)
         {
             linq = linq.Where(e => e.Deleted != true);
+        }
+
+        if (!columnFilters.IsNullOrEmpty())
+        {
+            var customFilter = CustomExpressionFilter<T>.CreateFilter(columnFilters!);
+
+            linq = linq.Where(customFilter);
         }
 
         var totalRecords = await linq.CountAsync();

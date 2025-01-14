@@ -2,6 +2,7 @@
 using HR4You.Contexts.WorkTime;
 using HR4You.Model.Base;
 using HR4You.Model.Base.Models.WorkTime;
+using HR4You.Model.Base.Pagination;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -23,12 +24,12 @@ public class WorkTimeController : ControllerBase
     [HttpGet("get-all-paged")]
     [SwaggerOperation("GetAllPagedWorkTimes")]
     //[Authorize(Policy = )]
-    public async Task<IActionResult> GetAllPagedWorkTimes(bool addDeleted, int pageNumber = 1, int pageSize = 10)
+    public async Task<IActionResult> GetAllPagedWorkTimes([FromQuery] List<ColumnFilter> columnFilters, bool addDeleted, int pageNumber = 1, int pageSize = 10)
     {
         using var scope = _serviceProvider.CreateScope();
         var sc = scope.ServiceProvider.GetService<WorkTimeContext>()!;
         
-        var result = await sc.GetAllOffsetPaged(pageNumber, pageSize, addDeleted);
+        var result = await sc.GetAllOffsetPaged(columnFilters, pageNumber, pageSize, addDeleted);
         return result.Error switch
         {
             MasterDataError.None => Ok(result.Entity),

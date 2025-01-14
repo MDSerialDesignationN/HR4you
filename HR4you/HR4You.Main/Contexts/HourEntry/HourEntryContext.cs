@@ -44,7 +44,7 @@ namespace HR4You.Contexts.HourEntry
                 _logger.LogError("Hour entry with id {Id} was not found!", id);
                 return HourEntryResult.NotOk(HourEntryError.DbError, id.ToString());
             }
-            
+
             var result = await CalcProperties(hourEntry);
             if (result.Error != HourEntryError.None)
             {
@@ -53,17 +53,21 @@ namespace HR4You.Contexts.HourEntry
 
             var dbResult = await base.Edit(id, hourEntry);
             return dbResult.Error != MasterDataError.None
-                ? HourEntryResult.NotOk(HourEntryError.DbError,$"DB Error - {dbResult.Error}")
+                ? HourEntryResult.NotOk(HourEntryError.DbError, $"DB Error - {dbResult.Error}")
                 : HourEntryResult.Ok(dbResult.Entity!);
         }
 
 
         public async Task<ModelResult<PagedResponseKeySet<Model.Base.Models.HourEntry.HourEntry>>> GetAllPagedEntries(
-            int reference, int pageSize, bool addDeleted, string? userId)
+            List<ColumnFilter> columnFilters, int reference, int pageSize, bool addDeleted, string? userId)
         {
+            //TODO code is more or less identical here because GetAllKeyPaged
+            //is meant to be more generic but we still need functionality for userId limitation in this context
+
+            //Used by admin policy - no userId needed
             if (userId.IsNullOrEmpty())
             {
-                var modelResult = await GetAllKeyPaged(reference, pageSize, addDeleted);
+                var modelResult = await GetAllKeyPaged(columnFilters, reference, pageSize, addDeleted);
                 return modelResult;
             }
 
@@ -73,7 +77,18 @@ namespace HR4You.Contexts.HourEntry
                 linq = linq.Where(he => he.Deleted != true);
             }
 
-            var result = await linq.Where(he => he.Id > reference)
+            //Go to reference in key set
+            linq = linq.Where(e => e.Id > reference);
+
+            if (!columnFilters.IsNullOrEmpty())
+            {
+                var customFilter =
+                    CustomExpressionFilter<Model.Base.Models.HourEntry.HourEntry>.CreateFilter(columnFilters!);
+
+                linq = linq.Where(customFilter);
+            }
+
+            var result = await linq
                 .Take(pageSize)
                 .OrderByDescending(he => he.LastModifiedAt ?? he.CreationDateTime)
                 .ToListAsync();
@@ -108,7 +123,7 @@ namespace HR4You.Contexts.HourEntry
                 DayOfWeek.Sunday => workTimeConfig.MinSunHours,
                 _ => throw new ArgumentOutOfRangeException()
             };
-            
+
             var holidayContext = scope.ServiceProvider.GetService<HolidayContext>()!;
             var holiday = await holidayContext.GetEntryForDate(hourEntry.Date);
 
