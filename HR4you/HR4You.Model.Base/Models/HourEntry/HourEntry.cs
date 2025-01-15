@@ -8,7 +8,7 @@ namespace HR4You.Model.Base.Models.HourEntry
     public class HourEntry : ModelBase
     {
         [Required] public string UserId { get; set; } = null!;
-        [Required] public DateOnly Date { get; set; }
+        [Required] public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Now);
         [Required] public TimeOnly StartTime { get; set; }
         [Required] public TimeOnly EndTime { get; set; }
         /// <summary>
@@ -46,7 +46,6 @@ namespace HR4You.Model.Base.Models.HourEntry
             }
 
             UserId = data.UserId;
-
             Date = data.Date;
             StartTime = data.StartTime;
             EndTime = data.EndTime;

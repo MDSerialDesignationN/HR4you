@@ -1,17 +1,8 @@
-﻿
-
-
-.searchAndAdd {
+﻿.AddHourEntry {
     display: flex;
-    margin-top: 20px;
+    
+    justify-content: flex-end;
 }
-
-
-.Add_Time {
-    float: right;
-    margin-left: auto;
-}
-
 
 .OverviewTable {
     border-collapse: collapse;

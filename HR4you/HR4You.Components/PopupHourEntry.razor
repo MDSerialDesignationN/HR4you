@@ -26,7 +26,7 @@
                         <!-- Date and Project-->
                         <div class="col-sm-4">
                             <label>Date</label>
-                            <InputDate @bind-Value="_hourEntry.Date" class="form-control mb-2" />
+                            <InputDate @bind-Value="_hourEntry.Date" class="form-control mb-2"></InputDate> 
                             
                             <label>Project</label>
                             <InputSelect @bind-Value="_hourEntry.ProjectId" class="form-select">
@@ -38,10 +38,10 @@
                             
                         </div>
 
-                        <!-- Name and Address -->
+                        <!-- Start Time and Tag -->
                         <div class="col-sm-4">
                             <label>Start Time</label>
-                            <InputDate @bind-Value="_hourEntry.StartTime" class="form-control mb-2" />
+                            <InputDate Type="InputDateType.Time" @bind-Value="_hourEntry.StartTime" class="form-control mb-2" />
 
                             <label>Tag</label>
                             <InputSelect @bind-Value="_hourEntry.TagId" class="form-select">
@@ -52,12 +52,10 @@
                             </InputSelect>
                         </div>
 
-                        <!-- Email and Phone Number -->
+                        <!-- EndTime -->
                         <div class="col-sm-4">
                             <label>End Time</label>
-                            <InputDate @bind-Value="_hourEntry.EndTime" class="form-control mb-2" />
-                            <label>Phone Number</label>
-                            @*<InputText @bind-Value="hourEntry.PhoneNumber" class="form-control mb-2" />*@
+                            <InputDate Type="InputDateType.Time" @bind-Value="_hourEntry.EndTime" class="form-control mb-2" />
                         </div>
 
                         <!-- Description -->
@@ -88,7 +86,7 @@
     public EventCallback<bool> IsVisibleChanged { get; set; }
 
     [Parameter] 
-    public EventCallback OnCustomerUpdated { get; set; }
+    public EventCallback OnHourEntryUpdated { get; set; }
 
     [Parameter]
     public string? HeaderText { get; set; }
@@ -105,6 +103,7 @@
 
     bool isEdit = false;
     bool gotProjectsList = false;
+    
 
     private async Task getProjects()
     {
@@ -141,9 +140,52 @@
         StateHasChanged();
     }
 
-    private void Submit()
+    private async Task Submit()  // DISCLAIMER: USERID IS NEEDED FOR "CREATE"
     {
-        
+        var editURL = "http://localhost:5001/api/master-data/hour-entry/edit?Id=";
+        var createURL = "http://localhost:5001/api/master-data/hour-entry/create";
+
+        if (isEdit == true)
+        {
+            try
+            {
+                var response = await HttpClient.PostAsJsonAsync(editURL + GivenId, _hourEntry);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("Entry saved successfully.");
+
+                    if (OnHourEntryUpdated.HasDelegate)
+                    {
+                        await OnHourEntryUpdated.InvokeAsync(); // Notify the parent component
+                    }
+                    else
+                    {
+                        Console.WriteLine("OnHourEntryUpdated has no delegate assigned.");
+                    }
+                    Close();
+                }
+                else
+                {
+                    Console.WriteLine("Error occurred while saving the Entry: " + response.ReasonPhrase);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception occurred: " + ex.Message);
+            }
+        }
+        else if (isEdit == false)
+        {
+            DateTime startDate = _hourEntry.Date.ToDateTime(_hourEntry.StartTime);
+            _hourEntry.Duration = Convert.ToSingle(startDate);
+            var response = await HttpClient.PostAsJsonAsync(createURL, _hourEntry);
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Entry saved successfully.");
+                Close();
+            }
+        }
     }
 
     private void Close()
