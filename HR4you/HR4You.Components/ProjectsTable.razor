@@ -47,54 +47,14 @@
     [Parameter]
     public EventCallback OnProjectUpdated2 { get; set; }
 
-    private Dictionary<int, string> customerNames = new Dictionary<int, string>();
+    [Parameter]
+    public Dictionary<int, string> customerNames { get; set; }
 
     private PopupProject popupRef;
-
-    public string RequestURLCustomer = "http://localhost:5001/api/master-data/customer/get?addDeleted=true&Id=";
 
     public string RequestURLEdit = "http://localhost:5001/api/master-data/project/get?addDeleted=true&Id=";
 
     public string RequestURLDelete = "http://localhost:5001/api/master-data/project/delete?Id=";
-
-    protected override async Task OnInitializedAsync()
-    {
-        List<int> uniqueCustomerIds = new List<int>();
-
-        // Fetch customer names for all entries
-        foreach (var entry in entries)
-        {
-            if (!uniqueCustomerIds.Contains(entry.CustomerId))
-            {
-                uniqueCustomerIds.Add(entry.CustomerId);
-            }
-        }
-
-        Console.WriteLine(uniqueCustomerIds);
-
-        foreach (var customerId in uniqueCustomerIds)
-        {
-            if (!customerNames.ContainsKey(customerId))
-            {
-                var customer = await FetchCustomerAsync(customerId);
-                customerNames[customerId] = customer?.Name ?? "Unknown Customer";
-            }
-        }
-    }
-
-    private async Task<Customer> FetchCustomerAsync(int customerId)
-    {
-        try
-        {
-            // Simulate API call (replace with actual API endpoint)
-            return await HttpClient.GetFromJsonAsync<Customer>(RequestURLCustomer + customerId);
-        }
-        catch
-        {
-            // Handle errors (e.g., customer not found)
-            return null;
-        }
-    }
 
 
     protected override void OnAfterRender(bool firstRender)
@@ -104,8 +64,7 @@
             popupRef.OnProjectUpdated = EventCallback.Factory.Create(this, RefreshTable);
         }
     }
-
-   
+  
     private void EditEntry(int GivenId)
     {
         popupRef.Show(GivenId, RequestURLEdit, "Edit Project");
@@ -117,7 +76,6 @@
         Console.WriteLine("RefreshTable() was called from CustomersTable");
         RefreshTable();
     }
-
 
     private async Task RefreshTable()
     {

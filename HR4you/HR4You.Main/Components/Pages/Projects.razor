@@ -18,7 +18,7 @@
 }
 else
 {
-    <ProjectsTable entries="entries" @ref="popupRef2" OnProjectUpdated2="RefreshTable2">
+    <ProjectsTable entries="entries" customerNames="customerNames" @ref="popupRef2" OnProjectUpdated2="RefreshTable2">
     </ProjectsTable>
 }
 
@@ -33,6 +33,10 @@ else
     public List<Project> entries = [];
 
     private ProjectsTable popupRef2;
+
+    public Dictionary<int, string> customerNames = new Dictionary<int, string>();
+
+    public string RequestURLCustomer = "http://localhost:5001/api/master-data/customer/get?addDeleted=true&Id=";
 
 
     protected override void OnAfterRender(bool firstRender)
@@ -53,8 +57,22 @@ else
         await LoadProjects();
     }
 
+    private async Task<Customer> FetchCustomerAsync(int customerId)
+    {
+        try
+        {
+            return await HttpClient.GetFromJsonAsync<Customer>(RequestURLCustomer + customerId);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     private async Task LoadProjects()
     {
+        List<int> uniqueCustomerIds = new List<int>();
+
         try
         {
             entries = await HttpClient.GetFromJsonAsync<List<Project>>((HttpURL + RequestURL) + addDeleted);
@@ -63,6 +81,24 @@ else
         {
             Console.WriteLine($"Error fetching entries: {ex.Message}");
         }        
+       
+        // Fetch customer names for all entries
+        foreach (var entry in entries)
+        {
+            if (!uniqueCustomerIds.Contains(entry.CustomerId))
+            {
+                uniqueCustomerIds.Add(entry.CustomerId);
+            }
+        }
+
+        foreach (var customerId in uniqueCustomerIds)
+        {
+            if (!customerNames.ContainsKey(customerId))
+            {
+                var customer = await FetchCustomerAsync(customerId);
+                customerNames[customerId] = customer?.Name ?? "Unknown Customer";
+            }
+        }
     }
 
     private async Task CheckboxChanged()
@@ -76,7 +112,7 @@ else
             addDeleted = false;
         }
 
-        entries = await HttpClient.GetFromJsonAsync<List<Project>>((HttpURL + RequestURL) + addDeleted);
+        await LoadProjects();
 
         StateHasChanged();
     }
