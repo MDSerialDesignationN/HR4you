@@ -36,7 +36,7 @@ else
 
     public Dictionary<int, string> customerNames = new Dictionary<int, string>();
 
-    public string RequestURLCustomer = "http://localhost:5001/api/master-data/customer/get?addDeleted=true&Id=";
+    public string RequestURLCustomer = "/api/master-data/customer/get?addDeleted=true&Id=";
 
 
     protected override void OnAfterRender(bool firstRender)
@@ -61,7 +61,7 @@ else
     {
         try
         {
-            return await HttpClient.GetFromJsonAsync<Customer>(RequestURLCustomer + customerId);
+            return await HttpClient.GetFromJsonAsync<Customer>((HttpURL + RequestURLCustomer) + customerId);
         }
         catch
         {
@@ -96,7 +96,7 @@ else
             if (!customerNames.ContainsKey(customerId))
             {
                 var customer = await FetchCustomerAsync(customerId);
-                customerNames[customerId] = customer?.Name ?? "Unknown Customer";
+                customerNames[customerId] = customer?.Name ?? "No Customer";
             }
         }
     }

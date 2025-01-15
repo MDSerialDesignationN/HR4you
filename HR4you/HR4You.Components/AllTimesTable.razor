@@ -13,8 +13,8 @@
             <th>Duration</th>
             <td>Worktime Diff</td>
             <th>Type</th>
-            <th>Project Id</th>
-            <th>Tag Id</th>
+            <th>Project</th>
+            <th>Tag</th>
             <th>Description</th>
             <th>Is Holiday</th>
             <th>Is Billable</th>
@@ -35,8 +35,8 @@
                 <td>@entry.Duration</td>
                 <td>@entry.WorktimeDiff</td>
                 <td>@entry.Type</td>
-                <td>@entry.ProjectId</td>
-                <td>@entry.TagId</td>
+                <td>@(projectNames.TryGetValue(entry.ProjectId, out var projectName) ? projectName : "No Project")</td>
+                <td>@(tagNames.TryGetValue(entry.TagId.GetValueOrDefault(), out var tagName) ? tagName: "No Tag")</td>
                 <td>@entry.Description</td>
                 <td>@(entry.IsHoliday ? "Yes" : "No")</td>
                 <td>@(entry.IsBillable ? "Yes" : "No")</td>
@@ -56,12 +56,18 @@
     [Parameter]
     public List<HourEntry> entries { get; set; }
 
+    [Parameter]
+    public EventCallback OnAllTimesUpdated2 { get; set; }
+
+    [Parameter]
+    public Dictionary<int, string> projectNames { get; set; }
+
+    [Parameter]
+    public Dictionary<int?, string> tagNames { get; set; }
+
     private PopupAllTimes popupRef;
 
     public string RequestURL = "http://localhost:5001/api/master-data/hour-entry/get?addDeleted=true&Id=";
-
-    [Parameter]
-    public EventCallback OnAllTimesUpdated2 { get; set; }
 
 
     protected override void OnAfterRender(bool firstRender)
@@ -86,7 +92,6 @@
         Console.WriteLine("RefreshTable() was called from CustomersTable");
         RefreshTable();
     }
-
 
     private async Task RefreshTable()
     {

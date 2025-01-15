@@ -24,34 +24,8 @@
                     <div class="row">
                         <!-- Project Number and Customer -->
                         <div class="col-sm-4">
-                            <label>User Id</label>
-                            <!-- <InputText @bind-Value="allTimes.UserId" class="form-control mb-2" />-->
-
-                            <label>EndTime</label>
-                            <InputDate Type="InputDateType.Time" @bind-Value="allTimes.EndTime" class="form-control mb-2" />
-
-                            <label>Type</label>
-                            <InputSelect @bind-Value="allTimes.Type">
-                                @foreach (var value in Enum.GetValues(typeof(ActivityType)))
-                                {
-                                    <option>@value</option>
-                                }
-                            </InputSelect>
-
-                            <label>IsHoliday</label>
-                             <InputCheckbox @bind-Value="allTimes.IsHoliday" />
-                        </div>
-
-                        <!-- Name and State -->
-                        <div class="col-sm-4">
-                            <label>Date</label>
-                            <InputDate @bind-Value="allTimes.Date" class="form-control mb-2" />
-
-                            <label>Duration</label>
-                            <InputNumber @bind-Value="allTimes.Duration" class="form-control mb-2" />
-
                             <label>Project</label>
-                            <InputSelect @bind-Value="allTimes.ProjectId">
+                            <InputSelect @bind-Value="allTimes.ProjectId" class="form-select">
                                 @foreach (var value in projectList)
                                 {
                                     if (@value.Id == allTimes.ProjectId)
@@ -66,20 +40,22 @@
                                 }
                             </InputSelect>
 
-                            <label>IsBillable</label>
-                            <InputCheckbox @bind-Value="allTimes.IsBillable" />
+                            <label>Type</label>
+                            <InputSelect @bind-Value="allTimes.Type" class="form-select">
+                                @foreach (var value in Enum.GetValues(typeof(ActivityType)))
+                                {
+                                    <option>@value</option>
+                                }
+                            </InputSelect>
                         </div>
 
                         <!-- Name and State -->
                         <div class="col-sm-4">
-                            <label>StartTime</label>
-                            <InputDate Type="InputDateType.Time" @bind-Value="allTimes.StartTime" class="form-control mb-2" />
-
-                            <label>WorktimeDiff</label>
-                            <InputNumber @bind-Value="allTimes.WorktimeDiff" class="form-control mb-2" />
+                            <label>Date</label>
+                            <InputDate @bind-Value="allTimes.Date" class="form-control mb-2" />
 
                             <label>Tag</label>
-                            <InputSelect @bind-Value="allTimes.TagId">
+                            <InputSelect @bind-Value="allTimes.TagId" class="form-select">
                                 @foreach (var value in tagList)
                                 {
                                     if (@value.Id == allTimes.TagId)
@@ -93,6 +69,25 @@
 
                                 }
                             </InputSelect>
+                        </div>
+
+                        <!-- Name and State -->
+                        <div class="col-sm-2">
+                            <label>Start Time</label>
+                            <InputDate Type="InputDateType.Time" @bind-Value="allTimes.StartTime" class="form-control mb-2" />
+
+                            <label>Is Holiday</label>
+                            <InputCheckbox @bind-Value="allTimes.IsHoliday" />
+                        </div>
+
+                        <!-- Name and State -->
+                        <div class="col-sm-2">
+                            <label>End Time</label>
+                            <InputDate Type="InputDateType.Time" @bind-Value="allTimes.EndTime" class="form-control mb-2" />
+
+                            <label>Is Billable</label>
+                            <InputCheckbox @bind-Value="allTimes.IsBillable" />
+
                         </div>
 
                         <!-- Description -->
