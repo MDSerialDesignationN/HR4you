@@ -2,8 +2,10 @@
 using HR4You.Contexts.WorkTime;
 using HR4You.Model.Base;
 using HR4You.Model.Base.Models.HourEntry;
+using HR4You.Model.Base.Pagination;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.IdentityModel.Tokens;
 
 namespace HR4You.Contexts.HourEntry
 {
@@ -42,7 +44,7 @@ namespace HR4You.Contexts.HourEntry
                 _logger.LogError("Hour entry with id {Id} was not found!", id);
                 return HourEntryResult.NotOk(HourEntryError.DbError, id.ToString());
             }
-            
+
             var result = await CalcProperties(hourEntry);
             if (result.Error != HourEntryError.None)
             {
@@ -51,23 +53,50 @@ namespace HR4You.Contexts.HourEntry
 
             var dbResult = await base.Edit(id, hourEntry);
             return dbResult.Error != MasterDataError.None
-                ? HourEntryResult.NotOk(HourEntryError.DbError,$"DB Error - {dbResult.Error}")
+                ? HourEntryResult.NotOk(HourEntryError.DbError, $"DB Error - {dbResult.Error}")
                 : HourEntryResult.Ok(dbResult.Entity!);
         }
 
 
-        public async Task<List<Model.Base.Models.HourEntry.HourEntry>> GetHourEntries(bool addDeleted, string userId)
+        public async Task<ModelResult<PagedResponseKeySet<Model.Base.Models.HourEntry.HourEntry>>> GetAllPagedEntries(
+            List<ColumnFilter> columnFilters, int reference, int pageSize, bool addDeleted, string? userId)
         {
-            using var scope = _serviceProvider.CreateScope();
-            var linq = Entities.AsQueryable();
+            //TODO code is more or less identical here because GetAllKeyPaged
+            //is meant to be more generic but we still need functionality for userId limitation in this context
 
-            linq = linq.Where(he => he.UserId == userId);
-            linq = linq.Where(he => he.Deleted == addDeleted);
+            //Used by admin policy - no userId needed
+            if (userId.IsNullOrEmpty())
+            {
+                var modelResult = await GetAllKeyPaged(columnFilters, reference, pageSize, addDeleted);
+                return modelResult;
+            }
 
-            var list = await linq.ToListAsync();
-            list = list.OrderByDescending(he => he.LastModifiedAt ?? he.CreationDateTime).ToList();
+            var linq = Entities.AsNoTracking().Where(he => he.UserId == userId).OrderBy(he => he.Id).AsQueryable();
+            if (!addDeleted)
+            {
+                linq = linq.Where(he => he.Deleted != true);
+            }
 
-            return list;
+            //Go to reference in key set
+            linq = linq.Where(e => e.Id > reference);
+
+            if (!columnFilters.IsNullOrEmpty())
+            {
+                var customFilter =
+                    CustomExpressionFilter<Model.Base.Models.HourEntry.HourEntry>.CreateFilter(columnFilters!);
+
+                linq = linq.Where(customFilter);
+            }
+
+            var result = await linq
+                .Take(pageSize)
+                .OrderByDescending(he => he.LastModifiedAt ?? he.CreationDateTime)
+                .ToListAsync();
+
+            var newReference = result.Count != 0 ? result.Last().Id : 0;
+            var pagedResponse = new PagedResponseKeySet<Model.Base.Models.HourEntry.HourEntry>(result, newReference);
+
+            return ModelResult<PagedResponseKeySet<Model.Base.Models.HourEntry.HourEntry>>.Ok(pagedResponse);
         }
 
         private async Task<HourEntryResult> CalcProperties(Model.Base.Models.HourEntry.HourEntry hourEntry)
@@ -94,7 +123,7 @@ namespace HR4You.Contexts.HourEntry
                 DayOfWeek.Sunday => workTimeConfig.MinSunHours,
                 _ => throw new ArgumentOutOfRangeException()
             };
-            
+
             var holidayContext = scope.ServiceProvider.GetService<HolidayContext>()!;
             var holiday = await holidayContext.GetEntryForDate(hourEntry.Date);
 

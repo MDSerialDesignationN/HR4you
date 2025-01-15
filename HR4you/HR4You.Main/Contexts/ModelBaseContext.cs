@@ -1,5 +1,7 @@
 ﻿using HR4You.Model.Base;
+using HR4You.Model.Base.Pagination;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace HR4You.Contexts;
 
@@ -25,7 +27,7 @@ public class ModelBaseContext<T> : DbContext where T : ModelBase
         data.CreationDateTime = DateTime.Now;
         data.LastModifiedAt = null;
         data.Deleted = false;
-        var e = Entities.Add(data);
+        var e = await Entities.AddAsync(data);
         await SaveChangesAsync();
 
         return new ModelResult<T>
@@ -95,5 +97,66 @@ public class ModelBaseContext<T> : DbContext where T : ModelBase
 
         var result = await linq.OrderByDescending(x => x.Id).ToListAsync();
         return ModelResult<List<T>>.Ok(result);
+    }
+
+    protected async Task<ModelResult<PagedResponseKeySet<T>>> GetAllKeyPaged(List<ColumnFilter>? columnFilters,
+        int reference, int pageSize,
+        bool addDeleted = true)
+    {
+        var linq = Entities.AsNoTracking().OrderBy(e => e.Id).AsQueryable();
+        if (!addDeleted)
+        {
+            linq = linq.Where(e => e.Deleted != true);
+        }
+
+        //Go to reference in key set
+        linq = linq.Where(e => e.Id > reference);
+
+        if (!columnFilters.IsNullOrEmpty())
+        {
+            var customFilter = CustomExpressionFilter<T>.CreateFilter(columnFilters!);
+
+            linq = linq.Where(customFilter);
+        }
+
+        var result = await linq
+            .Take(pageSize)
+            .OrderByDescending(e => e.Id)
+            .ToListAsync();
+
+        var newReference = result.Count != 0 ? result.Last().Id : 0;
+        var pagedResponse = new PagedResponseKeySet<T>(result, newReference);
+
+        return ModelResult<PagedResponseKeySet<T>>.Ok(pagedResponse);
+    }
+
+    public async Task<ModelResult<PagedResponseOffset<T>>> GetAllOffsetPaged(List<ColumnFilter>? columnFilters,
+        int pageNumber, int pageSize,
+        bool addDeleted = true)
+    {
+        var linq = Entities.AsNoTracking().OrderBy(e => e.Id).AsQueryable();
+        if (!addDeleted)
+        {
+            linq = linq.Where(e => e.Deleted != true);
+        }
+
+        if (!columnFilters.IsNullOrEmpty())
+        {
+            var customFilter = CustomExpressionFilter<T>.CreateFilter(columnFilters!);
+
+            linq = linq.Where(customFilter);
+        }
+
+        var totalRecords = await linq.CountAsync();
+
+        var result = await linq
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .OrderByDescending(e => e.Id)
+            .ToListAsync();
+
+        var pagedResponse = new PagedResponseOffset<T>(pageNumber, pageSize, totalRecords, result);
+
+        return ModelResult<PagedResponseOffset<T>>.Ok(pagedResponse);
     }
 }
