@@ -1,5 +1,5 @@
 ﻿.Table {
-    border-collapse: collapse;
+    border-collapse: collapse !important;
     position: relative;
     margin-top: 20px;
     padding: 10px;
@@ -7,7 +7,7 @@
     border: 1px solid gainsboro;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width:100%;
+    max-width: 100%;
 }
 
     .Table th,

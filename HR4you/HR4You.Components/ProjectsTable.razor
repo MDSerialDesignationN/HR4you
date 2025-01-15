@@ -1,7 +1,11 @@
-﻿<table class="table">
+﻿@rendermode InteractiveServer
+@inject HttpClient HttpClient
+
+<PopupProject @ref="popupRef" OnProjectUpdated="RefreshTable" />
+
+<table class="Table">
     <thead>
         <tr>
-            <th>Id</th>
             <th>Project Number</th>
             <th>Customer</th>
             <th>Name</th>
@@ -10,21 +14,24 @@
             <th>Creation Date</th>
             <th>Last Modified</th>
             <th>Is Deleted</th>
+            <th> </th>
+
         </tr>
     </thead>
     <tbody>
         @foreach (var entry in entries)
-        {
+        {   
             <tr>
-                <td>@entry.Id</td>
                 <td>@entry.ProjectNumber</td>
-                <td>@entry.CustomerId</td>
+                <td>@(customerNames.TryGetValue(entry.CustomerId, out var customerName) ? customerName : "Unknown Customer")</td>
                 <td>@entry.Name</td>
                 <td>@entry.State</td>
                 <td>@entry.Description</td>
                 <td>@entry.CreationDateTime</td>
                 <td>@entry.LastModifiedAt</td>
                 <td>@(entry.Deleted ? "Yes" : "No")</td>
+                <button type="button" class="btn btn-outline-danger" @onclick="(() => DeleteEntry(entry.Id))"><i class="fa fa-trash"></i></button>
+                <button type="button" class="btn btn-outline-info" @onclick="(() => EditEntry(entry.Id))"><i class="fa fa-pencil"></i></button>
             </tr>
         }
     </tbody>
@@ -36,6 +43,94 @@
 
     [Parameter]
     public List<Project> entries { get; set; }
+
+    [Parameter]
+    public EventCallback OnProjectUpdated2 { get; set; }
+
+    private Dictionary<int, string> customerNames = new Dictionary<int, string>();
+
+    private PopupProject popupRef;
+
+    public string RequestURLCustomer = "http://localhost:5001/api/master-data/customer/get?addDeleted=true&Id=";
+
+    public string RequestURLEdit = "http://localhost:5001/api/master-data/project/get?addDeleted=true&Id=";
+
+    public string RequestURLDelete = "http://localhost:5001/api/master-data/project/delete?Id=";
+
+    protected override async Task OnInitializedAsync()
+    {
+        List<int> uniqueCustomerIds = new List<int>();
+
+        // Fetch customer names for all entries
+        foreach (var entry in entries)
+        {
+            if (!uniqueCustomerIds.Contains(entry.CustomerId))
+            {
+                uniqueCustomerIds.Add(entry.CustomerId);
+            }
+        }
+
+        Console.WriteLine(uniqueCustomerIds);
+
+        foreach (var customerId in uniqueCustomerIds)
+        {
+            if (!customerNames.ContainsKey(customerId))
+            {
+                var customer = await FetchCustomerAsync(customerId);
+                customerNames[customerId] = customer?.Name ?? "Unknown Customer";
+            }
+        }
+    }
+
+    private async Task<Customer> FetchCustomerAsync(int customerId)
+    {
+        try
+        {
+            // Simulate API call (replace with actual API endpoint)
+            return await HttpClient.GetFromJsonAsync<Customer>(RequestURLCustomer + customerId);
+        }
+        catch
+        {
+            // Handle errors (e.g., customer not found)
+            return null;
+        }
+    }
+
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && popupRef != null)
+        {
+            popupRef.OnProjectUpdated = EventCallback.Factory.Create(this, RefreshTable);
+        }
+    }
+
+   
+    private void EditEntry(int GivenId)
+    {
+        popupRef.Show(GivenId, RequestURLEdit, "Edit Project");
+    }
+
+    private async Task DeleteEntry(int GivenId)
+    {
+        await HttpClient.DeleteFromJsonAsync<Project>(RequestURLDelete + GivenId);
+        Console.WriteLine("RefreshTable() was called from CustomersTable");
+        RefreshTable();
+    }
+
+
+    private async Task RefreshTable()
+    {
+        Console.WriteLine("RefreshTable() was called from CustomersTable");
+        if (OnProjectUpdated2.HasDelegate)
+        {
+            await OnProjectUpdated2.InvokeAsync(); // Notify the parent component
+        }
+        else
+        {
+            Console.WriteLine("OnCustomerUpdated has no delegate assigned.");
+        }
+    }
 
 }
 

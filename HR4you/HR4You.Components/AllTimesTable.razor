@@ -1,7 +1,11 @@
-﻿<table class="table">
+﻿@rendermode InteractiveServer
+@inject HttpClient HttpClient
+
+<PopupAllTimes @ref="popupRef" OnAllTimesUpdated="RefreshTable" />
+
+<table class="table">
     <thead>
         <tr>
-            <th>Id</th>
             <th>User Id</th>
             <th>Date</th>
             <th>Start Time</th>
@@ -17,13 +21,13 @@
             <th>Creation Date</th>
             <th>Last Modified</th>
             <th>Is Deleted</th>
+            <th> </th>
         </tr>
     </thead>
     <tbody>
     @foreach (var entry in entries)
         {
             <tr>
-                <td>@entry.Id</td>
                 <td>@entry.UserId</td>
                 <td>@entry.Date</td>
                 <td>@entry.StartTime</td>
@@ -39,6 +43,8 @@
                 <td>@entry.CreationDateTime</td>
                 <td>@entry.LastModifiedAt</td>
                 <td>@(entry.Deleted ? "Yes" : "No")</td>
+                <button type="button" class="btn btn-outline-danger" @onclick="(() => DeleteEntry(entry.Id))"><i class="fa fa-trash"></i></button>
+                <button type="button" class="btn btn-outline-info" @onclick="(() => EditEntry(entry.Id))"><i class="fa fa-pencil"></i></button>
             </tr>
         }
     </tbody>
@@ -49,5 +55,50 @@
 
     [Parameter]
     public List<HourEntry> entries { get; set; }
+
+    private PopupAllTimes popupRef;
+
+    public string RequestURL = "http://localhost:5001/api/master-data/hour-entry/get?addDeleted=true&Id=";
+
+    [Parameter]
+    public EventCallback OnAllTimesUpdated2 { get; set; }
+
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && popupRef != null)
+        {
+            popupRef.OnAllTimesUpdated = EventCallback.Factory.Create(this, RefreshTable);
+        }
+    }
+
+    public string RequestURLEdit = "http://localhost:5001/api/master-data/hour-entry/get?addDeleted=true&Id=";
+    public string RequestURLDelete = "http://localhost:5001/api/master-data/hour-entry/delete?Id=";
+
+    private void EditEntry(int GivenId)
+    {
+        popupRef.Show(GivenId, RequestURLEdit, "Edit Project");
+    }
+
+    private async Task DeleteEntry(int GivenId)
+    {
+        await HttpClient.DeleteFromJsonAsync<HourEntry>(RequestURLDelete + GivenId);
+        Console.WriteLine("RefreshTable() was called from CustomersTable");
+        RefreshTable();
+    }
+
+
+    private async Task RefreshTable()
+    {
+        Console.WriteLine("RefreshTable() was called from CustomersTable");
+        if (OnAllTimesUpdated2.HasDelegate)
+        {
+            await OnAllTimesUpdated2.InvokeAsync(); // Notify the parent component
+        }
+        else
+        {
+            Console.WriteLine("OnCustomerUpdated has no delegate assigned.");
+        }
+    }
 
 }

@@ -1,10 +1,14 @@
 ﻿@page "/AllTimes"
-@attribute [StreamRendering]
+@rendermode InteractiveServer
 @inject HttpClient HttpClient
+@inject IConfiguration Configuration
 
 <PageTitle>All Times</PageTitle>
 
 <h1>All Times</h1>
+
+<label>Show Deleted</label>
+<input type="checkbox" checked="@addDeleted" @oninput="CheckboxChanged">
 
 @if (entries == null)
 {
@@ -14,28 +18,74 @@
 }
 else
 {
-    <AllTimesTable entries="entries">
+    <AllTimesTable entries="entries" @ref="popupRef2" OnAllTimesUpdated2="RefreshTable2">
     </AllTimesTable>
 }
 
 
 
 @code {
+    private string HttpURL;
+
+    public string RequestURL = "/api/master-data/hour-entry/get-all?addDeleted=";
+
+    public bool addDeleted;
 
     public List<HourEntry> entries;
 
+    private AllTimesTable popupRef2;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && popupRef2 != null)
+        {
+            popupRef2.OnAllTimesUpdated2 = EventCallback.Factory.Create(this, RefreshTable2);
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
+        //Get first value from appsettings.json "Urls"
+        var urls = Configuration["Urls"];
+        HttpURL = urls?.Split(';').FirstOrDefault();
+
+        addDeleted = false;
+        await LoadAllTimes();
+    }
+
+    private async Task LoadAllTimes()
+    {
         try
         {
-            entries = await HttpClient.GetFromJsonAsync<List<HourEntry>>("http://localhost:5001/api/master-data/hour-entry/get-all");
-            //Console.WriteLine(entries);
+            entries = await HttpClient.GetFromJsonAsync<List<HourEntry>>((HttpURL + RequestURL) + addDeleted);
+            Console.WriteLine((HttpURL + RequestURL) + addDeleted);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error fetching entries: {ex.Message}");
         }
+    }
 
+    private async Task CheckboxChanged()
+    {
+        if (addDeleted == false)
+        {
+            addDeleted = true;
+        }
+        else
+        {
+            addDeleted = false;
+        }
+
+        entries = await HttpClient.GetFromJsonAsync<List<HourEntry>>((HttpURL + RequestURL) + addDeleted);
+        StateHasChanged();
+    }
+
+    private async Task RefreshTable2()
+    {
+        Console.WriteLine("RefreshTable2() was called from Project");
+        await LoadAllTimes();
+
+        StateHasChanged();
     }
 }

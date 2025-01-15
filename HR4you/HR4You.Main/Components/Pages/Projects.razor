@@ -1,10 +1,14 @@
 ﻿@page "/Projects"
-@attribute [StreamRendering]
+@rendermode InteractiveServer
 @inject HttpClient HttpClient
+@inject IConfiguration Configuration
 
 <PageTitle>Projects</PageTitle>
 
 <h1>Projects</h1>
+
+<label>Show Deleted</label>
+<input type="checkbox" checked="@addDeleted" @oninput="CheckboxChanged">
 
 @if (entries == null)
 {
@@ -14,29 +18,75 @@
 }
 else
 {
-    <ProjectsTable entries="entries">
+    <ProjectsTable entries="entries" @ref="popupRef2" OnProjectUpdated2="RefreshTable2">
     </ProjectsTable>
 }
 
 
-
 @code {
+    private string HttpURL;
 
-    public List<Project> entries;
+    public string RequestURL = "/api/master-data/project/get-all?addDeleted=";
 
+    public bool addDeleted;
+
+    public List<Project> entries = [];
+
+    private ProjectsTable popupRef2;
+
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && popupRef2 != null)
+        {
+            popupRef2.OnProjectUpdated2 = EventCallback.Factory.Create(this, RefreshTable2);
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
+        //Get first value from appsettings.json "Urls"
+        var urls = Configuration["Urls"];
+        HttpURL = urls?.Split(';').FirstOrDefault();
+
+        addDeleted = false;
+        await LoadProjects();
+    }
+
+    private async Task LoadProjects()
+    {
         try
         {
-            entries = await HttpClient.GetFromJsonAsync<List<Project>>("http://localhost:5001/api/master-data/project/get-all");
-            Console.WriteLine(entries);
+            entries = await HttpClient.GetFromJsonAsync<List<Project>>((HttpURL + RequestURL) + addDeleted);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error fetching entries: {ex.Message}");
+        }        
+    }
+
+    private async Task CheckboxChanged()
+    {
+        if (addDeleted == false)
+        {
+            addDeleted = true;
+        }
+        else
+        {
+            addDeleted = false;
         }
 
+        entries = await HttpClient.GetFromJsonAsync<List<Project>>((HttpURL + RequestURL) + addDeleted);
+
+        StateHasChanged();
+    }
+
+    private async Task RefreshTable2()
+    {
+        Console.WriteLine("RefreshTable2() was called from Project");
+        await LoadProjects(); 
+
+        StateHasChanged();
     }
 }
 
