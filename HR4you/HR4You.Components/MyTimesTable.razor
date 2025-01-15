@@ -1,7 +1,7 @@
 ﻿@rendermode InteractiveServer
 @inject HttpClient HttpClient
 
-<PopupAllTimes @ref="popupRef" OnAllTimesUpdated="RefreshTable" />
+<PopupMyTimes @ref="popupRef" OnMyTimesUpdated="RefreshTable" />
 
 <table class="table">
     <thead>
@@ -17,14 +17,11 @@
             <th>Description</th>
             <th>Is Holiday</th>
             <th>Is Billable</th>
-            <th>Creation Date</th>
-            <th>Last Modified</th>
-            <th>Is Deleted</th>
             <th> </th>
         </tr>
     </thead>
     <tbody>
-    @foreach (var entry in entries)
+        @foreach (var entry in entries)
         {
             <tr>
                 <td>@entry.Date</td>
@@ -34,13 +31,10 @@
                 <td>@entry.WorktimeDiff</td>
                 <td>@entry.Type</td>
                 <td>@(projectNames.TryGetValue(entry.ProjectId, out var projectName) ? projectName : "No Project")</td>
-                <td>@(tagNames.TryGetValue(entry.TagId.GetValueOrDefault(), out var tagName) ? tagName: "No Tag")</td>
+                <td>@(tagNames.TryGetValue(entry.TagId.GetValueOrDefault(), out var tagName) ? tagName : "No Tag")</td>
                 <td>@entry.Description</td>
                 <td>@(entry.IsHoliday ? "Yes" : "No")</td>
                 <td>@(entry.IsBillable ? "Yes" : "No")</td>
-                <td>@entry.CreationDateTime</td>
-                <td>@entry.LastModifiedAt</td>
-                <td>@(entry.Deleted ? "Yes" : "No")</td>
                 <button type="button" class="btn btn-outline-danger" @onclick="(() => DeleteEntry(entry.Id))"><i class="fa fa-trash"></i></button>
                 <button type="button" class="btn btn-outline-info" @onclick="(() => EditEntry(entry.Id))"><i class="fa fa-pencil"></i></button>
             </tr>
@@ -55,7 +49,7 @@
     public List<HourEntry> entries { get; set; }
 
     [Parameter]
-    public EventCallback OnAllTimesUpdated2 { get; set; }
+    public EventCallback OnMyTimesUpdated2 { get; set; }
 
     [Parameter]
     public Dictionary<int, string> projectNames { get; set; }
@@ -63,7 +57,7 @@
     [Parameter]
     public Dictionary<int?, string> tagNames { get; set; }
 
-    private PopupAllTimes popupRef;
+    private PopupMyTimes popupRef;
 
     public string RequestURL = "http://localhost:5001/api/master-data/hour-entry/get?addDeleted=true&Id=";
     public string RequestURLEdit = "http://localhost:5001/api/master-data/hour-entry/get?addDeleted=true&Id=";
@@ -74,7 +68,7 @@
     {
         if (firstRender && popupRef != null)
         {
-            popupRef.OnAllTimesUpdated = EventCallback.Factory.Create(this, RefreshTable);
+            popupRef.OnMyTimesUpdated = EventCallback.Factory.Create(this, RefreshTable);
         }
     }
 
@@ -93,9 +87,9 @@
     private async Task RefreshTable()
     {
         Console.WriteLine("RefreshTable() was called from CustomersTable");
-        if (OnAllTimesUpdated2.HasDelegate)
+        if (OnMyTimesUpdated2.HasDelegate)
         {
-            await OnAllTimesUpdated2.InvokeAsync(); // Notify the parent component
+            await OnMyTimesUpdated2.InvokeAsync(); // Notify the parent component
         }
         else
         {
