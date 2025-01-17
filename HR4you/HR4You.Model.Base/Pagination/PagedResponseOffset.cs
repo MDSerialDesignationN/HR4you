@@ -1,5 +1,6 @@
 ﻿namespace HR4You.Model.Base.Pagination;
 
+
 public record PagedResponseOffset<T>
 {
     public int PageNumber { get; init; }

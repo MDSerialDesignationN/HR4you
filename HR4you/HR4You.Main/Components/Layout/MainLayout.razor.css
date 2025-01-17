@@ -1,4 +1,4 @@
-body {
+/*body {
     
 }
 .page {
@@ -19,13 +19,13 @@ body {
     align-items: center;
 }
 
-main {
+main {*/
     /*    flex-grow: 1;*/
-    width: calc(100vw - 300px);
+    /*width: calc(100vw - 300px);
     box-sizing: border-box;
-    background-color: #f4f4f4;
+    background-color: #f4f4f4;*/
     /*    display: flex;*/
-    justify-content: left;
+    /*justify-content: left;
     padding: 20px;
     box-sizing: border-box;
 }
@@ -36,11 +36,11 @@ main {
     font-family: Arial, sans-serif;
     padding: 20px;
     width: 100%;
-}
+}*/
 
 
 /* Container für die Benutzeranzeige */
-.user-display {
+/*.user-display {
     display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -52,10 +52,10 @@ main {
     font-family: Arial, sans-serif;
     float: right;
 
-}
+}*/
 
 /* Benutzerinformationen */
-.user-info {
+/*.user-info {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -66,11 +66,11 @@ main {
     font-size: 20px;
     font-weight: bold;
     margin: 0;
-}
+}*/
 
 
 /* Aktionen und Icon */
-.user-actions {
+/*.user-actions {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -89,9 +89,14 @@ main {
 }
 
 .logout-text:hover {
-    color: red; /* Farbe ändern beim Hover */
-}
+    color: red;*/ /* Farbe ändern beim Hover */
+/*}
 
 ::-webkit-scrollbar {
     display: none;
+}*/
+
+
+main {
+    width: calc(100vw - 300px);
 }

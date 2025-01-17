@@ -2,7 +2,7 @@
 .AllTimesTable {
     border-collapse: collapse;
     position: relative;
-    margin-top: 20px;
+/*    margin-top: 20px;*/
     padding: 10px;
     background-color: white;
     border: 1px solid gainsboro;

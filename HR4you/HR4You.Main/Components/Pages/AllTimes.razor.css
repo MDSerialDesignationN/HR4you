@@ -1,4 +1,4 @@
-﻿.table-wrapper {
+﻿/*.table-wrapper {
     max-width: 100%;
     overflow-x: scroll;
     margin-top: 10px;
@@ -7,6 +7,6 @@
 
 .content {
     width: calc(100vw - 300px);
-    box-sizing: border-box;
+    box-sizing: border-box;*/
 /*    padding: 20px;*/
-}
+/*}*/

@@ -19,4 +19,10 @@
       <ProjectReference Include="..\HR4You.Model.Base\HR4You.Model.Base.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Content Update="OffsetPagination.razor">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      </Content>
+    </ItemGroup>
+
 </Project>

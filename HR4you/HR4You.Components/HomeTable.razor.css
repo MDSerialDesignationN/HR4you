@@ -1,10 +1,31 @@
-﻿
+﻿.addButtons button {
+    color: white;
+}
+
+table button {
+    width: 40px;
+    height: 40px;
+
+}
+
+.submit {
+    width: 40px;
+    height: 40px;
+    float: right;
+    color: white
+}
+
+/*div:has(> .submit){
+    justify-content: end;
+}*/
 
 
-.searchAndAdd {
+
+
+/*.searchAndAdd {
     display: flex;
     margin-top: 20px;
-}
+}*/
 
 
 .Add_Time {
@@ -16,7 +37,7 @@
 .OverviewTable {
     border-collapse: collapse;
     position: relative;
-    margin-top: 20px;
+/*    margin-top: 20px;*/
     padding: 10px;
     background-color: white;
     border: 1px solid gainsboro;
@@ -35,11 +56,11 @@
         background-color: #f4f4f4;
     }
 
-.addButtons {
-    display: flex;
+/*.addButtons {
+    display: flex;*/
     /*    justify-content: space-between;*/
-    gap: 10px;
+    /*gap: 10px;
     flex-wrap: wrap;
     width: 30%;
     margin: 2px;
-}
+}*/

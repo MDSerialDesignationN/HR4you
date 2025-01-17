@@ -1,5 +1,5 @@
 
-.searchAndFilter {
+/*.searchAndFilter {
     position: relative;
     display: flex;
     border: 1px solid #c1c1c1;
@@ -11,14 +11,14 @@
 
 .searchAndFilter > #Search {
     padding: 5px;
-    border: none;
-    /*    width: 250px*/
-    flex: 1;
+    border: none;*/
+/*    width: 250px*/
+/*flex: 1;
 }
 
-.searchAndFilter > button {
-    width: 40px;
-    border: none;
+.searchAndFilter > button {*/
+/*    width: 40px;*/
+/*border: none;
 }
 
 .searchAndFilter > #FilterOptions {
@@ -32,7 +32,17 @@
 .searchAndFilter > #Submit {
     border-radius: 0 5px 5px 0;
     border-left: 1px solid #c1c1c1;
+}*/
+
+
+button {
+    border-right: 1px solid #c1c1c1;
+    padding: 5px 20px
 }
+
+    button:last-of-type {
+        border: none;
+    }
 
 .FilterOptions {
     z-index: 1;
@@ -46,11 +56,11 @@
     height: fit-content;
 }
 
-.FilterOptions.active {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
+    .FilterOptions.active {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
 
 .OptionRow {
     display: flex;
