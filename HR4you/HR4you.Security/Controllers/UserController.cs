@@ -54,6 +54,12 @@ public class UserController : ControllerBase
         {
             return BadRequest("unknown user");
         }
+        
+        var userName = HttpContext.User.Identity!.Name!;
+        if (user.UserName == userName)
+        {
+            return BadRequest("user cannot change himself!");
+        }
 
         if (request.UserName != null)
         {
@@ -177,6 +183,13 @@ public class UserController : ControllerBase
         {
             return BadRequest("user id unknown");
         }
+        
+        var userName = HttpContext.User.Identity!.Name!;
+        if (user.UserName == userName)
+        {
+            return BadRequest("user cannot delete himself!");
+        }
+
 
         if (user.IsDeleted)
         {
