@@ -3,6 +3,8 @@ using HR4You.Contexts.Project;
 using HR4You.Model.Base;
 using HR4You.Model.Base.Models.Project;
 using HR4You.Model.Base.Pagination;
+using HR4you.Security;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -23,7 +25,7 @@ public class ProjectController : ControllerBase
     
     [HttpGet("get-all-paged")]
     [SwaggerOperation("GetAllPagedProjects")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.Authenticated)]
     public async Task<IActionResult> GetAllPagedProjects([FromQuery] List<ColumnFilter> columnFilters, bool addDeleted, int pageNumber = 1, int pageSize = 10)
     {
         if (pageNumber <= 0 || pageSize <= 0)
@@ -43,7 +45,7 @@ public class ProjectController : ControllerBase
     
     [HttpGet("get")]
     [SwaggerOperation("GetProject")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.Authenticated)]
     public async Task<IActionResult> GetProject(int id, bool addDeleted)
     {
         using var scope = _serviceProvider.CreateScope();
@@ -60,7 +62,7 @@ public class ProjectController : ControllerBase
     
     [HttpPost("create")]
     [SwaggerOperation("CreateProject")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> CreateProject([FromBody]Project project)
     {
         var checkResult = await _checker.CheckMasterData(project, null);
@@ -82,7 +84,7 @@ public class ProjectController : ControllerBase
     
     [HttpPost("edit")]
     [SwaggerOperation("EditProject")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> EditProject(int id, [FromBody] Project project)
     {
         var checkResult = await _checker.CheckMasterData(project, id);
@@ -105,7 +107,7 @@ public class ProjectController : ControllerBase
 
     [HttpDelete("delete")]
     [SwaggerOperation("DeleteProject")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> DeleteProject(int id)
     {
         using var scope = _serviceProvider.CreateScope();
