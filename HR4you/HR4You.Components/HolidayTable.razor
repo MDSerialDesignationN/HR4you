@@ -1,0 +1,82 @@
+﻿@rendermode InteractiveServer
+@inject HttpClient HttpClient
+
+<PopupHoliday @ref="popupRefHoliday" OnHolidayUpdated="RefreshTable" />
+
+<table class="Table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Name</th>
+            <th>Half Day</th>
+            <th> </th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var entry in entriesHoliday)
+        {
+            <tr>
+                <td>@entry.Date</td>
+                <td>@entry.Name</td>
+                <td>@(entry.HalfDay ? "Yes" : "No")</td>
+                <button type="button" class="btn btn-outline-danger" @onclick="(() => DeleteEntry(entry.Id))"><i class="fa fa-trash"></i></button>
+                <button type="button" class="btn btn-outline-info" @onclick="(() => EditEntryHoliday(entry.Id))"><i class="fa fa-pencil"></i></button>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+
+@code {
+    [Parameter]
+    public List<Holiday> entriesHoliday { get; set; }
+
+    private PopupHoliday popupRefHoliday;
+
+    [Parameter]
+    public EventCallback OnHolidayUpdated2 { get; set; }
+
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && popupRefHoliday != null)
+        {
+            popupRefHoliday.OnHolidayUpdated = EventCallback.Factory.Create(this, RefreshTable);
+        }
+    }
+
+    //holiday
+    public string RequestURLEditHoliday = "http://localhost:5001/api/master-data/holiday/get?addDeleted=true&Id=";
+    public string RequestURLDeleteHoliday = "http://localhost:5001/api/master-data/holiday/delete?Id=";
+
+
+    private void EditEntryHoliday(int GivenId)
+    {
+        popupRefHoliday.Show(GivenId, RequestURLEditHoliday, "Edit Holiday");
+    }
+
+    private async Task DeleteEntry(int GivenId)
+    {
+        await HttpClient.DeleteFromJsonAsync<Holiday>(RequestURLDeleteHoliday + GivenId);
+        RefreshTable();
+    }
+
+
+    private async Task RefreshTable()
+    {
+        if (OnHolidayUpdated2.HasDelegate)
+        {
+            await OnHolidayUpdated2.InvokeAsync(); // Notify the parent component
+        }
+        else
+        {
+            Console.WriteLine("no delegate assigned");
+        }
+    }
+
+}
+
+

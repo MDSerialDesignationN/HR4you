@@ -37,7 +37,6 @@
 
 
 @code {
-
     [Parameter]
     public List<WorkTime> entries { get; set; }
 
@@ -55,32 +54,23 @@
         }
     }
 
+    //worktime
     public string RequestURLEdit = "http://localhost:5001/api/master-data/work-time/get?addDeleted=true&Id=";
-    //public string RequestURLDelete = "http://localhost:5001/api/master-data/work-time/delete?Id=";
 
     private void EditEntry(int GivenId)
     {
         popupRef.Show(GivenId, RequestURLEdit, "Edit Project");
     }
 
-    //private async Task DeleteEntry(int GivenId)
-    //{
-    //    await HttpClient.DeleteFromJsonAsync<Project>(RequestURLDelete + GivenId);
-    //    Console.WriteLine("RefreshTable() was called from CustomersTable");
-    //    RefreshTable();
-    //}
-
-
     private async Task RefreshTable()
     {
-        Console.WriteLine("RefreshTable() was called from CustomersTable");
         if (OnCustomerUpdated2.HasDelegate)
         {
             await OnCustomerUpdated2.InvokeAsync(); // Notify the parent component
         }
         else
         {
-            Console.WriteLine("OnCustomerUpdated has no delegate assigned.");
+            Console.WriteLine("no delegate assigned");
         }
     }
 
