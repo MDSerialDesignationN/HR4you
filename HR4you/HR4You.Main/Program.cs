@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using HR4You.Components;
 using HR4You.Contexts;
+using HR4you.Security.Authentication;
 using Microsoft.OpenApi.Models;
 using NLog.Extensions.Logging;
 using NLog.Web;
@@ -65,8 +66,18 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+var connectionString = builder.Configuration.GetConnectionString("Db")!;
+
+//Configure authentication
+builder.Services.AddCustomAuthentication(new AuthenticationConfig
+{
+    ConnectionString = connectionString,
+    JwtKey = builder.Configuration.GetValue<string>("Jwt:Key")!,
+    JwtIssuer = builder.Configuration.GetValue<string>("Jwt:Issuer")!,
+    ConfigBuilder = builder.Configuration
+});
+
 //Configure db models + contexts with EF migrations
-var connectionString = builder.Configuration.GetConnectionString("Db");
 ModelContextHelper.ConfigureModelContexts(builder, connectionString);
 
 
@@ -77,7 +88,6 @@ var app = builder.Build();
 //Trigger DB migration
 ModelContextHelper.MigrateModelDb(app);
 
-//TODO rewrite rules if needed
 //TODO add authentication system for user management
 //TODO add and register audit service
 
@@ -108,7 +118,7 @@ app.UseCors();
 app.UseStaticFiles();
 app.MapControllers();
 
-app.UseAntiforgery();
+app.UseCustomAuthentication();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();

@@ -2,6 +2,9 @@
 using HR4You.Contexts.Tag;
 using HR4You.Model.Base;
 using HR4You.Model.Base.Models.Tag;
+using HR4You.Model.Base.Pagination;
+using HR4you.Security;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -20,15 +23,18 @@ public class TagController : ControllerBase
         _checker = checker;
     }
     
-    [HttpGet("get-all")]
-    [SwaggerOperation("GetAllTags")]
-    //[Authorize(Policy = )]
-    public async Task<IActionResult> GetAllTags(bool addDeleted)
-    {
+    [HttpGet("get-all-paged")]
+    [SwaggerOperation("GetAllPagedTags")]
+    [Authorize(Policy = BuildInUserRoles.Authenticated)]
+    public async Task<IActionResult> GetAllPagedTags([FromQuery] List<ColumnFilter> columnFilters, bool addDeleted, int pageNumber = 1, int pageSize = 10)
+    { 
+        if (pageNumber <= 0 || pageSize <= 0)
+            return BadRequest($"{nameof(pageNumber)} and {nameof(pageSize)} size must be greater than 0");
+        
         using var scope = _serviceProvider.CreateScope();
         var sc = scope.ServiceProvider.GetService<TagContext>()!;
         
-        var result = await sc.GetAll(addDeleted);
+        var result = await sc.GetAllOffsetPaged(columnFilters, pageNumber, pageSize, addDeleted);
         return result.Error switch
         {
             MasterDataError.None => Ok(result.Entity),
@@ -39,7 +45,7 @@ public class TagController : ControllerBase
     
     [HttpGet("get")]
     [SwaggerOperation("GetTag")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.Authenticated)]
     public async Task<IActionResult> GetTag(int id, bool addDeleted)
     {
         using var scope = _serviceProvider.CreateScope();
@@ -56,7 +62,7 @@ public class TagController : ControllerBase
     
     [HttpPost("create")]
     [SwaggerOperation("CreateTag")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> CreateTag([FromBody]Tag tag)
     {
         var checkResult = await _checker.CheckMasterData(tag, null);
@@ -78,7 +84,7 @@ public class TagController : ControllerBase
     
     [HttpPost("edit")]
     [SwaggerOperation("EditTag")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> EditTag(int id, [FromBody] Tag tag)
     {
         var checkResult = await _checker.CheckMasterData(tag, id);
@@ -101,7 +107,7 @@ public class TagController : ControllerBase
 
     [HttpDelete("delete")]
     [SwaggerOperation("DeleteTag")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> DeleteTag(int id)
     {
         using var scope = _serviceProvider.CreateScope();

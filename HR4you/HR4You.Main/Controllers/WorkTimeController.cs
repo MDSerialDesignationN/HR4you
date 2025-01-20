@@ -2,6 +2,9 @@
 using HR4You.Contexts.WorkTime;
 using HR4You.Model.Base;
 using HR4You.Model.Base.Models.WorkTime;
+using HR4You.Model.Base.Pagination;
+using HR4you.Security;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -20,15 +23,15 @@ public class WorkTimeController : ControllerBase
         _checker = checker;
     }
     
-    [HttpGet("get-all")]
-    [SwaggerOperation("GetAllWorkTimes")]
-    //[Authorize(Policy = )]
-    public async Task<IActionResult> GetAllWorkTimes(bool addDeleted)
+    [HttpGet("get-all-paged")]
+    [SwaggerOperation("GetAllPagedWorkTimes")]
+    [Authorize(Policy = BuildInUserRoles.Authenticated)]
+    public async Task<IActionResult> GetAllPagedWorkTimes([FromQuery] List<ColumnFilter> columnFilters, bool addDeleted, int pageNumber = 1, int pageSize = 10)
     {
         using var scope = _serviceProvider.CreateScope();
         var sc = scope.ServiceProvider.GetService<WorkTimeContext>()!;
         
-        var result = await sc.GetAll(addDeleted);
+        var result = await sc.GetAllOffsetPaged(columnFilters, pageNumber, pageSize, addDeleted);
         return result.Error switch
         {
             MasterDataError.None => Ok(result.Entity),
@@ -39,7 +42,7 @@ public class WorkTimeController : ControllerBase
     
     [HttpGet("get")]
     [SwaggerOperation("GetWorkTime")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.Authenticated)]
     public async Task<IActionResult> GetWorkTime(int id, bool addDeleted)
     {
         using var scope = _serviceProvider.CreateScope();
@@ -56,7 +59,7 @@ public class WorkTimeController : ControllerBase
     
     [HttpPost("create")]
     [SwaggerOperation("CreateWorkTime")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> CreateWorkTime([FromBody]WorkTime workTime)
     {
         var checkResult = await _checker.CheckMasterData(workTime, null);
@@ -78,7 +81,7 @@ public class WorkTimeController : ControllerBase
     
     [HttpPost("edit")]
     [SwaggerOperation("EditWorkTime")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> EditWorkTime(int id, [FromBody] WorkTime workTime)
     {
         var checkResult = await _checker.CheckMasterData(workTime, id);
@@ -101,7 +104,7 @@ public class WorkTimeController : ControllerBase
 
     [HttpDelete("delete")]
     [SwaggerOperation("DeleteWorkTime")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> DeleteWorkTime(int id)
     {
         using var scope = _serviceProvider.CreateScope();
