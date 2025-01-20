@@ -1,0 +1,92 @@
+﻿@page "/Users"
+@rendermode InteractiveServer
+@inject HttpClient HttpClient
+@inject IConfiguration Configuration
+
+<PageTitle>User</PageTitle>
+
+<h1>User</h1>
+
+<label>Show Deleted</label>
+<input type="checkbox" checked="@addDeleted" @oninput="CheckboxChanged">
+
+@if (entries == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <UserTable entries="entries" @ref="popupRef2" OnUserUpdated2="RefreshTable2">
+    </UserTable>
+}
+
+
+
+@code {
+    private string HttpURL;
+
+    public string RequestURL = "/api/master-data/user/get-all?addDeleted=";
+
+    public bool addDeleted;
+
+    public List<User> entries;
+
+    private UserTable popupRef2;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && popupRef2 != null)
+        {
+            popupRef2.OnUserUpdated2 = EventCallback.Factory.Create(this, RefreshTable2);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        //Get first value from appsettings.json "Urls"
+        var urls = Configuration["Urls"];
+        HttpURL = urls?.Split(';').FirstOrDefault();
+
+        addDeleted = false;
+        await LoadCustomers();
+    }
+
+    private async Task LoadCustomers()
+    {
+        try
+        {
+            entries = await HttpClient.GetFromJsonAsync<List<User>>((HttpURL + RequestURL) + addDeleted);
+            //Console.WriteLine(entries);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching entries: {ex.Message}");
+        }        
+    }
+
+    private async Task CheckboxChanged()
+    {
+        if (addDeleted == false)
+        {
+            addDeleted = true;
+        }
+        else
+        {
+            addDeleted = false;
+        }
+
+        entries = await HttpClient.GetFromJsonAsync<List<User>>((HttpURL + RequestURL) + addDeleted);
+        StateHasChanged();
+    }
+
+    private async Task RefreshTable2()
+    {
+        Console.WriteLine("RefreshTable2() was called");
+        await LoadCustomers(); 
+
+        StateHasChanged();
+    }
+}
+
