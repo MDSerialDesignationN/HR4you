@@ -9,8 +9,7 @@
             <th>First Name</th>
             <th>Last Name</th>
             <th>Username</th>
-            <th>Email</th>
-            <th>Phone Number</th>
+            <th>Roles</th>
             <th>Role Groups</th>
             <th>Is Deleted</th>
             <th> </th>
@@ -25,10 +24,9 @@
                 <td>@entry.FirstName</td>
                 <td>@entry.LastName</td>
                 <td>@entry.UserName</td>
-                <td>@entry.Email</td>
-                <td>@entry.PhoneNumber</td>
+                <td>@entry.Roles</td>
                 <td>@entry.RoleGroups</td>
-                <td>@(entry.IsDeleted ? "Yes" : "No")</td>
+                <td>@(entry.Deleted ? "Yes" : "No")</td>
                 <button type="button" class="btn btn-outline-danger" @onclick="(() => DeleteEntry(entry.Id))"><i class="fa fa-trash"></i></button>
                 <button type="button" class="btn btn-outline-info" @onclick="(() => EditEntry(entry.Id))"><i class="fa fa-pencil"></i></button>
 
@@ -41,7 +39,7 @@
 @code {
 
     [Parameter]
-    public List<User> entries { get; set; }
+    public List<UserInfo> entries { get; set; }
 
     private PopupUser popupRef;
 
@@ -58,7 +56,7 @@
     }
 
     public string RequestURLEdit = "http://localhost:5001/api/master-data/user/get?addDeleted=true&Id=";
-    public string RequestURLDelete = "http://localhost:5001/api/master-data/user/delete?Id=";
+    public string RequestURLDelete = "http://localhost:5001/api/auth/delete-user/delete?Id=";
 
     private void EditEntry(string GivenId)
     {
@@ -67,7 +65,7 @@
 
     private async Task DeleteEntry(string GivenId)
     {
-        await HttpClient.DeleteFromJsonAsync<User>(RequestURLDelete + GivenId);
+        await HttpClient.DeleteFromJsonAsync<UserInfo>(RequestURLDelete + GivenId);
         Console.WriteLine("RefreshTable() was called");
         RefreshTable();
     }

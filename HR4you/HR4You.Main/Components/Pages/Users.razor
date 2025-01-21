@@ -27,11 +27,11 @@ else
 @code {
     private string HttpURL;
 
-    public string RequestURL = "/api/master-data/user/get-all?addDeleted=";
+    public string RequestURL = "/api/auth/get-users?addDeleted=";
 
     public bool addDeleted;
 
-    public List<User> entries;
+    public List<UserInfo> entries;
 
     private UserTable popupRef2;
 
@@ -57,7 +57,7 @@ else
     {
         try
         {
-            entries = await HttpClient.GetFromJsonAsync<List<User>>((HttpURL + RequestURL) + addDeleted);
+            entries = await HttpClient.GetFromJsonAsync<List<UserInfo>>((HttpURL + RequestURL) + addDeleted);
             //Console.WriteLine(entries);
         }
         catch (Exception ex)
@@ -77,7 +77,7 @@ else
             addDeleted = false;
         }
 
-        entries = await HttpClient.GetFromJsonAsync<List<User>>((HttpURL + RequestURL) + addDeleted);
+        entries = await HttpClient.GetFromJsonAsync<List<UserInfo>>((HttpURL + RequestURL) + addDeleted);
         StateHasChanged();
     }
 

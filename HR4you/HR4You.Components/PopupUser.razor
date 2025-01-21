@@ -22,7 +22,7 @@
             <div class="toast-body" style="padding: 20px;">
                 <div class="container">
                     <div class="row">
-                        <!-- Customer Number and Website -->
+                        <!-- FirstNamw and LastName -->
                         <div class="col-sm-4">
                             <label>First Name</label>
                             <InputText @bind-Value="user.FirstName" class="form-control mb-2" />
@@ -31,23 +31,22 @@
                             <InputText @bind-Value="user.LastName" class="form-control mb-2" />
                         </div>
 
-                        <!-- Name and Address -->
+                        <!-- Username and Roles -->
                         <div class="col-sm-4">
                             <label>Username</label>
                             <InputText @bind-Value="user.UserName" class="form-control mb-2" />
 
-                            <label>Email</label>
-                            <InputText @bind-Value="user.Email" class="form-control mb-2" />
-                        </div>
+                            <label>Roles</label>
+                            <input>< />
+                            <!-- <InputText @bind-Value="user.Roles" class="form-control mb-2" /> -->
+                        </div> 
 
-                        <!-- Email and Phone Number -->
+                        <!-- Role Groups
                         <div class="col-sm-4">
-                            <label>Phone Number</label>
-                            <InputText @bind-Value="user.PhoneNumber" class="form-control mb-2" />
 
                             <label>Role Groups</label>
-                            <!--    <InputText @bind-Value="user.RoleGroups" class="form-control mb-2" /> -->
-                        </div>
+                            <InputText @bind-Value="user.RoleGroups" class="form-control mb-2" /> 
+                        </div> -->
                     </div>
 
                     <!-- Buttons -->
@@ -80,7 +79,7 @@
     public string? GivenId { get; set; }
 
 
-    User user = new User();
+    UserInfo user = new UserInfo();
 
     bool isEdit = false;
 
@@ -88,7 +87,7 @@
     {
         HeaderText = headerText;
         GivenId = givenId.ToString();
-        user = await HttpClient.GetFromJsonAsync<User>(requestURL + GivenId);
+        user = await HttpClient.GetFromJsonAsync<UserInfo>(requestURL + GivenId);
         IsVisible = true;
         isEdit = true;
         StateHasChanged();
@@ -112,9 +111,9 @@
         {
             try
             {
-                //if (customer.CustomerNumber == 0 || string.IsNullOrEmpty(customer.Name))
+                //if (string.IsNullOrEmpty(user.UserName)) || string.IsNullOrEmpty(user.Email))
                 //{
-                //    Console.WriteLine("Customer Number and Name are required.");
+                //    Console.WriteLine("Username and Email are required.");
                 //    return;
                 //}
 
@@ -162,7 +161,7 @@
 
     private void Close()
     {
-        user = new User();
+        user = new UserInfo();
         HeaderText = string.Empty;
         GivenId = null;
         IsVisible = false;
