@@ -156,14 +156,30 @@ public class UserController : ControllerBase
         return Ok();
     }
 
-    [HttpGet("get-users")]
-    [SwaggerOperation("GetUsers")]
+    [HttpGet("get-all-users")]
+    [SwaggerOperation("GetAllUsers")]
     [Authorize(Policy = BuildInUserRoles.SysAdminRole)]
-    public IActionResult GetUsers(bool showDeleted = false)
+    public IActionResult GetAllUsers(bool showDeleted = false)
     {
         var users = _db.GetUsers(showDeleted);
         var result = users.Select(user => UserInfo.FromUser(user, true)).ToList();
 
+        return Ok(result);
+    }
+    
+    [HttpGet("get-user")]
+    [SwaggerOperation("GetUser")]
+    [Authorize(Policy = BuildInUserRoles.SysAdminRole)]
+    public IActionResult GetUser(string id)
+    {
+        var user = _db.GetUserById(id);
+        if (user == null)
+        {
+            return BadRequest($"unknown user id - {id}");
+        }
+        
+        var result = UserInfo.FromUser(user, true);
+        
         return Ok(result);
     }
 
