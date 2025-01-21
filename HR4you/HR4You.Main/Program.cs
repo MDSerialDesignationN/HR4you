@@ -120,7 +120,7 @@ app.MapControllers();
 
 app.UseCustomAuthentication();
 
-app.MapRazorComponents<App>()
+app.MapRazorComponents<App>().DisableAntiforgery()
     .AddInteractiveServerRenderMode();
 
 app.Run();
