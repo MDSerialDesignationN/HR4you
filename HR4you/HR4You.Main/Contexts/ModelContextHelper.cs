@@ -1,4 +1,5 @@
-﻿using HR4You.Contexts.Customer;
+﻿using HR4You.Components.Handler;
+using HR4You.Contexts.Customer;
 using HR4You.Contexts.Holiday;
 using HR4You.Contexts.HourEntry;
 using HR4You.Contexts.Project;
@@ -63,8 +64,10 @@ public static class ModelContextHelper
             return new TagContext(optionsBuilder.Options, sp.GetService<ILogger<TagContext>>()!, sp);
         });
         
-        //Register remaining handler
+        //Register remaining handlers
         webApplicationBuilder.Services.AddSingleton<ModelChecker>();
+
+        webApplicationBuilder.Services.AddScoped<ILocalStorageHandler, LocalStorageHandler>();
     }
 
     public static void MigrateModelDb(WebApplication webApplication)

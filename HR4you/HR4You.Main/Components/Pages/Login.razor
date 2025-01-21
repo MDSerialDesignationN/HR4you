@@ -1,14 +1,14 @@
-﻿@page "/login"
+﻿@page "/"
+@using HR4You.Components.Handler
 @using HR4You.Components.Layout
 @layout LoginLayout
-@inject NavigationManager NavigationManager
 
 <PageTitle>HR4You Login</PageTitle>
 
 <div class="loginContainer">
     <h4 class="loginHeader">Login</h4>
     <div class="loginBody">
-        <input id="Username" type="text" placeholder="Username/Email" />
+        <input id="Username" type="text" placeholder="Username" />
         <input id="Password" type="password" placeholder="Password"/>
         <input id="Submit" type="submit" value="login" />
     </div>
@@ -18,8 +18,27 @@
 
 
 @code {
+    [Inject] ILocalStorageHandler LocalStorage { get; set; } = null!;
+    public string Text1 { get; set; }
 
+    public async Task Save()
+    {
+        await LocalStorage.SetItem("textData", Text1);
+    }
 
-    
+    public async Task Load()
+    {
+        Text1 = await LocalStorage.GetItem("textData");
+    }
+
+    public async Task Remove()
+    {
+        await LocalStorage.RemoveItem("textData");
+    }
+
+    public async Task Clear()
+    {
+        await LocalStorage.ClearData();
+    }
 
 }
