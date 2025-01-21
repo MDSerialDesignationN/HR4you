@@ -1,16 +1,13 @@
-﻿<table class="table">
+﻿<table class="AllTimesTable">
     <thead>
         <tr>
-            <th>Id</th>
             <th>User Id</th>
             <th>Date</th>
             <th>Start Time</th>
             <th>End Time</th>
             <th>Duration</th>
-            <td>Worktime Diff</td>
+            <th>Worktime Diff</th>
             <th>Type</th>
-            <th>Project Id</th>
-            <th>Tag Id</th>
             <th>Description</th>
             <th>Is Holiday</th>
             <th>Is Billable</th>
@@ -23,7 +20,6 @@
     @foreach (var entry in entries)
         {
             <tr>
-                <td>@entry.Id</td>
                 <td>@entry.UserId</td>
                 <td>@entry.Date</td>
                 <td>@entry.StartTime</td>
@@ -31,8 +27,6 @@
                 <td>@entry.Duration</td>
                 <td>@entry.WorktimeDiff</td>
                 <td>@entry.Type</td>
-                <td>@entry.ProjectId</td>
-                <td>@entry.TagId</td>
                 <td>@entry.Description</td>
                 <td>@(entry.IsHoliday ? "Yes" : "No")</td>
                 <td>@(entry.IsBillable ? "Yes" : "No")</td>

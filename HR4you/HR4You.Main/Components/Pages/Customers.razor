@@ -1,38 +1,62 @@
 ﻿@page "/Customers"
+@using HR4You.Model.Base.Pagination
 @attribute [StreamRendering]
 @rendermode InteractiveServer
 @inject HttpClient HttpClient
 
 <PageTitle>Customers</PageTitle>
+<div class="page-content min-h-[100vh] p-3 flex flex-col gap-2 select-none">
 
-<h1>Customers</h1>
+    <div class="flex flex-row justify-between">
+        <h1 class="text-[2rem] font-bold flex flex-row gap-3 items-center"><i class="fa-solid fa-users"></i>Customers</h1>
+        <div class="bg-[whitesmoke] flex flex gap-3 items-center p-3 rounded-[10px] border border-2 border-[#c1c1c1]">
+            <div class="user-info">
+                <p class="font-bold p-1">Thel Vadam'ee</p>
 
-<label>Show Deleted</label>
-<input type="checkbox" checked="@addDeleted" @oninput="CheckboxChanged">
+            </div>
+            <div class="user-actions">
+                <a class="cursor-pointer text-red-500 p-1 rounded-[5px] transition-all duration-500 hover:bg-gray-300">Logout</a>
+            </div>
+        </div>
+    </div>
 
-@if (entries == null)
-{
-    <p>
-        <em>Loading...</em>
-    </p>
-}
-else
-{
-    <CustomersTable entries="entries" @ref="popupRef2" OnCustomerUpdated2="RefreshTable2">
-    </CustomersTable>
-}
+
+    @if (entries == null)
+    {
+        <p>
+            <em>Loading...</em>
+        </p>
+    }
+    else
+    {
+        <div class="flex flex-row gap-2 items-center">
+            <CustomerSearch Entries="entries.Data" />
+            <div class="bg-gray-200 p-[5px] rounded-[5px] border border-1 border-[#c1c1c1] flex flex-row gap-1 justify-center items-center">
+                <label for="showDeleted">Show Deleted</label>
+                <input class="h-4 w-4" id="showDeleted" type="checkbox" checked="@addDeleted" @oninput="CheckboxChanged">
+            </div>
+        </div>
+        <OffsetPagination entries="entries" OnPageChanged="EventCallback.Factory.Create<PagedResponseOffset<Customer>>(this, UpdateEntries)" ApiEndpoint="http://localhost:5001/api/master-data/customer/get-all-paged" />
+        <div class="table-wrapper overflow-auto">
+
+            <CustomersTable entries="entries.Data" @ref="popupRef2" OnCustomerUpdated2="RefreshTable2">
+            </CustomersTable>
+        </div>
+
+    }
+</div>
 
 
 
 @code {
 
-    public List<Customer> entries;
+    public PagedResponseOffset<Customer> entries;
 
     //public bool IsChecked = true;
 
     public bool addDeleted;
 
-    public string RequestURL = "http://localhost:5001/api/master-data/customer/get-all?addDeleted=";
+    public string RequestURL = "http://localhost:5001/api/master-data/customer/get-all-paged?pageNumber=1&pageSize=2&addDeleted=";
 
     private CustomersTable popupRef2;
 
@@ -55,13 +79,13 @@ else
     {
         try
         {
-            entries = await HttpClient.GetFromJsonAsync<List<Customer>>(RequestURL + addDeleted);
+            entries = await HttpClient.GetFromJsonAsync<PagedResponseOffset<Customer>>(RequestURL + addDeleted);
             //Console.WriteLine(entries);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error fetching entries: {ex.Message}");
-        }        
+        }
     }
 
     private async Task CheckboxChanged()
@@ -75,15 +99,20 @@ else
             addDeleted = false;
         }
 
-        entries = await HttpClient.GetFromJsonAsync<List<Customer>>(RequestURL + addDeleted);
+        entries = await HttpClient.GetFromJsonAsync<PagedResponseOffset<Customer>>(RequestURL + addDeleted);
         StateHasChanged();
     }
 
     private async Task RefreshTable2()
     {
         Console.WriteLine("RefreshTable2() was called from Customers");
-        await LoadCustomers(); 
+        await LoadCustomers();
 
         StateHasChanged();
+    }
+
+    private void UpdateEntries(PagedResponseOffset<Customer> newEntries)
+    {
+        this.entries = newEntries;
     }
 }

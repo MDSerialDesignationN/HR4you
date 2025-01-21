@@ -1,48 +1,50 @@
-﻿@page "/home"
+@page "/home"
+@using HR4You.Model.Base.Pagination
 @attribute [StreamRendering]
 @inject HttpClient HttpClient
 @rendermode InteractiveServer
 
 <PageTitle>Overview</PageTitle>
-<h2>Overview</h2>
+<div class="page-content min-h-[100vh] p-3 flex flex-col gap-2 select-none">
 
+    <h1 class="text-[2rem] font-bold flex flex-row gap-3 items-center"><i class="fa-solid fa-house"></i>Overview</h1>
+    @if (entries == null)
+    {
+        <p>
+            <em>Loading...</em>
+        </p>
+    }
+    else
+    {
 
-
-
-
-
-
-@if (entries == null)
-{
-    <p>
-        <em>Loading...</em>
-    </p>
-}
-else
-{
-    <HomeTable entries="entries">
-    </HomeTable>
-}
+        <HomeTable entries="entries.Data">
+        </HomeTable>
+    }
+</div>
 
 
 
 @code {
 
-    public List<HourEntry> entries;
+    public PagedResponseKeySet<HourEntry> entries;
 
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            entries = await HttpClient.GetFromJsonAsync<List<HourEntry>>("http://localhost:5001/api/master-data/hour-entry/get-user-all?userId=4e2a437c-879f-4b49-b216-0dc4b6470d67");
-            Console.WriteLine(entries);
+            entries = await HttpClient.GetFromJsonAsync<PagedResponseKeySet<HourEntry>>("http://localhost:5001/api/master-data/hour-entry/get-user-all-paged?userId=003c1ae2-acfc-495b-b91a-8cedf507568a&reference=0");
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error fetching entries: {ex.Message}");
         }
 
+    }
+
+    private void UpdateEntries(PagedResponseKeySet<HourEntry> newEntries)
+    {
+        this.entries = newEntries;
     }
 }
 

@@ -1,0 +1,31 @@
+
+.AllTimesTable {
+    border-collapse: collapse;
+    position: relative;
+/*    margin-top: 20px;*/
+    padding: 10px;
+    background-color: white;
+    border: 1px solid gainsboro;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+    .AllTimesTable th,
+    .AllTimesTable td {
+        padding: 8px;
+        text-align: left;
+        border: 1px solid gainsboro;
+        max-width: fit-content;
+/*        max-width: 200px;*/
+/*display: none;*/
+    }
+
+    .AllTimesTable th {
+        background-color: #f4f4f4;
+        white-space: nowrap;
+    }
+
+    .AllTimesTable td {
+        overflow: hidden;
+        white-space: nowrap;
+    }

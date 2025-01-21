@@ -5,12 +5,12 @@
 
 <PageTitle>HR4You Login</PageTitle>
 
-<div class="loginContainer">
-    <h4 class="loginHeader">Login</h4>
-    <div class="loginBody">
-        <input id="Username" type="text" placeholder="Username" />
-        <input id="Password" type="password" placeholder="Password"/>
-        <input id="Submit" type="submit" value="login" />
+<div class="bg-gray-100 border border-2 rounded-[15px] py-2 px-5 flex flex-col items-center gap-2 max-w-[500px]">
+    <h4 class="font-monospace text-[2rem]">Login</h4>
+    <div class="loginBody flex flex-col gap-2 items-center">
+        <input class="w-[300px] p-1 rounded-full border border-2 font-monospace @(isInvalid ? "border-red-500" : "")" id="Username" type="text" placeholder="Username/Email" @bind="username" />
+        <input class="w-[300px] p-1 rounded-full border border-2 font-monospace @(isInvalid ? "border-red-500" : "")" id="Password" type="password" placeholder="Password" @bind="password" />
+        <input class="bg-[#ffffff] hover:bg-gray-200 w-[fit-content] py-1 px-5 rounded-full border border-2" value="Login" type="button" @onclick="checkLogin" />
     </div>
 </div>
 

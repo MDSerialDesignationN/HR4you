@@ -1,41 +1,67 @@
 ﻿@page "/AllTimes"
+@using HR4You.Model.Base
+@using HR4You.Model.Base.Pagination
 @attribute [StreamRendering]
 @inject HttpClient HttpClient
+@rendermode InteractiveServer
 
 <PageTitle>All Times</PageTitle>
+<div class="page-content min-h-[100vh] p-3 flex flex-col gap-2">
+    <div class="flex flex-row justify-between">
+        <h1 class="text-[2rem] font-bold flex flex-row gap-3 items-center"><i class="fa-solid fa-chart-area"></i>All Times</h1>
+        <div class="bg-[whitesmoke] flex flex gap-3 items-center p-3 rounded-[10px] border border-2 border-[#c1c1c1]">
+            <div class="user-info">
+                <p class="font-bold p-1">Thel Vadam'ee</p>
 
-<h1>All Times</h1>
+            </div>
+            <div class="user-actions">
+                <a class="cursor-pointer text-red-500 p-1 rounded-[5px] transition-all duration-500 hover:bg-gray-300">Logout</a>
+            </div>
+        </div>
+    </div>
 
-@if (entries == null)
-{
-    <p>
-        <em>Loading...</em>
-    </p>
-}
-else
-{
-    <AllTimesTable entries="entries">
-    </AllTimesTable>
-}
+    @if (entries == null)
+    {
+        <p>
+            <em>Loading...</em>
+        </p>
+    }
+    else
+    {
+        <HourEntrySearch Entries="entries.Data" />
+        <KeysetPagination entries="entries" OnPageChanged="EventCallback.Factory.Create<PagedResponseKeySet<HourEntry>>(this, UpdateEntries)" ApiEndpoint="http://localhost:5001/api/master-data/hour-entry/get-all-paged" />
+
+        <div class="table-wrapper overflow-auto">
+            <AllTimesTable entries="entries.Data"></AllTimesTable>
+        </div>
 
 
+
+    }
+</div>
 
 @code {
-
-    public List<HourEntry> entries;
-
+    public PagedResponseKeySet<HourEntry>? entries;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            entries = await HttpClient.GetFromJsonAsync<List<HourEntry>>("http://localhost:5001/api/master-data/hour-entry/get-all");
-            //Console.WriteLine(entries);
+            entries = await HttpClient.GetFromJsonAsync<PagedResponseKeySet<HourEntry>>("http://localhost:5001/api/master-data/hour-entry/get-all-paged?reference=0&pageSize=10");
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error fetching entries: {ex.Message}");
         }
-
     }
+
+    private void UpdateEntries(PagedResponseKeySet<HourEntry> newEntries)
+    {
+        this.entries = newEntries;
+        // if (entries != null)
+        // {
+        //     entries = new PagedResponseKeySet<HourEntry>(newEntries, entries.Reference);
+        // }
+    }
+
 }
