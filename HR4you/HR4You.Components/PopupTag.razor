@@ -1,48 +1,46 @@
-﻿@inject HttpClient HttpClient
+﻿@rendermode InteractiveServer
+@inject HttpClient HttpClient
 
 @{
     var showClass = IsVisible ? "d-block" : "d-none";
 }
 
-<div class="toast-container position-absolute @showClass" data-bs-autohide="true" data-bs-delay="5000"
-     style="left: 50%;
-    position: fixed;
-    transform: translate(-50%, 0px);
-    z-index: 9999;
-    width: 80%;">
+<div class="toast-container position-absolute @showClass" data-bs-autohide="true" data-bs-delay="50000"
+     style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
 
     <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true"
-         style="left: 50%;
-        position: fixed;
-        transform: translate(-50%, 0px);
-        z-index: 9999;
-        width: 80%;
-        background-color:white;">
+         style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; background-color:white; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
         <div class="toast-header">
             <strong class="me-auto">@HeaderText</strong>
             <button type="button" class="btn-close" aria-label="Close" @onclick="Close"></button>
         </div>
 
-        <div class="toast-body" style="padding: 20px;">
-            <div class="container">
-                @* <div class="row">
-                    <div class="col-sm-4">
-                        <EditForm Model="user" OnValidSubmit="Submit">
-                            <DataAnnotationsValidator />
-                            <ValidationSummary Model="user" />
+        <EditForm Model="tag" OnValidSubmit="Submit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
 
-                            <label>User Name</label>
-                            <InputNumber @bind-Value="customer.CustomerNumber" class="form-control mb-2" />
+            <div class="toast-body" style="padding: 20px;">
+                <div class="container">
+                    <div class="row">
+                        <!-- Name -->
+                        <div class="col-sm-4">
+                            <label>Name</label>
+                            <InputText @bind-Value="tag.Name" class="form-control mb-2" />
+                        </div>
+                    </div>
 
-                            <label>User Password</label>
-                            <InputText @bind-Value="customer.Website" class="form-control mb-2" />
-                        </EditForm>
-                    </div> *@
+                    <!-- Buttons -->
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <button type="submit" class="btn btn-dark">Save</button>
+                            <button type="button" class="btn btn-outline-secondary" @onclick="Close">Cancel</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        </EditForm>
     </div>
 </div>
-
 
 @code {
     [Parameter]
@@ -52,40 +50,96 @@
     public EventCallback<bool> IsVisibleChanged { get; set; }
 
     [Parameter]
+    public EventCallback OnTagUpdated { get; set; }
+
+    [Parameter]
     public string? HeaderText { get; set; }
 
     [Parameter]
     public string? GivenId { get; set; }
 
-    
+    public string editURL = "http://localhost:5001/api/tag/edit"; //replace with correct one
+    public string createURL = "http://localhost:5001/api/tag/create"; //replace with correct one
 
-    async public void Show(string requestURL, string headerText)
+    Tag tag = new Tag();
+
+    bool isEdit = false;
+
+    async public Task Show(int givenId, string requestURL, string headerText)
     {
         HeaderText = headerText;
-        //customer = await HttpClient.GetFromJsonAsync<Customer>(requestURL + GivenId);
+        GivenId = givenId.ToString();
+        tag = await HttpClient.GetFromJsonAsync<Tag>(requestURL + GivenId);
         IsVisible = true;
+        isEdit = true;
         StateHasChanged();
     }
 
-    async public void ShowOverview(string requestURL, string headerText)
+    async public Task ShowOverview(string headerText)
     {
         HeaderText = headerText;
-        //customer = await HttpClient.GetFromJsonAsync<Customer>(requestURL + GivenId);
         IsVisible = true;
+        isEdit = false;
         StateHasChanged();
     }
 
-    private void Submit()
+    private async Task Submit()
     {
-        var createURL = "http://localhost:5001/api/master-data/user/create";
+        if (isEdit == true)
+        {
+            try
+            {
+                var response = await HttpClient.PostAsJsonAsync(editURL, tag);
 
+                if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("Tag saved successfully.");
+
+                    if (OnTagUpdated.HasDelegate)
+                    {
+                        await OnTagUpdated.InvokeAsync(); // Notify the parent component
+                    }
+                    else
+                    {
+                        Console.WriteLine("no delegate assigned.");
+                    }
+
+                    Close();
+                }
+                else
+                {
+                    Console.WriteLine("Error occurred while saving the Tag: " + response.ReasonPhrase);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception occurred: " + ex.Message);
+            }
+        }
+        else if (isEdit == false)
+        {
+            var response = await HttpClient.PostAsJsonAsync(createURL, tag);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Tag created successfully.");
+
+                Close();
+            }
+            else
+            {
+                Console.WriteLine("Error occurred while creating the Tag: " + response.ReasonPhrase);
+            }
+        }
     }
 
     private void Close()
     {
+        tag = new Tag();
         HeaderText = string.Empty;
         GivenId = null;
         IsVisible = false;
+
         StateHasChanged();
     }
 }

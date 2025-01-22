@@ -22,38 +22,30 @@
             <div class="toast-body" style="padding: 20px;">
                 <div class="container">
                     <div class="row">
-                        <!-- FirstNamw and LastName -->
+                        <!-- FirstName and Roles -->
                         <div class="col-sm-4">
                             <label>First Name</label>
                             <InputText @bind-Value="user.FirstName" class="form-control mb-2" />
-
-                            <label>Last Name</label>
-                            <InputText @bind-Value="user.LastName" class="form-control mb-2" />
                         </div>
 
-                        <!-- Username and Roles -->
+                        <!-- LastName and RoleGroups -->
                         <div class="col-sm-4">
-                            <label>Username</label>
-                            <InputText @bind-Value="user.UserName" class="form-control mb-2" />
-
-                            <label>Roles</label>
-                            <input>< />
-                            <!-- <InputText @bind-Value="user.Roles" class="form-control mb-2" /> -->
+                            <label>Last Name</label>
+                            <InputText @bind-Value="user.LastName" class="form-control mb-2" />
                         </div> 
 
-                        <!-- Role Groups
+                        <!-- UserName -->
                         <div class="col-sm-4">
-
-                            <label>Role Groups</label>
-                            <InputText @bind-Value="user.RoleGroups" class="form-control mb-2" /> 
-                        </div> -->
+                            <label>Username</label>
+                            <InputText @bind-Value="user.UserName" class="form-control mb-2" />                           
+                        </div>
                     </div>
 
                     <!-- Buttons -->
                     <div class="row">
                         <div class="col-sm-4">
                             <button type="submit" class="btn btn-dark">Save</button>
-                            <button type="button" class="btn btn-outline-secondary" @onclick="Close">Cancel</button>
+                            <button type="button" class="btn btn-outline-secondary" @onclick="Close">Cancel</button> 
                         </div>
                     </div>
                 </div>
@@ -78,6 +70,8 @@
     [Parameter]
     public string? GivenId { get; set; }
 
+    public string editURL = "http://localhost:5001/api/auth/change-user-data";
+    public string createURL = "http://localhost:5001/api/auth/add-new-user";
 
     UserInfo user = new UserInfo();
 
@@ -99,25 +93,15 @@
         IsVisible = true;
         isEdit = false;
         StateHasChanged();
-
     }
 
     private async Task Submit()
     {
-        var editURL = "http://localhost:5001/api/master-data/user/edit?Id=";
-        var createURL = "http://localhost:5001/api/master-data/user/create";
-
         if (isEdit == true)
         {
             try
             {
-                //if (string.IsNullOrEmpty(user.UserName)) || string.IsNullOrEmpty(user.Email))
-                //{
-                //    Console.WriteLine("Username and Email are required.");
-                //    return;
-                //}
-
-                var response = await HttpClient.PostAsJsonAsync(editURL + GivenId, user);
+                var response = await HttpClient.PostAsJsonAsync(editURL, user);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -145,19 +129,21 @@
             }
         }
         else if (isEdit == false)
-        {
+        {           
             var response = await HttpClient.PostAsJsonAsync(createURL, user);
+
             if (response.IsSuccessStatusCode)
             {
-                Console.WriteLine("User saved successfully.");
+                Console.WriteLine("User created successfully.");
 
                 Close();
             }
+            else
+            {
+                Console.WriteLine("Error occurred while creating the user: " + response.ReasonPhrase);
+            }
         }
-
-
     }
-
 
     private void Close()
     {
