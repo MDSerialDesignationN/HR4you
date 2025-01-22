@@ -1,9 +1,9 @@
 ﻿@page "/AllTimes"
+@using HR4You.Model.Base
 @using HR4You.Model.Base.Pagination
 @attribute [StreamRendering]
 @inject HttpClient HttpClient
 @rendermode InteractiveServer
-@inject IConfiguration Configuration
 
 <PageTitle>All Times</PageTitle>
 <div class="page-content min-h-[100vh] p-3 flex flex-col gap-2">
@@ -43,33 +43,25 @@
 
 @code {
     public PagedResponseKeySet<HourEntry>? entries;
-    public FilterOption[] options1 = new FilterOption[] {
-        new FilterOption{ Icon = "<i class='fa-solid fa-calendar-days'></i>", Name = "Date", InputType = "date" },
-        new FilterOption{ Icon = "<i class='fa-regular fa-clock'></i>", Name = "StartTime", InputType = "time" },
-        new FilterOption{ Icon = "<i class='fa-regular fa-clock'></i>", Name = "EndTime", InputType = "time" },
-        new FilterOption{ Icon = "<i class='fa-solid fa-timeline'></i>", Name = "Duration", InputType = "number" },
-        new FilterOption{ Icon = "<i class='fa-solid fa-tasks'></i>", Name = "Type", InputType = "select", Options = Enum.GetValues<ActivityType>().Select(e => e.ToString()).ToList() },
-    };
-    public FilterOption[] options2 = new FilterOption[] {
-        new FilterOption{ Icon = "<i class='fa-solid fa-id-card'></i>", Name = "UserId", InputType = "string" },
-        new FilterOption{ Icon = "<i class='fa-solid fa-diagram-project'></i>", Name = "ProjectId", InputType = "string" },
-        new FilterOption{ Icon = "<i class='fa-solid fa-tag'></i>", Name = "TagId", InputType = "string" },
-        new FilterOption{ Icon = "<i class='fa-solid fa-mug-hot'></i>", Name = "IsHoliday", InputType = "checkbox" },
-        new FilterOption{ Icon = "<i class='fa-solid fa-money-bill'></i>", Name = "IsBillable", InputType = "checkbox" },
-        new FilterOption{ Icon = "<i class='fa-solid fa-trash'></i>", Name = "Deleted", InputType = "checkbox" },
-    };
+    public FilterOption[] options1 =
+    [
+        new() { Icon = "<i class='fa-solid fa-calendar-days'></i>", Name = "Date", InputType = "date" },
+        new() { Icon = "<i class='fa-regular fa-clock'></i>", Name = "StartTime", InputType = "time" },
+        new() { Icon = "<i class='fa-regular fa-clock'></i>", Name = "EndTime", InputType = "time" },
+        new() { Icon = "<i class='fa-solid fa-timeline'></i>", Name = "Duration", InputType = "number" },
+        new() { Icon = "<i class='fa-solid fa-tasks'></i>", Name = "Type", InputType = "select", Options = Enum.GetValues<ActivityType>().Select(e => e.ToString()).ToList() }
+    ];
+    public FilterOption[] options2 =
+    [
+        new() { Icon = "<i class='fa-solid fa-id-card'></i>", Name = "UserId", InputType = "string" },
+        new() { Icon = "<i class='fa-solid fa-diagram-project'></i>", Name = "ProjectId", InputType = "string" },
+        new() { Icon = "<i class='fa-solid fa-tag'></i>", Name = "TagId", InputType = "string" },
+        new() { Icon = "<i class='fa-solid fa-mug-hot'></i>", Name = "IsHoliday", InputType = "checkbox" },
+        new() { Icon = "<i class='fa-solid fa-money-bill'></i>", Name = "IsBillable", InputType = "checkbox" },
+        new() { Icon = "<i class='fa-solid fa-trash'></i>", Name = "Deleted", InputType = "checkbox" }
+    ];
 
-
-
-    // <div class="OptionRow">
-    //     <span><i class="fa-solid fa-mug-hot"></i>Holiday</span><input type="checkbox" name="Holiday" @bind="holiday" @bind:event="oninput" />
-    // </div>
-    // <div class="OptionRow">
-    //     <span><i class="fa-solid fa-money-bill"></i>Billable</span><input type="checkbox" name="Billable" @bind="billable" @bind:event="oninput" />
-    // </div>
-    // <div class="OptionRow">
-    //     <span><i class="fa-solid fa-trash"></i>Deleted</span><input type="checkbox" name="Deleted" @bind="deleted" @bind:event="oninput" />
-    // </div>
+    
     private string HttpURL;
 
     public string RequestURL = "/api/master-data/hour-entry/get-all?addDeleted=";
@@ -103,10 +95,6 @@
     private void UpdateEntries(PagedResponseKeySet<HourEntry> newEntries)
     {
         entries = newEntries;
-        // if (entries != null)
-        // {
-        //     entries = new PagedResponseKeySet<HourEntry>(newEntries, entries.Reference);
-        // }
     }
 
     private async Task LoadAllTimes()

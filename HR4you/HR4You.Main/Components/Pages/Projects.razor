@@ -34,7 +34,7 @@ else
 
     private ProjectsTable popupRef2;
 
-    public Dictionary<int, string> customerNames = new Dictionary<int, string>();
+    public Dictionary<int, string> customerNames = new();
     public PagedResponseKeySet<Project> entries;
 
     public string RequestURLCustomer = "/api/master-data/customer/get?addDeleted=true&Id=";
