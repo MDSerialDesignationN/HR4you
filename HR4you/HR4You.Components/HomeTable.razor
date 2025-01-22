@@ -1,7 +1,8 @@
 ﻿@using HR4You.Model.Base.Pagination
-@* <PopupTag @ref="popupRefTag"></PopupTag> *@
-@* <PopupProject @ref="popupRefProject"></PopupProject> *@
-@* <PopupCustomers @ref="popupRefCustomer"></PopupCustomers> *@
+<PopupTag @ref="popupRefTag"></PopupTag>
+<PopupProject @ref="popupRefProject"></PopupProject>
+<PopupCustomers @ref="popupRefCustomer"></PopupCustomers>
+<PopupHourEntry @ref="popupRefHourEntry"></PopupHourEntry>
 
 
 <div class="addButtons flex flex-row gap-2">
@@ -11,6 +12,10 @@
 </div>
 
 <input class="submit bg-black rounded-[5px]" type="submit" value="+" />
+
+<div class="AddHourEntry">
+    <button class="btn btn-dark" @onclick="(() => CreateHourEntry())">+</button>
+</div>
 
 <div class="OverviewContainer">
     <table class="OverviewTable">
@@ -61,10 +66,12 @@
     private PopupTag popupRefTag;
     private PopupProject popupRefProject;
     private PopupCustomers popupRefCustomer;
+    private PopupHourEntry popupRefHourEntry;
 
     public string RequestURLUser = "http://localhost:5001/api/master-data/customer/get?Id="; //User
     public string RequestURLProject = "http://localhost:5001/api/master-data/project/get?Id=";
     public string RequestURLCustomer = "http://localhost:5001/api/master-data/customer/get?Id="; // ????
+    public string RequestURLHourEntry = "http://localhost:5001/api/master-data/hour-entry/get?Id=";
 
     private void CreateTag()
     {
@@ -78,6 +85,12 @@
     private void CreateCustomer()
     {
         popupRefCustomer.ShowOverview("Add Customer");
+    }
+
+    private async Task CreateHourEntry()
+    {
+        await popupRefHourEntry.ShowOverview("Add Hour Entry");
+        
     }
 }
 

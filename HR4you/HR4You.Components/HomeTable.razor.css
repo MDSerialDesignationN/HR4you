@@ -33,6 +33,11 @@ table button {
     margin-left: auto;
 }
 
+.AddHourEntry {
+    display: flex;
+
+    justify-content: flex-end;
+}
 
 .OverviewTable {
     border-collapse: collapse;

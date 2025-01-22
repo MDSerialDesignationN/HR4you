@@ -1,5 +1,12 @@
 @page "/home"
 @using HR4You.Model.Base.Pagination
+@using System.Security.Policy
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@using HR4You.Model.Base.Pagination
+@using Microsoft.AspNetCore.WebUtilities
+@using Newtonsoft.Json
+@using MySqlX.XDevAPI
 @attribute [StreamRendering]
 @inject HttpClient HttpClient
 @rendermode InteractiveServer
@@ -26,21 +33,40 @@
 
 @code {
 
-    public PagedResponseKeySet<HourEntry> entries;//TODO pagination should cover this - remove from here
+    public PagedResponseKeySet<HourEntry> entries;
 
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            var parameters = new Dictionary<string, string>
+            //entries = await HttpClient.GetFromJsonAsync<List<HourEntry>>("http://localhost:5001/api/master-data/hour-entry/get-user-all-paged4e2a437c-879f-4b49-b216-0dc4b6470d67");
+            //entries = await HttpClient.GetFromJsonAsync<List<HourEntry>>(@Ur?userId=4e2a437c-879f-4b49-b216-0dc4b6470d67")api/master-data/hour-entry/get-user-all-paged?userId=4e2a437c-879f
+            var param = new Dictionary<string, string>
             {
-
+                {"addDeleted", "false"},
+                {"userId", "4e2a437c-879f-4b49-b216-0dc4b6470d67"},
+                {"reference", "0"},
+                {"pagesize", "10"}
             };
+
+            string methodName = "http://localhost:5001/api/master-data/hour-entry/get-user-all-paged";
+            methodName = QueryHelpers.AddQueryString(methodName, param);
+
+            var request = new HttpRequestMessage(HttpMethod.Get, methodName);
+
+            var response = await HttpClient.SendAsync(request);
+
+            var json = response.Content.ReadAsStringAsync().Result;
+
+            entries = JsonConvert.DeserializeObject<PagedResponseKeySet<HourEntry>>(json);
             
+            /*FormUrlEncodedContent content = new For1mUrlEncodedContent(param);
+            Uri URL = ("http://localhost:5001/api/master-data/hour-entry/get-user-all-paged" + content);
             
+            var response = await HttpClient.GetAsync("http://localhost:5001/api/master-data/hour-entry/get-user-all-paged", content!);*/
             
-            var result = await HttpClient.GetFromJsonAsync<PagedResponseKeySet<HourEntry>>("api/master-data/hour-entry/get-user-all-paged?userId=003c1ae2-acfc-495b-b91a-8cedf507568a&reference=0");
+            Console.WriteLine(entries);
         }
         catch (Exception ex)
         {
