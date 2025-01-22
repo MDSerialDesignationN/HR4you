@@ -27,7 +27,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var entry in entries)
+            @foreach (var entry in entries.Data)
             {
                 <tr>
                     <td>@entry.Date</td>
@@ -54,7 +54,7 @@
 @code {
 
     [Parameter]
-    public List<HourEntry> entries { get; set; }
+    public PagedResponseKeySet<HourEntry> entries { get; set; }
 
     public List<Customer> customerEntries { get; set; }
 

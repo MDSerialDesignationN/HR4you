@@ -17,7 +17,7 @@
     else
     {
 
-        <HomeTable entries="entries.Data">
+        <HomeTable entries="entries">
         </HomeTable>
     }
 </div>
@@ -26,14 +26,21 @@
 
 @code {
 
-    public PagedResponseKeySet<HourEntry> entries;
+    public PagedResponseKeySet<HourEntry> entries;//TODO pagination should cover this - remove from here
 
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            entries = await HttpClient.GetFromJsonAsync<PagedResponseKeySet<HourEntry>>("http://localhost:5001/api/master-data/hour-entry/get-user-all-paged?userId=003c1ae2-acfc-495b-b91a-8cedf507568a&reference=0");
+            var parameters = new Dictionary<string, string>
+            {
+
+            };
+            
+            
+            
+            var result = await HttpClient.GetFromJsonAsync<PagedResponseKeySet<HourEntry>>("api/master-data/hour-entry/get-user-all-paged?userId=003c1ae2-acfc-495b-b91a-8cedf507568a&reference=0");
         }
         catch (Exception ex)
         {

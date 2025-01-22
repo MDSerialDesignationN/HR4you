@@ -1,44 +1,89 @@
 ﻿@page "/"
+@using System.Text.Json
 @using HR4You.Components.Handler
 @using HR4You.Components.Layout
+@using HR4you.Security
+@using Microsoft.IdentityModel.Tokens
 @layout LoginLayout
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
 
 <PageTitle>HR4You Login</PageTitle>
 
 <div class="bg-gray-100 border border-2 rounded-[15px] py-2 px-5 flex flex-col items-center gap-2 max-w-[500px]">
     <h4 class="font-monospace text-[2rem]">Login</h4>
     <div class="loginBody flex flex-col gap-2 items-center">
-        <input class="w-[300px] p-1 rounded-full border border-2 font-monospace @(isInvalid ? "border-red-500" : "")" id="Username" type="text" placeholder="Username/Email" @bind="username" />
-        <input class="w-[300px] p-1 rounded-full border border-2 font-monospace @(isInvalid ? "border-red-500" : "")" id="Password" type="password" placeholder="Password" @bind="password" />
-        <input class="bg-[#ffffff] hover:bg-gray-200 w-[fit-content] py-1 px-5 rounded-full border border-2" value="Login" type="button" @onclick="checkLogin" />
+        <input class="w-[300px] p-1 rounded-full border border-2 font-monospace @(isInvalid ? "border-red-500" : "")" id="Username" type="text" placeholder="Username" @bind="username"/>
+        <input class="w-[300px] p-1 rounded-full border border-2 font-monospace @(isInvalid ? "border-red-500" : "")" id="Password" type="password" placeholder="Password" @bind="password"/>
+        <input class="bg-[#ffffff] hover:bg-gray-200 w-[fit-content] py-1 px-5 rounded-full border border-2" value="Login" type="button" @onclick="CheckLogin"/>
     </div>
 </div>
 
 
-
-
 @code {
     [Inject] ILocalStorageHandler LocalStorage { get; set; } = null!;
-    public string Text1 { get; set; }
+
+    private bool isInvalid;
+    private string? username;
+    private string? password;
+
+    private UserInfo? UserInfo;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await Load();
+            if (UserInfo != null)
+            {
+                NavigationManager.NavigateTo("/home");
+            }
+            
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error during login: {ex.Message}");
+        }
+    }
+    
+    private async Task CheckLogin(){
+        try
+        {
+            
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error during check login: {ex.Message}");
+        }
+        
+        
+        if (true)
+        {
+            isInvalid = false;
+            NavigationManager.NavigateTo("/home");
+        }
+        else
+        {
+            isInvalid = true;
+        }
+    }
+
 
     public async Task Save()
     {
-        await LocalStorage.SetItem("textData", Text1);
+        await LocalStorage.SetItem(ILocalStorageHandler.userStorageName, JsonSerializer.Serialize(UserInfo));
     }
 
     public async Task Load()
     {
-        Text1 = await LocalStorage.GetItem("textData");
-    }
+        var storedItem = await LocalStorage.GetItem(ILocalStorageHandler.userStorageName);
+        if (storedItem.IsNullOrEmpty())
+        {
+            return;
+        }
 
-    public async Task Remove()
-    {
-        await LocalStorage.RemoveItem("textData");
-    }
-
-    public async Task Clear()
-    {
-        await LocalStorage.ClearData();
+        UserInfo = JsonSerializer.Deserialize<UserInfo>(storedItem);
     }
 
 }

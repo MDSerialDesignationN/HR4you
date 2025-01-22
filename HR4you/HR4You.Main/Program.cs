@@ -80,8 +80,10 @@ builder.Services.AddCustomAuthentication(new AuthenticationConfig
 //Configure db models + contexts with EF migrations
 ModelContextHelper.ConfigureModelContexts(builder, connectionString);
 
-
-builder.Services.AddHttpClient();
+builder.Services.AddScoped(_ => new HttpClient
+{
+    BaseAddress = new Uri(builder.Configuration.GetValue<string>("url")!)
+});
 
 var app = builder.Build();
 
