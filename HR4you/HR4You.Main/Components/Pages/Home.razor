@@ -3,8 +3,9 @@
 @using Microsoft.AspNetCore.WebUtilities
 @using Newtonsoft.Json
 @attribute [StreamRendering]
-@inject HttpClient HttpClient
 @rendermode InteractiveServer
+@inject HttpClient HttpClient
+@inject IConfiguration Configuration
 
 <PageTitle>Overview</PageTitle>
 <div class="page-content min-h-[100vh] p-3 flex flex-col gap-2 select-none">
@@ -27,12 +28,18 @@
 
 
 @code {
+    private string HttpURL;
+
+    public string RequestURL = "/api/master-data/hour-entry/get-user-all?userId=4e2a437c-879f-4b49-b216-0dc4b6470d67";
 
     public PagedResponseKeySet<HourEntry> entries;
 
 
     protected override async Task OnInitializedAsync()
     {
+        //Get first value from appsettings.json "Urls"
+        var urls = Configuration["Urls"];
+        HttpURL = urls?.Split(';').FirstOrDefault();
         try
         {
             //entries = await HttpClient.GetFromJsonAsync<List<HourEntry>>("http://localhost:5001/api/master-data/hour-entry/get-user-all-paged4e2a437c-879f-4b49-b216-0dc4b6470d67");

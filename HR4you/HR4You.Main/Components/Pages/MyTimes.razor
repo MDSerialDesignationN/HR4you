@@ -1,27 +1,11 @@
-﻿@page "/AllTimes"
-@using HR4You.Model.Base.Pagination
-@attribute [StreamRendering]
-@inject HttpClient HttpClient
+﻿@page "/MyTimes"
 @rendermode InteractiveServer
+@inject HttpClient HttpClient
 @inject IConfiguration Configuration
 
-<PageTitle>All Times</PageTitle>
-<div class="page-content min-h-[100vh] p-3 flex flex-col gap-2">
-    <div class="flex flex-row justify-between">
-        <h1 class="text-[2rem] font-bold flex flex-row gap-3 items-center"><i class="fa-solid fa-chart-area"></i>All Times</h1>
-        <div class="bg-[whitesmoke] flex flex gap-3 items-center p-3 rounded-[10px] border border-2 border-[#c1c1c1]">
-            <div class="user-info">
-                <p class="font-bold p-1">Thel Vadam'ee</p>
+<PageTitle>My Times</PageTitle>
 
-            </div>
-            <div class="user-actions">
-                <a class="cursor-pointer text-red-500 p-1 rounded-[5px] transition-all duration-500 hover:bg-gray-300">Logout</a>
-            </div>
-        </div>
-    </div>
-
-<label>Show Deleted</label>
-<input type="checkbox" checked="@addDeleted" @oninput="CheckboxChanged">
+<h1>My Times</h1>
 
 @if (entries == null)
 {
@@ -31,21 +15,11 @@
 }
 else
 {
-    <HourEntrySearch Entries="entries.Data" />
-    <KeysetPagination entries="entries.Data" OnPageChanged="EventCallback.Factory.Create<PagedResponseKeySet<HourEntry>>(this, UpdateEntries)" ApiEndpoint="http://localhost:5001/api/master-data/hour-entry/get-all-paged" />
-    
-    <div class="table-wrapper overflow-auto">
-        <AllTimesTable entries="entries" projectNames="projectNames" tagNames="tagNames" @ref="popupRef2" OnAllTimesUpdated2="RefreshTable2">
-        </AllTimesTable>
-    </div>
+    <MyTimesTable entries="entries" projectNames="projectNames" tagNames="tagNames" @ref="popupRef2" OnMyTimesUpdated2="RefreshTable2">
+    </MyTimesTable>
 }
 
-
-    }
-</div>
-
 @code {
-    public PagedResponseKeySet<HourEntry>? entries;
     private string HttpURL;
 
     public string RequestURL = "/api/master-data/hour-entry/get-all?addDeleted=";
@@ -54,7 +28,7 @@ else
 
     public List<HourEntry> entries;
 
-    private AllTimesTable popupRef2;
+    private MyTimesTable popupRef2;
 
     public Dictionary<int, string> projectNames = new Dictionary<int, string>();
 
@@ -68,7 +42,7 @@ else
     {
         if (firstRender && popupRef2 != null)
         {
-            popupRef2.OnAllTimesUpdated2 = EventCallback.Factory.Create(this, RefreshTable2);
+            popupRef2.OnMyTimesUpdated2 = EventCallback.Factory.Create(this, RefreshTable2);
         }
     }
 
@@ -80,15 +54,6 @@ else
 
         addDeleted = false;
         await LoadAllTimes();
-    }
-    
-    private void UpdateEntries(PagedResponseKeySet<HourEntry> newEntries)
-    {
-        this.entries = newEntries;
-        // if (entries != null)
-        // {
-        //     entries = new PagedResponseKeySet<HourEntry>(newEntries, entries.Reference);
-        // }
     }
 
     private async Task LoadAllTimes()
@@ -162,21 +127,6 @@ else
         }
     }
 
-    private async Task CheckboxChanged()
-    {
-        if (addDeleted == false)
-        {
-            addDeleted = true;
-        }
-        else
-        {
-            addDeleted = false;
-        }
-
-        entries = await HttpClient.GetFromJsonAsync<List<HourEntry>>((HttpURL + RequestURL) + addDeleted);
-        StateHasChanged();
-    }
-
     private async Task RefreshTable2()
     {
         Console.WriteLine("RefreshTable2() was called from Project");
@@ -184,5 +134,4 @@ else
 
         StateHasChanged();
     }
-
 }

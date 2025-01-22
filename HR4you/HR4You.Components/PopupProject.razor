@@ -1,4 +1,5 @@
-﻿@inject HttpClient HttpClient
+@rendermode InteractiveServer
+@inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 
@@ -6,59 +7,58 @@
     var showClass = IsVisible ? "d-block" : "d-none";
 }
 
-<div class="toast-container position-absolute @showClass" data-bs-autohide="true" data-bs-delay="5000"
-     style="left: 50%;
-    position: fixed;
-    transform: translate(-50%, 0px);
-    z-index: 9999;
-    width: 80%;">
+<div class="toast-container position-absolute @showClass" data-bs-autohide="true" data-bs-delay="50000"
+    style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
 
     <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true"
-         style="left: 50%;
-        position: fixed;
-        transform: translate(-50%, 0px);
-        z-index: 9999;
-        width: 80%;
-        background-color:white;">
-        <div class="toast-header">
-            <strong class="me-auto">@HeaderText</strong>
-            <button type="button" class="btn-close" aria-label="Close" @onclick="Close"></button>
-        </div>
+        style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; background-color:white; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
+            <div class="toast-header">
+                <strong class="me-auto">@HeaderText</strong>
+                <button type="button" class="btn-close" aria-label="Close" @onclick="Close"></button>
+            </div>
 
-        @*<EditForm Model="project" OnValidSubmit="Submit">
+        <EditForm Model="project" OnValidSubmit="Submit">
             <DataAnnotationsValidator />
             <ValidationSummary />
         
             <div class="toast-body" style="padding: 20px;">
                 <div class="container">
                     <div class="row">
-                        <!-- Date and Project-->
+                        <!-- Project Number and Customer -->
                         <div class="col-sm-4">
-                            <label>Date</label>
-                            <InputDate @bind-Value="project.ProjectNumber" class="form-control mb-2"></InputDate> 
-                            
-                            
-                            
-                        </div>
+                            <label>Project Number</label>
+                            <InputNumber @bind-Value="project.ProjectNumber" class="form-control mb-2" />
 
-                        <!-- Start Time and Tag -->
-                        <div class="col-sm-4">
-                            <label>Start Time</label>
-                            <InputDate Type="InputDateType.Time" @bind-Value="project.Name" class="form-control mb-2" />
-
-                            <label>Tag</label>
-                            <InputSelect @bind-Value="project.CustomerId" class="form-select">
-                                @foreach (var customer in customers)
+                            <label>Customer</label>
+                            <InputSelect @bind-Value="project.CustomerId">
+                                @foreach (var value in customerList)
                                 {
-                                    <option value="@customer.Id">@customer.Name</option>
+                                    if (@value.Id == @project.CustomerId)
+                                    {
+                                        <option selected value="@value.Id">@value.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@value.Id">@value.Name</option>
+                                    }
+                                    
                                 }
                             </InputSelect>
+                            
                         </div>
 
-                        <!-- EndTime -->
+                        <!-- Name and State -->
                         <div class="col-sm-4">
-                            <label>End Time</label>
-                            <InputDate Type="InputDateType.Time" @bind-Value="project.EndTime" class="form-control mb-2" />
+                            <label>Name</label>
+                            <InputText @bind-Value="project.Name" class="form-control mb-2" />
+
+                             <label>State</label>                        
+                            <InputSelect @bind-Value="project.State">
+                                @foreach (var value in Enum.GetValues(typeof(ProjectState)))
+                                {
+                                    <option>@value</option>
+                                }
+                            </InputSelect>
                         </div>
 
                         <!-- Description -->
@@ -67,6 +67,19 @@
                             <InputTextArea @bind-Value="project.Description" rows="4" class="form-control mb-2" />
                         </div>
                     </div>
+
+                    <!-- Buttons -->
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <button type="submit" class="btn btn-dark">Save</button>
+                            <button type="button" class="btn btn-outline-secondary" @onclick="Close">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+</div>
 
                     <!-- Buttons -->
                     <div class="row">
@@ -88,7 +101,7 @@
     [Parameter]
     public EventCallback<bool> IsVisibleChanged { get; set; }
 
-    [Parameter] 
+    [Parameter]
     public EventCallback OnProjectUpdated { get; set; }
 
     [Parameter]
@@ -99,39 +112,92 @@
 
     Project project = new Project();
 
-    List<Customer> customers = [];
+    public List<Customer> customerList = [];
 
-    private async Task getCustomers()
-    {
-        
-    }
-    
-    public async Task Show(string requestURL, string headerText)
+    public string RequestURLCustomer = "http://localhost:5001/api/master-data/customer/get-all?addDeleted=true";
+
+    bool isEdit = false;
+
+    async public Task Show(int givenId, string requestURL, string headerText)
     {
         HeaderText = headerText;
-        //customer = await HttpClient.GetFromJsonAsync<Customer>(requestURL + GivenId);
+        GivenId = givenId.ToString(); 
+        customerList = await HttpClient.GetFromJsonAsync<List<Customer>>(RequestURLCustomer);
+        project = await HttpClient.GetFromJsonAsync<Project>(requestURL + GivenId);
+
         IsVisible = true;
+        isEdit = true;
         StateHasChanged();
     }
 
     public async Task ShowOverview(string requestURL, string headerText)
     {
         HeaderText = headerText;
-        //customer = await HttpClient.GetFromJsonAsync<Customer>(requestURL + GivenId);
         IsVisible = true;
         StateHasChanged();
     }
 
     private async Task Submit()
     {
-        
+        var editURL = "http://localhost:5001/api/master-data/project/edit?Id=";
+        var createURL = "http://localhost:5001/api/master-data/project/create";
+
+        if (isEdit == true)
+        {
+            try
+            {
+                if (project.ProjectNumber == 0 || string.IsNullOrEmpty(project.Name))
+                {
+                    Console.WriteLine("Project Number and Name are required.");
+                    return;
+                }
+
+                var response = await HttpClient.PostAsJsonAsync(editURL + GivenId, project);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("Project saved successfully.");
+
+                if (OnProjectUpdated.HasDelegate)
+                {
+                    await OnProjectUpdated.InvokeAsync(); // Notify the parent component
+                }
+                else
+                {
+                    Console.WriteLine("OnCustomerUpdated has no delegate assigned.");
+                }
+
+                    Close();
+                }
+                else
+                {
+                    Console.WriteLine("Error occurred while saving the project: " + response.ReasonPhrase);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception occurred: " + ex.Message);
+            }
+        }
+        else if (isEdit == false)
+        {
+            var response = await HttpClient.PostAsJsonAsync(createURL, project);
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Project saved successfully.");
+
+                Close();
+            }
+        }
     }
 
     private async Task Close()
     {
+        project = new Project();
         HeaderText = string.Empty;
         GivenId = null;
         IsVisible = false;
+
         StateHasChanged();
     }
 }

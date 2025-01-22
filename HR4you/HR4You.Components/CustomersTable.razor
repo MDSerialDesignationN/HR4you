@@ -1,5 +1,5 @@
-﻿@inject HttpClient HttpClient
-@rendermode InteractiveServer
+﻿@rendermode InteractiveServer
+@inject HttpClient HttpClient
 
 @* <PopupCustomers @ref="popupRef" OnCustomerUpdated="RefreshTable" /> *@
 
@@ -55,6 +55,7 @@
     [Parameter]
     public EventCallback OnCustomerUpdated2 { get; set; }
 
+
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender && popupRef != null)
@@ -69,12 +70,13 @@
     private void EditEntry(int GivenId)
     {
         popupRef.Show(GivenId, RequestURLEdit, "Edit Customer");
-        //NavigationManager.NavigateTo($"edit-product/{GivenId}");
     }
 
-    private void DeleteEntry(int GivenId)
+    private async Task DeleteEntry(int GivenId)
     {
-        HttpClient.DeleteFromJsonAsync<Customer>(RequestURLDelete + GivenId);
+        await HttpClient.DeleteFromJsonAsync<Customer>(RequestURLDelete + GivenId);
+        Console.WriteLine("RefreshTable() was called from CustomersTable");
+        await RefreshTable();
     }
 
 

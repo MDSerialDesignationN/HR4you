@@ -1,0 +1,42 @@
+﻿@rendermode InteractiveServer
+@inject HttpClient HttpClient
+
+<table class="Table">
+    <thead>
+        <tr>
+            <th>Monday (h)</th>
+            <th>Tuesday (h)</th>
+            <th>Wednesday (h)</th>
+            <th>Thursday (h)</th>
+            <th>Friday (h)</th>
+            <th>Saturday (h)</th>
+            <th>Sunday (h)</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var entry in entries)
+        {
+            <tr>
+                <td>@entry.MinMonHours</td>
+                <td>@entry.MinTueHours</td>
+                <td>@entry.MinWedHours</td>
+                <td>@entry.MinThuHours</td>
+                <td>@entry.MinFriHours</td>
+                <td>@entry.MinSatHours</td>
+                <td>@entry.MinSunHours</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+@code {
+
+    [Parameter]
+    public List<WorkTime> entries { get; set; }
+
+}
+
+

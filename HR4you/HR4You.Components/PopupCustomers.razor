@@ -1,15 +1,14 @@
-﻿@inject HttpClient HttpClient
-@inject NavigationManager NavigationManager
-@rendermode InteractiveServer
+﻿@rendermode InteractiveServer
+@inject HttpClient HttpClient
 
 @{
     var showClass = IsVisible ? "d-block" : "d-none";
 }
 
-    <div class="toast-container position-absolute @showClass" data-bs-autohide="true" data-bs-delay="50000"
+<div class="toast-container position-absolute @showClass" data-bs-autohide="true" data-bs-delay="50000"
     style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
 
-        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true"
+    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true"
         style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; background-color:white; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
             <div class="toast-header">
                 <strong class="me-auto">@HeaderText</strong>
@@ -67,8 +66,8 @@
                 </div>
             </div>
         </EditForm>
-        </div>
     </div>
+</div>
 
 @code {
     [Parameter]
@@ -91,7 +90,7 @@
 
     bool isEdit = false;
 
-    async public void Show(int givenId, string requestURL, string headerText)
+    async public Task Show(int givenId, string requestURL, string headerText)
     {
         HeaderText = headerText;
         GivenId = givenId.ToString(); 
@@ -101,7 +100,7 @@
         StateHasChanged();
     }
 
-    async public void ShowOverview(string headerText)
+    async public Task ShowOverview(string headerText)
     {
         HeaderText = headerText;
         IsVisible = true;

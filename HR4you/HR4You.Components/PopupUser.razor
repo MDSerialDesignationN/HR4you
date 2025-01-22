@@ -1,0 +1,171 @@
+﻿@rendermode InteractiveServer
+@inject HttpClient HttpClient
+
+@{
+    var showClass = IsVisible ? "d-block" : "d-none";
+}
+
+<div class="toast-container position-absolute @showClass" data-bs-autohide="true" data-bs-delay="50000"
+     style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
+
+    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true"
+         style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; background-color:white; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
+        <div class="toast-header">
+            <strong class="me-auto">@HeaderText</strong>
+            <button type="button" class="btn-close" aria-label="Close" @onclick="Close"></button>
+        </div>
+
+        <EditForm Model="user" OnValidSubmit="Submit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="toast-body" style="padding: 20px;">
+                <div class="container">
+                    <div class="row">
+                        <!-- FirstNamw and LastName -->
+                        <div class="col-sm-4">
+                            <label>First Name</label>
+                            <InputText @bind-Value="user.FirstName" class="form-control mb-2" />
+
+                            <label>Last Name</label>
+                            <InputText @bind-Value="user.LastName" class="form-control mb-2" />
+                        </div>
+
+                        <!-- Username and Roles -->
+                        <div class="col-sm-4">
+                            <label>Username</label>
+                            <InputText @bind-Value="user.UserName" class="form-control mb-2" />
+
+                            <label>Roles</label>
+                            <input>< />
+                            <!-- <InputText @bind-Value="user.Roles" class="form-control mb-2" /> -->
+                        </div> 
+
+                        <!-- Role Groups
+                        <div class="col-sm-4">
+
+                            <label>Role Groups</label>
+                            <InputText @bind-Value="user.RoleGroups" class="form-control mb-2" /> 
+                        </div> -->
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <button type="submit" class="btn btn-dark">Save</button>
+                            <button type="button" class="btn btn-outline-secondary" @onclick="Close">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsVisibleChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnUserUpdated { get; set; }
+
+    [Parameter]
+    public string? HeaderText { get; set; }
+
+    [Parameter]
+    public string? GivenId { get; set; }
+
+
+    UserInfo user = new UserInfo();
+
+    bool isEdit = false;
+
+    async public Task Show(string givenId, string requestURL, string headerText)
+    {
+        HeaderText = headerText;
+        GivenId = givenId.ToString();
+        user = await HttpClient.GetFromJsonAsync<UserInfo>(requestURL + GivenId);
+        IsVisible = true;
+        isEdit = true;
+        StateHasChanged();
+    }
+
+    async public Task ShowOverview(string headerText)
+    {
+        HeaderText = headerText;
+        IsVisible = true;
+        isEdit = false;
+        StateHasChanged();
+
+    }
+
+    private async Task Submit()
+    {
+        var editURL = "http://localhost:5001/api/master-data/user/edit?Id=";
+        var createURL = "http://localhost:5001/api/master-data/user/create";
+
+        if (isEdit == true)
+        {
+            try
+            {
+                //if (string.IsNullOrEmpty(user.UserName)) || string.IsNullOrEmpty(user.Email))
+                //{
+                //    Console.WriteLine("Username and Email are required.");
+                //    return;
+                //}
+
+                var response = await HttpClient.PostAsJsonAsync(editURL + GivenId, user);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("User saved successfully.");
+
+                    if (OnUserUpdated.HasDelegate)
+                    {
+                        await OnUserUpdated.InvokeAsync(); // Notify the parent component
+                    }
+                    else
+                    {
+                        Console.WriteLine("no delegate assigned.");
+                    }
+
+                    Close();
+                }
+                else
+                {
+                    Console.WriteLine("Error occurred while saving the user: " + response.ReasonPhrase);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception occurred: " + ex.Message);
+            }
+        }
+        else if (isEdit == false)
+        {
+            var response = await HttpClient.PostAsJsonAsync(createURL, user);
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("User saved successfully.");
+
+                Close();
+            }
+        }
+
+
+    }
+
+
+    private void Close()
+    {
+        user = new UserInfo();
+        HeaderText = string.Empty;
+        GivenId = null;
+        IsVisible = false;
+
+        StateHasChanged();
+    }
+}

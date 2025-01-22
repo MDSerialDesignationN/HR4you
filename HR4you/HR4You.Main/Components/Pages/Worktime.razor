@@ -1,0 +1,55 @@
+﻿@page "/Worktime"
+@rendermode InteractiveServer
+@inject HttpClient HttpClient
+@inject IConfiguration Configuration
+
+<PageTitle>Worktime</PageTitle>
+
+<h1>Worktime</h1>
+
+@if (entries == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <WorktimeTable entries="entries">
+    </WorktimeTable>
+}
+
+
+@code {
+    private string HttpURL;
+
+    public string RequestURL = "/api/master-data/work-time/get-all";
+
+    public List<WorkTime> entries;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        //Get first value from appsettings.json "Urls"
+        var urls = Configuration["Urls"];
+        HttpURL = urls?.Split(';').FirstOrDefault();
+
+        await LoadWorktime();
+    }
+
+    private async Task LoadWorktime()
+    {
+        try
+        {
+            entries = await HttpClient.GetFromJsonAsync<List<WorkTime>>(HttpURL + RequestURL);
+            //Console.WriteLine(entries);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching entries: {ex.Message}");
+        }
+    }
+
+}
+
+

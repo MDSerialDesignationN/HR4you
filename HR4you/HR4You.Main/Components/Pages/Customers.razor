@@ -3,6 +3,7 @@
 @attribute [StreamRendering]
 @rendermode InteractiveServer
 @inject HttpClient HttpClient
+@inject IConfiguration Configuration
 
 <PageTitle>Customers</PageTitle>
 <div class="page-content min-h-[100vh] p-3 flex flex-col gap-2 select-none">
@@ -49,14 +50,14 @@
 
 
 @code {
+    private string HttpURL;
 
+    public string RequestURL = "/api/master-data/customer/get-all?addDeleted=";
     public PagedResponseOffset<Customer> entries;
-
-    //public bool IsChecked = true;
 
     public bool addDeleted;
 
-    public string RequestURL = "http://localhost:5001/api/master-data/customer/get-all-paged?pageNumber=1&pageSize=2&addDeleted=";
+    public List<Customer> entries;
 
     private CustomersTable popupRef2;
 
@@ -68,9 +69,12 @@
         }
     }
 
-
     protected override async Task OnInitializedAsync()
     {
+        //Get first value from appsettings.json "Urls"
+        var urls = Configuration["Urls"];
+        HttpURL = urls?.Split(';').FirstOrDefault();
+
         addDeleted = false;
         await LoadCustomers();
     }

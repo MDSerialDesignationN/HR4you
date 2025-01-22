@@ -1,0 +1,165 @@
+﻿@rendermode InteractiveServer
+@inject HttpClient HttpClient
+
+@{
+    var showClass = IsVisible ? "d-block" : "d-none";
+}
+
+<div class="toast-container position-absolute @showClass" data-bs-autohide="true" data-bs-delay="50000"
+     style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
+
+    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true"
+         style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; background-color:white; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
+        <div class="toast-header">
+            <strong class="me-auto">@HeaderText</strong>
+            <button type="button" class="btn-close" aria-label="Close" @onclick="Close"></button>
+        </div>
+
+        <EditForm Model="worktime" OnValidSubmit="Submit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="toast-body" style="padding: 20px;">
+                <div class="container">
+                    <div class="row">
+                        <!-- Project Number and Customer -->
+                        <div class="col-sm">
+                            <label>Monday (h)</label>
+                            <InputNumber @bind-Value="worktime.MinMonHours" class="form-control mb-2" />
+                        </div>
+
+                        <div class="col-sm">
+                            <label>Tuesday (h)</label>
+                            <InputNumber @bind-Value="worktime.MinTueHours" class="form-control mb-2" />
+                        </div>
+                        
+                        <div class="col-sm">
+                            <label>Wednesday (h)</label>
+                            <InputNumber @bind-Value="worktime.MinWedHours" class="form-control mb-2" />
+                        </div>
+
+                        <div class="col-sm">
+                            <label>Thursday (h)</label>
+                            <InputNumber @bind-Value="worktime.MinThuHours" class="form-control mb-2" />
+                        </div>
+
+                        <div class="col-sm">
+                            <label>Friday (h)</label>
+                            <InputNumber @bind-Value="worktime.MinFriHours" class="form-control mb-2" />
+                        </div>
+
+                        <div class="col-sm">
+                            <label>Saturday (h)</label>
+                            <InputNumber @bind-Value="worktime.MinSatHours" class="form-control mb-2" />
+                        </div>
+
+                        <div class="col-sm">
+                            <label>Sunday (h)</label>
+                            <InputNumber @bind-Value="worktime.MinSunHours" class="form-control mb-2" />
+                        </div>
+
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <button type="submit" class="btn btn-dark">Save</button>
+                            <button type="button" class="btn btn-outline-secondary" @onclick="Close">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsVisibleChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnCustomerUpdated { get; set; }
+
+    [Parameter]
+    public string? HeaderText { get; set; }
+
+    [Parameter]
+    public string? GivenId { get; set; }
+
+
+    WorkTime worktime = new WorkTime();
+
+    bool isEdit = false;
+
+    async public void Show(int givenId, string requestURL, string headerText)
+    {
+        HeaderText = headerText;
+        GivenId = givenId.ToString();
+        worktime = await HttpClient.GetFromJsonAsync<WorkTime>(requestURL + GivenId);
+        IsVisible = true;
+        isEdit = true;
+        StateHasChanged();
+    }
+
+    private async Task Submit()
+    {
+        var editURL = "http://localhost:5001/api/master-data/work-time/edit?Id=";
+        var createURL = "http://localhost:5001/api/master-data/work-time/create";
+
+        if (isEdit == true)
+        {
+            try
+            {
+                var response = await HttpClient.PostAsJsonAsync(editURL + GivenId, worktime);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("Worktime saved successfully.");
+
+                    if (OnCustomerUpdated.HasDelegate)
+                    {
+                        await OnCustomerUpdated.InvokeAsync(); // Notify the parent component
+                    }
+                    else
+                    {
+                        Console.WriteLine("OnCustomerUpdated has no delegate assigned.");
+                    }
+
+                    Close();
+                }
+                else
+                {
+                    Console.WriteLine("Error occurred while saving the Worktime: " + response.ReasonPhrase);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception occurred: " + ex.Message);
+            }
+        }
+        else if (isEdit == false)
+        {
+            var response = await HttpClient.PostAsJsonAsync(createURL, worktime);
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Worktime saved successfully.");
+
+                Close();
+            }
+        }
+    }
+
+    private void Close()
+    {
+        worktime = new WorkTime();
+        HeaderText = string.Empty;
+        GivenId = null;
+        IsVisible = false;
+
+        StateHasChanged();
+    }
+}
