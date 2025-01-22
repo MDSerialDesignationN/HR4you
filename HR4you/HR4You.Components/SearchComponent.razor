@@ -1,4 +1,8 @@
 ﻿@using HR4You.Model.Base
+@using Microsoft.JSInterop
+@using HR4You.Model.Base.Pagination
+@rendermode InteractiveServer
+
 <div>
     <div class="searchBar border border-1 border-[#c1c1c1] rounded-[5px] w-[fit-content] flex flex-row">
         @if (Options1 != null)
@@ -18,16 +22,14 @@
     @if (Options1 != null)
     {
         <div class="FilterOptions @(showFilterOptions ? "active" : "")">
-
             @foreach (var option in Options1)
             {
                 <div class="OptionRow">
                     <span>@((MarkupString)option.Icon)@option.Name</span>
                     @if (option.InputType == "select" && option.Options != null)
                     {
-                        <select name="@option.Name">
+                        <select name="@option.Name" @ref="values[option.Name]">
                             <option value="">None</option>
-
                             @foreach (var opt in option.Options)
                             {
                                 <option value="@opt">@opt</option>
@@ -36,7 +38,7 @@
                     }
                     else
                     {
-                        <input type="@option.InputType" name="@option.Name" />
+                        <input type="@option.InputType" name="@option.Name" @ref="values[option.Name]" />
                     }
                 </div>
             }
@@ -51,9 +53,8 @@
                     <span>@((MarkupString)option.Icon)@option.Name</span>
                     @if (option.InputType == "select" && option.Options != null)
                     {
-                        <select name="@option.Name" @bind:event="oninput">
+                        <select name="@option.Name" @ref="values[option.Name]" @bind:event="oninput">
                             <option value="">None</option>
-
                             @foreach (var opt in option.Options)
                             {
                                 <option value="@opt">@opt</option>
@@ -62,7 +63,7 @@
                     }
                     else
                     {
-                        <input type="@option.InputType" name="@option.Name" />
+                        <input type="@option.InputType" name="@option.Name" @ref="values[option.Name]" />
                     }
                 </div>
             }
@@ -73,8 +74,13 @@
 @code {
     [Parameter] public FilterOption[] Options1 { get; set; } = Array.Empty<FilterOption>();
     [Parameter] public FilterOption[] Options2 { get; set; } = Array.Empty<FilterOption>();
+
     private bool showFilterOptions = false;
     private bool showFilterOptionsAdmin = false;
+
+    private Dictionary<string, ElementReference> values = new Dictionary<string, ElementReference>();
+
+    [Inject] private IJSRuntime JS { get; set; }
 
     private void ToggleFilterOptions()
     {
@@ -85,8 +91,20 @@
     {
         showFilterOptionsAdmin = !showFilterOptionsAdmin;
     }
-    private void Filter()
-    {
 
+    private async Task Filter()
+    {
+        var columnFilters = new List<ColumnFilter>();
+
+        foreach (var element in values)
+        {
+            var value = await JS.InvokeAsync<string>("getElementValue", element.Value);
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                columnFilters.Add(
+                    new ColumnFilter { ColumnName = element.Key, Value = value }
+                );
+            }
+        }
     }
 }

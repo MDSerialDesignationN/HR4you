@@ -2,40 +2,25 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <base href="/"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
     @* <link rel="stylesheet" href="/bootstrap/bootstrap.min.css"/> *@
-    <link rel="stylesheet" href="/app.css"/>
+    <link rel="stylesheet" href="/app.css" />
 
-    <link rel="stylesheet" href="HR4You.Main.styles.css"/>
-    <link rel="stylesheet" href="HR4You.Components"/>
+    <link rel="stylesheet" href="HR4You.Main.styles.css" />
+    <link rel="stylesheet" href="HR4You.Components" />
     <link href="css/output.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="/favicon.png" />
     <script src="https://kit.fontawesome.com/6b7f9f412e.js" crossorigin="anonymous"></script>
+    <script src="js/scripts.js"></script>
 
-    <HeadOutlet/>
+    <HeadOutlet />
 </head>
 
 <body>
-<Routes/>
-<script src="_framework/blazor.web.js"></script>
+    <Routes />
+    <script src="_framework/blazor.web.js"></script>
 </body>
 
 </html>
-
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const dropdownButtons = document.querySelectorAll(".hr4you_dropdown-button");
-
-        dropdownButtons.forEach(button => {
-            button.addEventListener("click", () => {
-                const dropdown = button.closest(".hr4you_dropdown");
-                dropdown.classList.toggle("active");
-
-
-            });
-        });
-    });
-
-</script>
