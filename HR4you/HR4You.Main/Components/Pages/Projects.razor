@@ -1,4 +1,7 @@
 ﻿@page "/Projects"
+@using Newtonsoft.Json
+@using HR4You.Model.Base.Pagination
+@using Microsoft.AspNetCore.WebUtilities
 @attribute [StreamRendering]
 @inject HttpClient HttpClient
 
@@ -14,7 +17,7 @@
 }
 else
 {
-    <ProjectsTable entries="entries">
+    <ProjectsTable entries="entries.Data">
     </ProjectsTable>
 }
 
@@ -22,14 +25,30 @@ else
 
 @code {
 
-    public List<Project> entries;
+    public PagedResponseKeySet<Project> entries;
 
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            entries = await HttpClient.GetFromJsonAsync<List<Project>>("http://localhost:5001/api/master-data/project/get-all");
+            var param = new Dictionary<string, string>
+            {
+                {"addDeleted", "false"},
+                {"reference", "0"},
+                {"pagesize", "10"}
+            };
+
+            string methodName = "http://localhost:5001/api/master-data/Project/get-all-paged";
+            methodName = QueryHelpers.AddQueryString(methodName, param);
+
+            var request = new HttpRequestMessage(HttpMethod.Get, methodName);
+
+            var response = await HttpClient.SendAsync(request);
+
+            var json = response.Content.ReadAsStringAsync().Result;
+
+            entries = JsonConvert.DeserializeObject<PagedResponseKeySet<Project>>(json);
             Console.WriteLine(entries);
         }
         catch (Exception ex)

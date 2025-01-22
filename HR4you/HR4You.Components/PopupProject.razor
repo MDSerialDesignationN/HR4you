@@ -1,4 +1,6 @@
 ﻿@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
 
 @{
     var showClass = IsVisible ? "d-block" : "d-none";
@@ -23,12 +25,61 @@
             <button type="button" class="btn-close" aria-label="Close" @onclick="Close"></button>
         </div>
 
-        <div class="toast-body" style="padding: 20px;">
-            <input id="UserID" type="text" />
+        @*<EditForm Model="project" OnValidSubmit="Submit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+        
+            <div class="toast-body" style="padding: 20px;">
+                <div class="container">
+                    <div class="row">
+                        <!-- Date and Project-->
+                        <div class="col-sm-4">
+                            <label>Date</label>
+                            <InputDate @bind-Value="project.ProjectNumber" class="form-control mb-2"></InputDate> 
+                            
+                            
+                            
+                        </div>
+
+                        <!-- Start Time and Tag -->
+                        <div class="col-sm-4">
+                            <label>Start Time</label>
+                            <InputDate Type="InputDateType.Time" @bind-Value="project.Name" class="form-control mb-2" />
+
+                            <label>Tag</label>
+                            <InputSelect @bind-Value="project.CustomerId" class="form-select">
+                                @foreach (var customer in customers)
+                                {
+                                    <option value="@customer.Id">@customer.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+
+                        <!-- EndTime -->
+                        <div class="col-sm-4">
+                            <label>End Time</label>
+                            <InputDate Type="InputDateType.Time" @bind-Value="project.EndTime" class="form-control mb-2" />
+                        </div>
+
+                        <!-- Description -->
+                        <div class="col-sm-8">
+                            <label>Description</label>
+                            <InputTextArea @bind-Value="project.Description" rows="4" class="form-control mb-2" />
+                        </div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <button type="submit" class="btn btn-dark">Save</button>
+                            <button type="button" class="btn btn-outline-secondary" @onclick="Close">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </EditForm>*@
         </div>
     </div>
-</div>
-
 
 @code {
     [Parameter]
@@ -37,15 +88,25 @@
     [Parameter]
     public EventCallback<bool> IsVisibleChanged { get; set; }
 
+    [Parameter] 
+    public EventCallback OnProjectUpdated { get; set; }
+
     [Parameter]
     public string? HeaderText { get; set; }
 
     [Parameter]
     public string? GivenId { get; set; }
 
+    Project project = new Project();
+
+    List<Customer> customers = [];
+
+    private async Task getCustomers()
+    {
+        
+    }
     
-
-    async public void Show(string requestURL, string headerText)
+    public async Task Show(string requestURL, string headerText)
     {
         HeaderText = headerText;
         //customer = await HttpClient.GetFromJsonAsync<Customer>(requestURL + GivenId);
@@ -53,7 +114,7 @@
         StateHasChanged();
     }
 
-    async public void ShowOverview(string requestURL, string headerText)
+    public async Task ShowOverview(string requestURL, string headerText)
     {
         HeaderText = headerText;
         //customer = await HttpClient.GetFromJsonAsync<Customer>(requestURL + GivenId);
@@ -61,12 +122,12 @@
         StateHasChanged();
     }
 
-    private void Submit()
+    private async Task Submit()
     {
         
     }
 
-    private void Close()
+    private async Task Close()
     {
         HeaderText = string.Empty;
         GivenId = null;
