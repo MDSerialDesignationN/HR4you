@@ -1,7 +1,6 @@
 @rendermode InteractiveServer
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
-@rendermode InteractiveServer
 
 @{
     var showClass = IsVisible ? "d-block" : "d-none";
@@ -80,19 +79,6 @@
         </EditForm>
     </div>
 </div>
-
-                    <!-- Buttons -->
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <button type="submit" class="btn btn-dark">Save</button>
-                            <button type="button" class="btn btn-outline-secondary" @onclick="Close">Cancel</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </EditForm>*@
-        </div>
-    </div>
 
 @code {
     [Parameter]

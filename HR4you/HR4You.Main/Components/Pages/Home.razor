@@ -4,7 +4,6 @@
 @using Newtonsoft.Json
 @attribute [StreamRendering]
 @rendermode InteractiveServer
-@inject HttpClient HttpClient
 @inject IConfiguration Configuration
 
 <PageTitle>Overview</PageTitle>
@@ -35,7 +34,7 @@
     public PagedResponseKeySet<HourEntry> entries;
 
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         //Get first value from appsettings.json "Urls"
         var urls = Configuration["Urls"];
@@ -62,11 +61,6 @@
             var json = response.Content.ReadAsStringAsync().Result;
 
             entries = JsonConvert.DeserializeObject<PagedResponseKeySet<HourEntry>>(json);
-            
-            /*FormUrlEncodedContent content = new For1mUrlEncodedContent(param);
-            Uri URL = ("http://localhost:5001/api/master-data/hour-entry/get-user-all-paged" + content);
-            
-            var response = await HttpClient.GetAsync("http://localhost:5001/api/master-data/hour-entry/get-user-all-paged", content!);*/
             
             Console.WriteLine(entries);
         }

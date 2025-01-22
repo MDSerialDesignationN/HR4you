@@ -28,7 +28,7 @@ public class AuthenticationController: ControllerBase
     [HttpPost("log-in-user")]
     [AllowAnonymous]
     [SwaggerOperation("LogUserIn")]
-    public IActionResult LogUserIn (string username, [FromBody]string password) {
+    public IActionResult LogUserIn (string username, string password) {
 
         if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
         {

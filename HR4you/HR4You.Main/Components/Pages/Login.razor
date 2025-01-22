@@ -1,8 +1,5 @@
 ﻿@page "/"
-@using System.Text.Json
-@using HR4You.Components.Handler
 @using HR4You.Components.Layout
-@using HR4you.Security
 @using Microsoft.IdentityModel.Tokens
 @layout LoginLayout
 @inject NavigationManager NavigationManager
@@ -13,77 +10,95 @@
 <div class="bg-gray-100 border border-2 rounded-[15px] py-2 px-5 flex flex-col items-center gap-2 max-w-[500px]">
     <h4 class="font-monospace text-[2rem]">Login</h4>
     <div class="loginBody flex flex-col gap-2 items-center">
-        <input class="w-[300px] p-1 rounded-full border border-2 font-monospace @(isInvalid ? "border-red-500" : "")" id="Username" type="text" placeholder="Username" @bind="username"/>
-        <input class="w-[300px] p-1 rounded-full border border-2 font-monospace @(isInvalid ? "border-red-500" : "")" id="Password" type="password" placeholder="Password" @bind="password"/>
+        <input class="w-[300px] p-1 rounded-full border border-2 font-monospace @(_isInvalid ? "border-red-500" : "")" id="Username" type="text" placeholder="Username" @bind="_username"/>
+        <input class="w-[300px] p-1 rounded-full border border-2 font-monospace @(_isInvalid ? "border-red-500" : "")" id="Password" type="password" placeholder="Password" @bind="_password"/>
         <input class="bg-[#ffffff] hover:bg-gray-200 w-[fit-content] py-1 px-5 rounded-full border border-2" value="Login" type="button" @onclick="CheckLogin"/>
     </div>
 </div>
 
 
 @code {
-    [Inject] ILocalStorageHandler LocalStorage { get; set; } = null!;
+    private bool _isInvalid; //TODO doesnt update right or smth => doesnt show as red when Isinvalid
+    private string? _username;
+    private string? _password;
 
-    private bool isInvalid;
-    private string? username;
-    private string? password;
+    private const string ApiEndpointRoute = "api/auth/";
+    private const string LogInApiEndpoint = $"{ApiEndpointRoute}log-in-user";
+    private const string TokenEndOfLifeApiEndpoint = $"{ApiEndpointRoute}get-token-expiry";
 
-    private UserInfo? UserInfo;
+    private UserInfo? _userInfo;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         try
         {
             await Load();
-            if (UserInfo != null)
+            if (_userInfo != null)
             {
+                var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, TokenEndOfLifeApiEndpoint, new Dictionary<string, string>(), _userInfo.AuthToken);
+                var response = await HttpClient.SendAsync(request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    await LocalStorage.ClearData();
+                    return;
+                }
+
                 NavigationManager.NavigateTo("/home");
             }
-            
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error during login: {ex.Message}");
         }
     }
-    
-    private async Task CheckLogin(){
+
+    private async Task CheckLogin()
+    {
         try
         {
-            
+            var userParams = new Dictionary<string, string>
+            {
+                { "username", _username! },
+                { "password", _password! }
+            };
+            var request = HttpQueryHandler.CreateEndpointRequest(HttpMethod.Post, LogInApiEndpoint, userParams);
 
+            var response = await HttpClient.SendAsync(request);
+            if (!response.IsSuccessStatusCode)
+            {
+                _isInvalid = true;
+                return;
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            _userInfo = content.FromJson();
+            await Save();
+
+            _isInvalid = false;
+            NavigationManager.NavigateTo("/home");
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error during check login: {ex.Message}");
         }
-        
-        
-        if (true)
-        {
-            isInvalid = false;
-            NavigationManager.NavigateTo("/home");
-        }
-        else
-        {
-            isInvalid = true;
-        }
     }
 
 
-    public async Task Save()
+    private async Task Save()
     {
-        await LocalStorage.SetItem(ILocalStorageHandler.userStorageName, JsonSerializer.Serialize(UserInfo));
+        await LocalStorage.SetItem(ILocalStorageHandler.UserStorageName, _userInfo!.ToJson());
     }
 
-    public async Task Load()
+    private async Task Load()
     {
-        var storedItem = await LocalStorage.GetItem(ILocalStorageHandler.userStorageName);
+        var storedItem = await LocalStorage.GetItem(ILocalStorageHandler.UserStorageName);
         if (storedItem.IsNullOrEmpty())
         {
             return;
         }
 
-        UserInfo = JsonSerializer.Deserialize<UserInfo>(storedItem);
+        _userInfo = storedItem.FromJson();
     }
 
 }

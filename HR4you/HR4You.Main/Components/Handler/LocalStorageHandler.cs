@@ -4,7 +4,7 @@ namespace HR4You.Components.Handler;
 
 public interface ILocalStorageHandler
 {
-    public const string userStorageName = "UserStorage";
+    public const string UserStorageName = "UserStorage";
     
     Task SetItem(string key, string value);
     Task<string> GetItem(string key);

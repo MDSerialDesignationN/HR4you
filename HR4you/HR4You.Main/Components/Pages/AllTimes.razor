@@ -32,16 +32,15 @@
 else
 {
     <HourEntrySearch Entries="entries.Data" />
-    <KeysetPagination entries="entries.Data" OnPageChanged="EventCallback.Factory.Create<PagedResponseKeySet<HourEntry>>(this, UpdateEntries)" ApiEndpoint="http://localhost:5001/api/master-data/hour-entry/get-all-paged" />
+    <KeysetPagination entries="entries" OnPageChanged="EventCallback.Factory.Create<PagedResponseKeySet<HourEntry>>(this, UpdateEntries)" ApiEndpoint="http://localhost:5001/api/master-data/hour-entry/get-all-paged" />
     
     <div class="table-wrapper overflow-auto">
-        <AllTimesTable entries="entries" projectNames="projectNames" tagNames="tagNames" @ref="popupRef2" OnAllTimesUpdated2="RefreshTable2">
+        <AllTimesTable entries="entries.Data" projectNames="projectNames" tagNames="tagNames" @ref="popupRef2" OnAllTimesUpdated2="RefreshTable2">
         </AllTimesTable>
     </div>
 }
 
-
-    }
+    
 </div>
 
 @code {
@@ -51,14 +50,12 @@ else
     public string RequestURL = "/api/master-data/hour-entry/get-all?addDeleted=";
 
     public bool addDeleted;
-
-    public List<HourEntry> entries;
-
+    
     private AllTimesTable popupRef2;
 
-    public Dictionary<int, string> projectNames = new Dictionary<int, string>();
+    public Dictionary<int, string> projectNames = new();
 
-    public Dictionary<int?, string> tagNames = new Dictionary<int?, string>();
+    public Dictionary<int?, string> tagNames = new();
 
     public string RequestURLProject = "/api/master-data/project/get?addDeleted=true&Id=";
 
@@ -74,17 +71,13 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        //Get first value from appsettings.json "Urls"
-        var urls = Configuration["Urls"];
-        HttpURL = urls?.Split(';').FirstOrDefault();
-
         addDeleted = false;
         await LoadAllTimes();
     }
     
     private void UpdateEntries(PagedResponseKeySet<HourEntry> newEntries)
     {
-        this.entries = newEntries;
+        entries = newEntries;
         // if (entries != null)
         // {
         //     entries = new PagedResponseKeySet<HourEntry>(newEntries, entries.Reference);
@@ -98,7 +91,7 @@ else
 
         try
         {
-            entries = await HttpClient.GetFromJsonAsync<List<HourEntry>>((HttpURL + RequestURL) + addDeleted);
+            entries = await HttpClient.GetFromJsonAsync<PagedResponseKeySet<HourEntry>>((HttpURL + RequestURL) + addDeleted);
             Console.WriteLine((HttpURL + RequestURL) + addDeleted);
         }
         catch (Exception ex)
@@ -107,17 +100,18 @@ else
         }
 
         // Fetch project and tag names for all entries
-        foreach (var entry in entries)
-        {
-            if (!uniqueProjectIds.Contains(entry.ProjectId))
+        if (entries != null)
+            foreach (var entry in entries.Data)
             {
-                uniqueProjectIds.Add(entry.ProjectId);
+                if (!uniqueProjectIds.Contains(entry.ProjectId))
+                {
+                    uniqueProjectIds.Add(entry.ProjectId);
+                }
+                else if (!uniqueTagIds.Contains(entry.TagId.GetValueOrDefault()))
+                {
+                    uniqueTagIds.Add(entry.TagId.GetValueOrDefault());
+                }
             }
-            else if (!uniqueTagIds.Contains(entry.TagId.GetValueOrDefault()))
-            {
-                uniqueTagIds.Add(entry.TagId.GetValueOrDefault());
-            }
-        }
 
         foreach (var projectId in uniqueProjectIds)
         {
@@ -173,7 +167,7 @@ else
             addDeleted = false;
         }
 
-        entries = await HttpClient.GetFromJsonAsync<List<HourEntry>>((HttpURL + RequestURL) + addDeleted);
+        entries = await HttpClient.GetFromJsonAsync<PagedResponseKeySet<HourEntry>>((HttpURL + RequestURL) + addDeleted);
         StateHasChanged();
     }
 
