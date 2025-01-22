@@ -24,12 +24,18 @@
                 <td>@entry.FirstName</td>
                 <td>@entry.LastName</td>
                 <td>@entry.UserName</td>
-                <td>@entry.Roles</td>
-                <td>@entry.RoleGroups</td>
-                <td>@(entry.Deleted ? "Yes" : "No")</td>
-                <button type="button" class="btn btn-outline-danger" @onclick="(() => DeleteEntry(entry.Id))"><i class="fa fa-trash"></i></button>
+                <td>@string.Join(", ", @entry.Roles.Select(role => role.Replace("UserRole_", "")))</td>
+                <td>@string.Join(", ", @entry.RoleGroups.Select(roleGroup => roleGroup.Replace("HR_UserRoleGroup_", "")))</td>
+                <td>@(entry.Deleted ? "Yes" : "No")</td>                
+                @if (entry.Deleted == true)
+                {
+                    <button type="button" class="btn btn-outline-danger" @onclick="(() => Reactivate(entry.Id))"><i class="fa fa-rotate-right"></i></button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-outline-danger" @onclick="(() => DeleteEntry(entry.Id))"><i class="fa fa-trash"></i></button>
+                }
                 <button type="button" class="btn btn-outline-info" @onclick="(() => EditEntry(entry.Id))"><i class="fa fa-pencil"></i></button>
-
             </tr>
         }
     </tbody>
@@ -46,6 +52,10 @@
     [Parameter]
     public EventCallback OnUserUpdated2 { get; set; }
 
+    public string unDeleteURL = "http://localhost:5001/api/auth/un-delete-user?id=";
+
+    UserInfo emptyBody = new UserInfo();
+
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -55,8 +65,8 @@
         }
     }
 
-    public string RequestURLEdit = "http://localhost:5001/api/master-data/user/get?addDeleted=true&Id=";
-    public string RequestURLDelete = "http://localhost:5001/api/auth/delete-user/delete?Id=";
+    public string RequestURLEdit = "http://localhost:5001/api/auth/get-user?Id=";
+    public string RequestURLDelete = "http://localhost:5001/api/auth/delete-user?Id=";
 
     private void EditEntry(string GivenId)
     {
@@ -65,11 +75,37 @@
 
     private async Task DeleteEntry(string GivenId)
     {
-        await HttpClient.DeleteFromJsonAsync<UserInfo>(RequestURLDelete + GivenId);
-        Console.WriteLine("RefreshTable() was called");
-        RefreshTable();
+        var response = await HttpClient.PostAsJsonAsync<UserInfo>(RequestURLDelete + GivenId, emptyBody);
+        if (response.IsSuccessStatusCode)
+        {
+            Console.WriteLine("User reactivated successfully.");
+            RefreshTable();
+        }
+        else
+        {
+            Console.WriteLine("Error occurred while reactivating the user: " + response.ReasonPhrase);
+        }
     }
 
+    private async Task Reactivate(string GivenId)
+    {
+        var response = await HttpClient.PostAsJsonAsync(unDeleteURL + GivenId, emptyBody);
+
+        if (response.IsSuccessStatusCode)
+        {
+            Console.WriteLine("User reactivated successfully.");
+            RefreshTable();           
+        }
+        else
+        {
+            Console.WriteLine("Error occurred while reactivating the user: " + response.ReasonPhrase);
+        }
+    }
+
+    private void CreateUser()
+    {
+        popupRef.ShowOverview("Add User");
+    }
 
     private async Task RefreshTable()
     {
