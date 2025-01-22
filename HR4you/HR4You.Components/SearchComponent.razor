@@ -1,0 +1,92 @@
+﻿@using HR4You.Model.Base
+<div>
+    <div class="searchBar border border-1 border-[#c1c1c1] rounded-[5px] w-[fit-content] flex flex-row">
+        @if (Options1 != null)
+        {
+            <button @onclick="ToggleFilterOptions">
+                <i class="fa-solid fa-filter"></i>
+            </button>
+        }
+        @if (Options2.Length != 0)
+        {
+            <button @onclick="ToggleFilterOptionsAdmin">
+                <i class="fa-solid fa-user-tie"></i>
+            </button>
+        }
+        <button class="flex flex-row gap-2 items-center bg-gray-200" id="Submit" type="submit" value="Search" @onclick="Filter">Search<i class="fa-solid fa-magnifying-glass"></i></button>
+    </div>
+    @if (Options1 != null)
+    {
+        <div class="FilterOptions @(showFilterOptions ? "active" : "")">
+
+            @foreach (var option in Options1)
+            {
+                <div class="OptionRow">
+                    <span>@((MarkupString)option.Icon)@option.Name</span>
+                    @if (option.InputType == "select" && option.Options != null)
+                    {
+                        <select name="@option.Name">
+                            <option value="">None</option>
+
+                            @foreach (var opt in option.Options)
+                            {
+                                <option value="@opt">@opt</option>
+                            }
+                        </select>
+                    }
+                    else
+                    {
+                        <input type="@option.InputType" name="@option.Name" />
+                    }
+                </div>
+            }
+        </div>
+    }
+    @if (Options2 != null)
+    {
+        <div class="FilterOptions @(showFilterOptionsAdmin ? "active" : "")">
+            @foreach (var option in Options2)
+            {
+                <div class="OptionRow">
+                    <span>@((MarkupString)option.Icon)@option.Name</span>
+                    @if (option.InputType == "select" && option.Options != null)
+                    {
+                        <select name="@option.Name" @bind:event="oninput">
+                            <option value="">None</option>
+
+                            @foreach (var opt in option.Options)
+                            {
+                                <option value="@opt">@opt</option>
+                            }
+                        </select>
+                    }
+                    else
+                    {
+                        <input type="@option.InputType" name="@option.Name" />
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public FilterOption[] Options1 { get; set; } = Array.Empty<FilterOption>();
+    [Parameter] public FilterOption[] Options2 { get; set; } = Array.Empty<FilterOption>();
+    private bool showFilterOptions = false;
+    private bool showFilterOptionsAdmin = false;
+
+    private void ToggleFilterOptions()
+    {
+        showFilterOptions = !showFilterOptions;
+    }
+
+    private void ToggleFilterOptionsAdmin()
+    {
+        showFilterOptionsAdmin = !showFilterOptionsAdmin;
+    }
+    private void Filter()
+    {
+
+    }
+}

@@ -28,20 +28,45 @@
     }
     else
     {
-        <HourEntrySearch Entries="entries.Data" />
-        <KeysetPagination entries="entries" OnPageChanged="EventCallback.Factory.Create<PagedResponseKeySet<HourEntry>>(this, UpdateEntries)" ApiEndpoint="http://localhost:5001/api/master-data/hour-entry/get-all-paged" />
+        @* <HourEntrySearch Entries="entries.Data" /> *@
+        <SearchComponent Options1="options1" Options2="options2" />
 
         <div class="table-wrapper overflow-auto">
             <AllTimesTable entries="entries.Data"></AllTimesTable>
         </div>
-
-
-
+        <KeysetPagination entries="entries" OnPageChanged="EventCallback.Factory.Create<PagedResponseKeySet<HourEntry>>(this, UpdateEntries)" ApiEndpoint="http://localhost:5001/api/master-data/hour-entry/get-all-paged" />
     }
 </div>
 
 @code {
     public PagedResponseKeySet<HourEntry>? entries;
+    public FilterOption[] options1 = new FilterOption[] {
+        new FilterOption{ Icon = "<i class='fa-solid fa-calendar-days'></i>", Name = "Date", InputType = "date" },
+        new FilterOption{ Icon = "<i class='fa-regular fa-clock'></i>", Name = "StartTime", InputType = "time" },
+        new FilterOption{ Icon = "<i class='fa-regular fa-clock'></i>", Name = "EndTime", InputType = "time" },
+        new FilterOption{ Icon = "<i class='fa-solid fa-timeline'></i>", Name = "Duration", InputType = "number" },
+        new FilterOption{ Icon = "<i class='fa-solid fa-tasks'></i>", Name = "Type", InputType = "select", Options = Enum.GetValues<ActivityType>().Select(e => e.ToString()).ToList() },
+    };
+    public FilterOption[] options2 = new FilterOption[] {
+        new FilterOption{ Icon = "<i class='fa-solid fa-id-card'></i>", Name = "UserId", InputType = "string" },
+        new FilterOption{ Icon = "<i class='fa-solid fa-diagram-project'></i>", Name = "ProjectId", InputType = "string" },
+        new FilterOption{ Icon = "<i class='fa-solid fa-tag'></i>", Name = "TagId", InputType = "string" },
+        new FilterOption{ Icon = "<i class='fa-solid fa-mug-hot'></i>", Name = "IsHoliday", InputType = "checkbox" },
+        new FilterOption{ Icon = "<i class='fa-solid fa-money-bill'></i>", Name = "IsBillable", InputType = "checkbox" },
+        new FilterOption{ Icon = "<i class='fa-solid fa-trash'></i>", Name = "Deleted", InputType = "checkbox" },
+    };
+
+
+
+    // <div class="OptionRow">
+    //     <span><i class="fa-solid fa-mug-hot"></i>Holiday</span><input type="checkbox" name="Holiday" @bind="holiday" @bind:event="oninput" />
+    // </div>
+    // <div class="OptionRow">
+    //     <span><i class="fa-solid fa-money-bill"></i>Billable</span><input type="checkbox" name="Billable" @bind="billable" @bind:event="oninput" />
+    // </div>
+    // <div class="OptionRow">
+    //     <span><i class="fa-solid fa-trash"></i>Deleted</span><input type="checkbox" name="Deleted" @bind="deleted" @bind:event="oninput" />
+    // </div>
 
     protected override async Task OnInitializedAsync()
     {

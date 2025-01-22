@@ -1,0 +1,53 @@
+﻿.searchBar {
+    position: relative;
+}
+
+button {
+    border-right: 1px solid #c1c1c1;
+    padding: 5px 20px
+}
+
+    button:last-of-type {
+        border: none;
+    }
+
+.FilterOptions {
+    flex-direction: column;
+    gap: 10px;
+    z-index: 10;
+    display: none;
+    position: absolute;
+    background: whitesmoke;
+    padding: 10px;
+    border: 1px solid #c1c1c1;
+    border-radius: 5px;
+    width: 350px;
+    height: fit-content;
+}
+
+    .FilterOptions.active {
+        display: flex;
+    }
+
+.OptionRow {
+    display: flex;
+    justify-content: space-between;
+}
+
+    .OptionRow > input, .OptionRow > select {
+        width: 200px;
+        padding: 5px;
+        border-radius: 5px;
+        border: 1px solid #c1c1c1;
+    }
+
+    .OptionRow > span > i {
+        width: 15px;
+    }
+
+    .OptionRow > span {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        gap: 10px;
+    }

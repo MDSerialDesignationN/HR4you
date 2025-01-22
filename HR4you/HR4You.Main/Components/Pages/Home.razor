@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using HR4You.Model.Base
 @using HR4You.Model.Base.Pagination
 @attribute [StreamRendering]
 @inject HttpClient HttpClient
@@ -16,17 +17,22 @@
     }
     else
     {
-
+        <SearchComponent Options1="options1"/>
         <HomeTable entries="entries.Data">
         </HomeTable>
+        <KeysetPagination entries="entries" OnPageChanged="EventCallback.Factory.Create<PagedResponseKeySet<HourEntry>>(this, UpdateEntries)" ApiEndpoint="http://localhost:5001/api/master-data/hour-entry/get-user-all-paged?userId=003c1ae2-acfc-495b-b91a-8cedf507568a" />
     }
 </div>
 
 
 
 @code {
-
     public PagedResponseKeySet<HourEntry> entries;
+    public FilterOption[] options1 = new FilterOption[] { 
+        new FilterOption{ Icon = "<i class='fa-regular fa-calendar'></i>", Name = "Date", InputType = "date" },
+        new FilterOption{ Icon = "<i class='fa-solid fa-clock'></i>", Name = "StartTime", InputType = "time" },
+        new FilterOption{ Icon = "<i class='fa-solid fa-clock'></i>", Name = "EndTime", InputType = "time" },
+    };
 
 
     protected override async Task OnInitializedAsync()
