@@ -70,15 +70,15 @@
 
     private void CreateTag()
     {
-        popupRefTag.ShowOverview(RequestURLUser, "Add Tag");
+        popupRefTag.ShowOverview("Add Tag");
         //NavigationManager.NavigateTo($"edit-product/{GivenId}");
     }
-    private void CreateProject(){
-        popupRefProject.Show(RequestURLProject, "Add Project");
+    private async Task CreateProject(){
+        await popupRefProject.ShowOverview(RequestURLProject, "Add Project");
     }
-    private void CreateCustomer()
+    private async Task CreateCustomer()
     {
-        popupRefCustomer.ShowOverview("Add Customer");
+        await popupRefCustomer.ShowOverview("Add Customer");
     }
 
     private async Task CreateHourEntry()

@@ -91,7 +91,7 @@
 
     bool isEdit = false;
 
-    async public void Show(int givenId, string requestURL, string headerText)
+    public async Task Show(int givenId, string requestURL, string headerText)
     {
         HeaderText = headerText;
         GivenId = givenId.ToString(); 
@@ -101,13 +101,12 @@
         StateHasChanged();
     }
 
-    async public void ShowOverview(string headerText)
+    public async Task ShowOverview(string headerText)
     {
         HeaderText = headerText;
         IsVisible = true;
         isEdit = false;
         StateHasChanged();
-
     }
 
     private async Task Submit()

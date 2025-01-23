@@ -1,4 +1,8 @@
 ﻿@inject HttpClient HttpClient
+@using System.Security.Cryptography
+@using Microsoft.AspNetCore.WebUtilities
+@using HR4You.Model.Base.Pagination
+@using Newtonsoft.Json
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 
@@ -25,40 +29,39 @@
             <button type="button" class="btn-close" aria-label="Close" @onclick="Close"></button>
         </div>
 
-        @*<EditForm Model="project" OnValidSubmit="Submit">
+        <EditForm Model="project" OnValidSubmit="Submit">
             <DataAnnotationsValidator />
             <ValidationSummary />
         
             <div class="toast-body" style="padding: 20px;">
                 <div class="container">
                     <div class="row">
-                        <!-- Date and Project-->
+                        <!-- Project Number and State -->
                         <div class="col-sm-4">
-                            <label>Date</label>
-                            <InputDate @bind-Value="project.ProjectNumber" class="form-control mb-2"></InputDate> 
+                            <label>Project Number</label>
+                            <InputNumber @bind-Value="project.ProjectNumber" class="form-control mb-2"></InputNumber>
                             
-                            
-                            
-                        </div>
-
-                        <!-- Start Time and Tag -->
-                        <div class="col-sm-4">
-                            <label>Start Time</label>
-                            <InputDate Type="InputDateType.Time" @bind-Value="project.Name" class="form-control mb-2" />
-
-                            <label>Tag</label>
-                            <InputSelect @bind-Value="project.CustomerId" class="form-select">
-                                @foreach (var customer in customers)
+                            <label>State</label>
+                            <InputSelect @bind-value="project.State" class="form-select">
+                                @foreach (var state in states)
                                 {
-                                    <option value="@customer.Id">@customer.Name</option>
+                                    <option value="@state">@state.ToString()</option>
                                 }
                             </InputSelect>
                         </div>
 
-                        <!-- EndTime -->
+                        <!-- Name and Customer -->
                         <div class="col-sm-4">
-                            <label>End Time</label>
-                            <InputDate Type="InputDateType.Time" @bind-Value="project.EndTime" class="form-control mb-2" />
+                            <label>Name</label>
+                            <InputText @bind-Value="project.Name" class="form-control mb-2"></InputText>
+
+                            <label>Customer</label>
+                            <InputSelect @bind-Value="project.CustomerId" class="form-select">
+                                @foreach (var customer in customersToShow)
+                                {
+                                    <option value="@customer.Id">@customer.Name</option>
+                                }
+                            </InputSelect>
                         </div>
 
                         <!-- Description -->
@@ -77,7 +80,7 @@
                     </div>
                 </div>
             </div>
-        </EditForm>*@
+        </EditForm>
         </div>
     </div>
 
@@ -97,20 +100,48 @@
     [Parameter]
     public string? GivenId { get; set; }
 
+    private const string RefCustomerUrl = "http://localhost:5001/api/master-data/customer/get-all-paged";
+    
     Project project = new Project();
 
-    List<Customer> customers = [];
+    ProjectState[] states = new[] { ProjectState.Open, ProjectState.Closed };
+
+    PagedResponseKeySet<Customer> customers;
+    List<Customer> customersToShow = [];
+    bool isEdit = false;
 
     private async Task getCustomers()
     {
-        
+        customers = await HttpClient.GetFromJsonAsync<PagedResponseKeySet<Customer>>(RefCustomerUrl);
+        customersToShow = customers.Data;
+        /*var param = new Dictionary<string, string>
+        {
+            {"addDeleted", "false"},
+            {"reference", "0"},
+            {"pagesize", "10"}
+        };
+
+        string methodName = "http://localhost:5001/api/master-data/customer/get-all-paged";
+        methodName = QueryHelpers.AddQueryString(methodName, param);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, methodName);
+
+        var response = await HttpClient.SendAsync(request);
+
+        var json = response.Content.ReadAsStringAsync().Result;
+
+        customers = JsonConvert.DeserializeObject<PagedResponseOffset<Customer>>(json);*/
     }
+    
+    
     
     public async Task Show(string requestURL, string headerText)
     {
         HeaderText = headerText;
         //customer = await HttpClient.GetFromJsonAsync<Customer>(requestURL + GivenId);
         IsVisible = true;
+        isEdit = true;
+        await getCustomers();
         StateHasChanged();
     }
 
@@ -119,12 +150,55 @@
         HeaderText = headerText;
         //customer = await HttpClient.GetFromJsonAsync<Customer>(requestURL + GivenId);
         IsVisible = true;
+        isEdit = false;
+        await getCustomers();
         StateHasChanged();
     }
 
     private async Task Submit()
     {
-        
+        var editURL = "http://localhost:5001/api/master-data/project/edit?Id=";
+        var createURL = "http://localhost:5001/api/master-data/project/create";
+
+        if (isEdit == true)
+        {
+            try
+            {
+                var response = await HttpClient.PostAsJsonAsync(editURL + GivenId, project);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("Entry saved successfully.");
+
+                    if (OnProjectUpdated.HasDelegate)
+                    {
+                        await OnProjectUpdated.InvokeAsync(); // Notify the parent component
+                    }
+                    else
+                    {
+                        Console.WriteLine("OnProjectUpdated has no delegate assigned.");
+                    }
+                    Close();
+                }
+                else
+                {
+                    Console.WriteLine("Error occurred while saving the Entry: " + response.ReasonPhrase);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception occurred: " + ex.Message);
+            }
+        }
+        else if (isEdit == false)
+        {
+            var response = await HttpClient.PostAsJsonAsync(createURL, project);
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Entry saved successfully.");
+                Close();
+            }
+        }
     }
 
     private async Task Close()

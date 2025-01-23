@@ -25,19 +25,30 @@
 
         <div class="toast-body" style="padding: 20px;">
             <div class="container">
-                @* <div class="row">
-                    <div class="col-sm-4">
-                        <EditForm Model="user" OnValidSubmit="Submit">
-                            <DataAnnotationsValidator />
-                            <ValidationSummary Model="user" />
+                <EditForm Model="tag" OnValidSubmit="Submit">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
 
-                            <label>User Name</label>
-                            <InputNumber @bind-Value="customer.CustomerNumber" class="form-control mb-2" />
+                    <div class="toast-body" style="padding: 20px;">
+                        <div class="container">
+                            <div class="row">
+                                <!-- Name-->
+                                <div class="col-sm-4">
+                                    <label>Tag Name</label>
+                                    <InputText @bind-Value="tag.Name" class="form-control mb-2"></InputText>
+                                </div>
 
-                            <label>User Password</label>
-                            <InputText @bind-Value="customer.Website" class="form-control mb-2" />
-                        </EditForm>
-                    </div> *@
+                                <!-- Buttons -->
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <button type="submit" class="btn btn-dark">Save</button>
+                                        <button type="button" class="btn btn-outline-secondary" @onclick="Close">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </EditForm>
             </div>
         </div>
     </div>
@@ -51,15 +62,20 @@
     [Parameter]
     public EventCallback<bool> IsVisibleChanged { get; set; }
 
+    [Parameter] 
+    public EventCallback OnTagUpdated { get; set; }
+    
     [Parameter]
     public string? HeaderText { get; set; }
 
     [Parameter]
     public string? GivenId { get; set; }
 
-    
+    Tag tag = new Tag();
 
-    async public void Show(string requestURL, string headerText)
+    bool isEdit = false;
+
+    public async Task Show(string requestURL, string headerText)
     {
         HeaderText = headerText;
         //customer = await HttpClient.GetFromJsonAsync<Customer>(requestURL + GivenId);
@@ -67,7 +83,7 @@
         StateHasChanged();
     }
 
-    async public void ShowOverview(string requestURL, string headerText)
+    public async Task ShowOverview(string headerText)
     {
         HeaderText = headerText;
         //customer = await HttpClient.GetFromJsonAsync<Customer>(requestURL + GivenId);
@@ -75,10 +91,50 @@
         StateHasChanged();
     }
 
-    private void Submit()
+    private async Task Submit()
     {
-        var createURL = "http://localhost:5001/api/master-data/user/create";
+        var createURL = "http://localhost:5001/api/master-data/tag/create";
+        var editURL = "http://localhost:5001/api/master-data/tag/edit?Id=";
 
+        if (isEdit == true)
+        {
+            try
+            {
+                var response = await HttpClient.PostAsJsonAsync(editURL + GivenId, tag);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("Entry saved successfully.");
+
+                    if (OnTagUpdated.HasDelegate)
+                    {
+                        await OnTagUpdated.InvokeAsync(); // Notify the parent component
+                    }
+                    else
+                    {
+                        Console.WriteLine("OnTagUpdated has no delegate assigned.");
+                    }
+                    Close();
+                }
+                else
+                {
+                    Console.WriteLine("Error occurred while saving the Entry: " + response.ReasonPhrase);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception occurred: " + ex.Message);
+            }
+        }
+        else if (isEdit == false)
+        {
+            var response = await HttpClient.PostAsJsonAsync(createURL, tag);
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Entry saved successfully.");
+                Close();
+            }
+        }
     }
 
     private void Close()
