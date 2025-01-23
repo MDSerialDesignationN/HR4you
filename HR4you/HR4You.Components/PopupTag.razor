@@ -80,6 +80,7 @@
         HeaderText = headerText;
         //customer = await HttpClient.GetFromJsonAsync<Customer>(requestURL + GivenId);
         IsVisible = true;
+        isEdit = true;
         StateHasChanged();
     }
 
@@ -88,6 +89,7 @@
         HeaderText = headerText;
         //customer = await HttpClient.GetFromJsonAsync<Customer>(requestURL + GivenId);
         IsVisible = true;
+        isEdit = false;
         StateHasChanged();
     }
 
