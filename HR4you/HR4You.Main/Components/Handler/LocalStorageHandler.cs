@@ -4,6 +4,8 @@ namespace HR4You.Components.Handler;
 
 public interface ILocalStorageHandler
 {
+    public const string userStorageName = "UserStorage";
+    
     Task SetItem(string key, string value);
     Task<string> GetItem(string key);
     Task RemoveItem(string key);
@@ -13,7 +15,6 @@ public interface ILocalStorageHandler
 public class LocalStorageHandler : ILocalStorageHandler
 {
     private readonly IJSRuntime _javaScript;
-
     public LocalStorageHandler(IJSRuntime javaScript)
     {
         _javaScript = javaScript;   

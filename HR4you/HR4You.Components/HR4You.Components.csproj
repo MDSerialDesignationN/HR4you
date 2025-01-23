@@ -20,4 +20,10 @@
       <ProjectReference Include="..\HR4you.Security\HR4you.Security.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Content Update="OffsetPagination.razor">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      </Content>
+    </ItemGroup>
+
 </Project>

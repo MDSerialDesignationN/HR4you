@@ -1,38 +1,47 @@
 ﻿@page "/AllTimes"
-@rendermode InteractiveServer
+@using HR4You.Model.Base
+@using HR4You.Model.Base.Pagination
+@attribute [StreamRendering]
 @inject HttpClient HttpClient
-@inject IConfiguration Configuration
+@rendermode InteractiveServer
 
 <PageTitle>All Times</PageTitle>
+<div class="page-content min-h-[100vh] p-3 flex flex-col gap-2">
+    <div class="flex flex-row justify-between">
+        <h1 class="text-[2rem] font-bold flex flex-row gap-3 items-center"><i class="fa-solid fa-chart-area"></i>All Times</h1>
+        <div class="bg-[whitesmoke] flex flex gap-3 items-center p-3 rounded-[10px] border border-2 border-[#c1c1c1]">
+            <div class="user-info">
+                <p class="font-bold p-1">Thel Vadam'ee</p>
 
-<h1>All Times</h1>
+            </div>
+            <div class="user-actions">
+                <a class="cursor-pointer text-red-500 p-1 rounded-[5px] transition-all duration-500 hover:bg-gray-300">Logout</a>
+            </div>
+        </div>
+    </div>
 
-<label>Show Deleted</label>
-<input type="checkbox" checked="@addDeleted" @oninput="CheckboxChanged">
+    @if (entries == null)
+    {
+        <p>
+            <em>Loading...</em>
+        </p>
+    }
+    else
+    {
+        <HourEntrySearch Entries="entries.Data" />
+        <KeysetPagination entries="entries" OnPageChanged="EventCallback.Factory.Create<PagedResponseKeySet<HourEntry>>(this, UpdateEntries)" ApiEndpoint="http://localhost:5001/api/master-data/hour-entry/get-all-paged" />
 
-@if (entries == null)
-{
-    <p>
-        <em>Loading...</em>
-    </p>
-}
-else
-{
-    <AllTimesTable entries="entries" projectNames="projectNames" tagNames="tagNames" @ref="popupRef2" OnAllTimesUpdated2="RefreshTable2">
-    </AllTimesTable>
-}
+        <div class="table-wrapper overflow-auto">
+            <AllTimesTable entries="entries.Data"></AllTimesTable>
+        </div>
 
 
+
+    }
+</div>
 
 @code {
-    private string HttpURL;
-
-    public string RequestURL = "/api/master-data/hour-entry/get-all?addDeleted=";
-
-    public bool addDeleted;
-
-    public List<HourEntry> entries;
-
+    public PagedResponseKeySet<HourEntry>? entries;
     private AllTimesTable popupRef2;
 
     public Dictionary<int, string> projectNames = new Dictionary<int, string>();
@@ -68,70 +77,21 @@ else
     
         try
         {
-            entries = await HttpClient.GetFromJsonAsync<List<HourEntry>>((HttpURL + RequestURL) + addDeleted);
-            Console.WriteLine((HttpURL + RequestURL) + addDeleted);
+            entries = await HttpClient.GetFromJsonAsync<PagedResponseKeySet<HourEntry>>("http://localhost:5001/api/master-data/hour-entry/get-all-paged?reference=0&pageSize=10");
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error fetching entries: {ex.Message}");
         }
-    
-        // Fetch project and tag names for all entries
-        foreach (var entry in entries)
-        {
-            if (!uniqueProjectIds.Contains(entry.ProjectId))
-            {
-                uniqueProjectIds.Add(entry.ProjectId);
-            }
-            else if (!uniqueTagIds.Contains(entry.TagId.GetValueOrDefault()))
-            {
-                uniqueTagIds.Add(entry.TagId.GetValueOrDefault());
-            }
-        }
-    
-        foreach (var projectId in uniqueProjectIds)
-        {
-            if (!projectNames.ContainsKey(projectId))
-            {
-                var project = await FetchProjectAsync(projectId);
-                projectNames[projectId] = project?.Name ?? "No Project";
-            }
-        }
-    
-        foreach (var tagId in uniqueTagIds)
-        {
-            if (!tagNames.ContainsKey(tagId))
-            {
-                var tag = await FetchTagAsync(tagId);
-                tagNames[tagId] = tag?.Name ?? "No Tag";
-            }
-        }
     }
 
-    private async Task<Project> FetchProjectAsync(int projectId)
+    private void UpdateEntries(PagedResponseKeySet<HourEntry> newEntries)
     {
-        try
-        {
-            return await HttpClient.GetFromJsonAsync<Project>((HttpURL + RequestURLProject) + projectId);
-        }
-        catch
-        {
-            return null;
-        }
-    }
-
-    private async Task<Tag> FetchTagAsync(int tagId)
-    {
-        try
-        {
-            return await HttpClient.GetFromJsonAsync<Tag>((HttpURL + RequestURLTag) + tagId);
-        }
-        catch
-        {
-            return null;
-        }
-    }
-
+        this.entries = newEntries;
+        // if (entries != null)
+        // {
+        //     entries = new PagedResponseKeySet<HourEntry>(newEntries, entries.Reference);
+        // }
     private async Task CheckboxChanged()
     {
         if (addDeleted == false)
@@ -154,4 +114,5 @@ else
 
         StateHasChanged();
     }
+
 }

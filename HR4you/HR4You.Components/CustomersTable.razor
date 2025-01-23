@@ -1,7 +1,7 @@
 ﻿@rendermode InteractiveServer
 @inject HttpClient HttpClient
 
-<PopupCustomers @ref="popupRef" OnCustomerUpdated="RefreshTable" />
+@* <PopupCustomers @ref="popupRef" OnCustomerUpdated="RefreshTable" /> *@
 
 <table class="Table">
     <thead>
@@ -16,14 +16,14 @@
             <th>Creation Date</th>
             <th>Last Modified</th>
             <th>Is Deleted</th>
-            <th> </th>
+            <th class="w-[fit-content] p-0"> </th>
 
         </tr>
     </thead>
     <tbody>
         @foreach (var entry in entries)
         {
-            
+
             <tr>
                 <td>@entry.CustomerNumber</td>
                 <td>@entry.Name</td>
@@ -35,9 +35,10 @@
                 <td>@entry.CreationDateTime</td>
                 <td>@entry.LastModifiedAt</td>
                 <td>@(entry.Deleted ? "Yes" : "No")</td>
-                <button type="button" class="btn btn-outline-danger" @onclick="(() => DeleteEntry(entry.Id))"><i class="fa fa-trash"></i></button>
-                <button type="button" class="btn btn-outline-info" @onclick="(() => EditEntry(entry.Id))"><i class="fa fa-pencil"></i></button>
-
+                <td class="max-w-[fit-content] flex flex-col gap-1 justify-center items-center p-1">
+                    <button type="button" class="border border-2 border-red-500 bg-red-500 bg-opacity-50 rounded-[5px]" @onclick="(() => DeleteEntry(entry.Id))"><i class="fa fa-trash"></i></button>
+                    <button type="button" class="border border-2 border-gray-500 bg-gray-500 bg-opacity-50 rounded-[5px]" @onclick="(() => EditEntry(entry.Id))"><i class="fa fa-pencil"></i></button>
+                </td>
             </tr>
         }
     </tbody>

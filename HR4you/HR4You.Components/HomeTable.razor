@@ -1,20 +1,16 @@
-﻿<PopupTag @ref="popupRefTag"></PopupTag>
-<PopupProject @ref="popupRefProject"></PopupProject>
-<PopupCustomers @ref="popupRefCustomer"></PopupCustomers>
+﻿@using HR4You.Model.Base.Pagination
+@* <PopupTag @ref="popupRefTag"></PopupTag> *@
+@* <PopupProject @ref="popupRefProject"></PopupProject> *@
+@* <PopupCustomers @ref="popupRefCustomer"></PopupCustomers> *@
 
 
-<div class="addButtons">
-    <button class="btn btn-dark" @onclick="(() => CreateTag())">Add Tag</button>
-    <button class="btn btn-dark" @onclick="(() => CreateProject())">Add Project</button>
-    <button class="btn btn-dark" @onclick="(() => CreateCustomer())">Add Customer</button>
+<div class="addButtons flex flex-row gap-2">
+    <button class="bg-black p-1 rounded-[5px]" @onclick="(() => CreateTag())">Add Tag</button>
+    <button class="bg-black p-1 rounded-[5px]" @onclick="(() => CreateProject())">Add Project</button>
+    <button class="bg-black p-1 rounded-[5px]" @onclick="(() => CreateCustomer())">Add Customer</button>
 </div>
 
-<div class="searchAndAdd">
-    <input id="Search_Box" type="text" />
-    <input id="Search" type="submit" value="Search" />
-
-    <input class="Add_Time" type="submit" value="+" />
-</div>
+<input class="submit bg-black rounded-[5px]" type="submit" value="+" />
 
 <div class="OverviewContainer">
     <table class="OverviewTable">
@@ -31,7 +27,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var entry in entries)
+            @foreach (var entry in entries.Data)
             {
                 <tr>
                     <td>@entry.Date</td>
@@ -42,8 +38,8 @@
                     <td>@entry.Type</td>
                     <td>@entry.TagId</td>
                     <td>
-                        <span style="color:red"><i class="fa-solid fa-trash"></i></span>
-                        <i class="fa-regular fa-pen-to-square"></i>
+                        <button class="bg-red-500 bg-opacity-50 rounded-[5px] border border-2 border-red-500"><i class="fa-solid fa-trash"></i></button>
+                        <button class="bg-gray-500 bg-opacity-50 rounded-[5px] border border-2 border-gray-500"><i class="fa-regular fa-pen-to-square"></i></button>
                     </td>
                 </tr>
             }
@@ -52,10 +48,13 @@
     </table>
 </div>
 
+<KeysetPagination TItem="HourEntry" entries="entries" ApiEndpoint="http://localhost:5001/api/master-data/hour-entry/get-all-paged" />
+
+
 @code {
 
     [Parameter]
-    public List<HourEntry> entries { get; set; }
+    public PagedResponseKeySet<HourEntry> entries { get; set; }
 
     public List<Customer> customerEntries { get; set; }
 
@@ -72,8 +71,9 @@
         popupRefTag.ShowOverview("Add Tag");
         //NavigationManager.NavigateTo($"edit-product/{GivenId}");
     }
-    private void CreateProject(){
-        popupRefProject.ShowOverview(RequestURLProject, "Add Project");
+    private void CreateProject()
+    {
+        popupRefProject.Show(RequestURLProject, "Add Project");
     }
     private void CreateCustomer()
     {
@@ -81,4 +81,3 @@
     }
 }
 
-         

@@ -1,7 +1,8 @@
-﻿.Table {
+﻿
+.AllTimesTable {
     border-collapse: collapse;
     position: relative;
-    margin-top: 20px;
+/*    margin-top: 20px;*/
     padding: 10px;
     background-color: white;
     border: 1px solid gainsboro;
@@ -10,13 +11,22 @@
     max-width: 100%;
 }
 
-    .Table th,
-    .Table td {
+    .AllTimesTable th,
+    .AllTimesTable td {
         padding: 8px;
         text-align: left;
         border: 1px solid gainsboro;
+        max-width: fit-content;
+/*        max-width: 200px;*/
+/*display: none;*/
     }
 
-    .Table th {
+    .AllTimesTable th {
         background-color: #f4f4f4;
+        white-space: nowrap;
+    }
+
+    .AllTimesTable td {
+        overflow: hidden;
+        white-space: nowrap;
     }
