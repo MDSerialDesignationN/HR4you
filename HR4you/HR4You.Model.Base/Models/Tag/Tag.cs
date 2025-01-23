@@ -7,7 +7,7 @@ namespace HR4You.Model.Base.Models.Tag
     [Table("hr4you_tag")]
     public class Tag : ModelBase
     {
-        [Required] public string Name { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Name required!")] public string Name { get; set; } = string.Empty;
 
         [JsonIgnore]
         public ICollection<HourEntry.HourEntry>? HourEntries { get; } = new List<HourEntry.HourEntry>();

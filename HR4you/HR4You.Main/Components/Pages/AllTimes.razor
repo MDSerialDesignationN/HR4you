@@ -65,7 +65,7 @@ else
     {
         List<int> uniqueProjectIds = new List<int>();
         List<int> uniqueTagIds = new List<int>();
-
+    
         try
         {
             entries = await HttpClient.GetFromJsonAsync<List<HourEntry>>((HttpURL + RequestURL) + addDeleted);
@@ -75,7 +75,7 @@ else
         {
             Console.WriteLine($"Error fetching entries: {ex.Message}");
         }
-
+    
         // Fetch project and tag names for all entries
         foreach (var entry in entries)
         {
@@ -88,7 +88,7 @@ else
                 uniqueTagIds.Add(entry.TagId.GetValueOrDefault());
             }
         }
-
+    
         foreach (var projectId in uniqueProjectIds)
         {
             if (!projectNames.ContainsKey(projectId))
@@ -97,7 +97,7 @@ else
                 projectNames[projectId] = project?.Name ?? "No Project";
             }
         }
-
+    
         foreach (var tagId in uniqueTagIds)
         {
             if (!tagNames.ContainsKey(tagId))

@@ -26,6 +26,7 @@
                         <div class="col-sm-4">
                             <label>Name</label>
                             <InputText @bind-Value="tag.Name" class="form-control mb-2" />
+                            <ValidationMessage For="(() => tag.Name)" class="text-red-600 font-light mb-2" />
                         </div>
                     </div>
 

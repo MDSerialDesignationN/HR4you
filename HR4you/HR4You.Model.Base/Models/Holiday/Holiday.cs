@@ -6,8 +6,8 @@ namespace HR4You.Model.Base.Models.Holiday;
 [Table("hr4you_holiday")]
 public class Holiday : ModelBase
 {
-    [Required] public DateOnly Date { get; set; } //todo make unique
-    [Required] public string Name { get; set; } = string.Empty;
+    [Required(ErrorMessage = "Date required!")] public DateOnly Date { get; set; } //todo make unique
+    [Required(ErrorMessage = "Name required!")] public string Name { get; set; } = string.Empty;
     [Required] public bool HalfDay { get; set; }
 
     public override void Set(ModelBase model)

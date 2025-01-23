@@ -26,11 +26,13 @@
                         <div class="col-sm">
                             <label>Date</label>
                             <InputDate Type="InputDateType.Date" @bind-Value="holiday.Date" class="form-control mb-2" />
+                            <ValidationMessage For="(() => holiday.Date)" class="text-red-600 font-light mb-2" />
                         </div>
 
                         <div class="col-sm">
                             <label>Name</label>
                             <InputText @bind-Value="holiday.Name" class="form-control mb-2" />
+                            <ValidationMessage For="(() => holiday.Name)" class="text-red-600 font-light mb-2" />
                         </div>
 
                         <div class="col-sm">

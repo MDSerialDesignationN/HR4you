@@ -7,7 +7,7 @@ namespace HR4You.Model.Base.Models.Project
     [Table("hr4you_project")]
     public class Project : ModelBase
     {
-        [Required] public int ProjectNumber { get; set; } //todo set constraint for unique
+        [Required(ErrorMessage = "Project number required!")] public int ProjectNumber { get; set; } //todo set constraint for unique
 
         [Required] public int CustomerId { get; set; }
 
@@ -15,7 +15,7 @@ namespace HR4You.Model.Base.Models.Project
         [ForeignKey(nameof(CustomerId))]
         public Customer.Customer? Customer { get; set; } = null!;
 
-        [Required] public string Name { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Name required!")] public string Name { get; set; } = string.Empty;
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
         [Required]

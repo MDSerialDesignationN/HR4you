@@ -26,6 +26,7 @@
                         <div class="col-sm-4">
                             <label>Customer Number</label>
                             <InputNumber @bind-Value="customer.CustomerNumber" class="form-control mb-2" />
+                            <ValidationMessage For="(() => customer.CustomerNumber)" class="text-red-600 font-light mb-2"/>
 
                             <label>Website</label>
                             <InputText @bind-Value="customer.Website" class="form-control mb-2" />
@@ -35,6 +36,7 @@
                         <div class="col-sm-4">
                             <label>Name</label>
                             <InputText @bind-Value="customer.Name" class="form-control mb-2" />
+                            <ValidationMessage For="(() => customer.Name)" class="text-red-600 font-light mb-2"/>
 
                             <label>Address</label>
                             <InputText @bind-Value="customer.Address" class="form-control mb-2" />
@@ -44,6 +46,7 @@
                         <div class="col-sm-4">
                             <label>Email</label>
                             <InputText @bind-Value="customer.Email" class="form-control mb-2" />
+                            <ValidationMessage For="(() => customer.Email)" class="text-red-600 font-light mb-2"/>
 
                             <label>Phone Number</label>
                             <InputText @bind-Value="customer.PhoneNumber" class="form-control mb-2" />
