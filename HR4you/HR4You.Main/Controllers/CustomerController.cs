@@ -3,6 +3,8 @@ using HR4You.Contexts.Customer;
 using HR4You.Model.Base;
 using HR4You.Model.Base.Models.Customer;
 using HR4You.Model.Base.Pagination;
+using HR4you.Security;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -23,7 +25,7 @@ public class CustomerController : ControllerBase
     
     [HttpGet("get-all-paged")]
     [SwaggerOperation("GetAllPagedCustomers")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.Authenticated)]
     public async Task<IActionResult> GetAllPagedCustomers([FromQuery] List<ColumnFilter> columnFilters, bool addDeleted, int pageNumber = 1, int pageSize = 10)
     {
         if (pageNumber <= 0 || pageSize <= 0)
@@ -43,7 +45,7 @@ public class CustomerController : ControllerBase
     
     [HttpGet("get")]
     [SwaggerOperation("GetCustomer")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.Authenticated)]
     public async Task<IActionResult> GetCustomer(int id, bool addDeleted)
     {
         using var scope = _serviceProvider.CreateScope();
@@ -60,7 +62,7 @@ public class CustomerController : ControllerBase
     
     [HttpPost("create")]
     [SwaggerOperation("CreateCustomer")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> CreateCustomer([FromBody]Customer customer)
     {
         var checkResult = await _checker.CheckMasterData(customer, null);
@@ -82,7 +84,7 @@ public class CustomerController : ControllerBase
 
     [HttpPost("edit")]
     [SwaggerOperation("EditCustomer")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> EditCustomer(int id, [FromBody] Customer customer)
     {
         var checkResult = await _checker.CheckMasterData(customer, id);
@@ -105,7 +107,7 @@ public class CustomerController : ControllerBase
 
     [HttpDelete("delete")]
     [SwaggerOperation("DeleteCustomer")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> DeleteCustomer(int id)
     {
         using var scope = _serviceProvider.CreateScope();

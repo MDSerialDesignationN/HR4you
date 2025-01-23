@@ -384,7 +384,7 @@ public class SeedingController : ControllerBase
                 Type = ActivityType.Planning,
                 ProjectId = projectResult.Entity!.FirstOrDefault(p => p.Name == "Update Line Management")!.Id,
                 TagId = tagResult.Entity!.FirstOrDefault(t => t.Name == "Word")!.Id,
-                Description = "this **** is a repetitive entry",
+                Description = "this is a repetitive test entry",
                 IsBillable = true
             });
         }

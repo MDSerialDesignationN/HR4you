@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using HR4You.Components;
 using HR4You.Contexts;
+using HR4you.Security.Authentication;
 using Microsoft.OpenApi.Models;
 using NLog.Extensions.Logging;
 using NLog.Web;
@@ -65,12 +66,24 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+var connectionString = builder.Configuration.GetConnectionString("Db")!;
+
+//Configure authentication
+builder.Services.AddCustomAuthentication(new AuthenticationConfig
+{
+    ConnectionString = connectionString,
+    JwtKey = builder.Configuration.GetValue<string>("Jwt:Key")!,
+    JwtIssuer = builder.Configuration.GetValue<string>("Jwt:Issuer")!,
+    ConfigBuilder = builder.Configuration
+});
+
 //Configure db models + contexts with EF migrations
-var connectionString = builder.Configuration.GetConnectionString("Db");
 ModelContextHelper.ConfigureModelContexts(builder, connectionString);
 
-
-builder.Services.AddHttpClient();
+builder.Services.AddScoped(_ => new HttpClient
+{
+    BaseAddress = new Uri(builder.Configuration.GetValue<string>("url")!)
+});
 
 var app = builder.Build();
 
@@ -107,9 +120,9 @@ app.UseCors();
 app.UseStaticFiles();
 app.MapControllers();
 
-app.UseAntiforgery();
+app.UseCustomAuthentication();
 
-app.MapRazorComponents<App>()
+app.MapRazorComponents<App>().DisableAntiforgery()
     .AddInteractiveServerRenderMode();
 
 app.Run();

@@ -3,6 +3,8 @@ using HR4You.Contexts.Tag;
 using HR4You.Model.Base;
 using HR4You.Model.Base.Models.Tag;
 using HR4You.Model.Base.Pagination;
+using HR4you.Security;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -23,7 +25,7 @@ public class TagController : ControllerBase
     
     [HttpGet("get-all-paged")]
     [SwaggerOperation("GetAllPagedTags")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.Authenticated)]
     public async Task<IActionResult> GetAllPagedTags([FromQuery] List<ColumnFilter> columnFilters, bool addDeleted, int pageNumber = 1, int pageSize = 10)
     { 
         if (pageNumber <= 0 || pageSize <= 0)
@@ -43,7 +45,7 @@ public class TagController : ControllerBase
     
     [HttpGet("get")]
     [SwaggerOperation("GetTag")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.Authenticated)]
     public async Task<IActionResult> GetTag(int id, bool addDeleted)
     {
         using var scope = _serviceProvider.CreateScope();
@@ -60,7 +62,7 @@ public class TagController : ControllerBase
     
     [HttpPost("create")]
     [SwaggerOperation("CreateTag")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> CreateTag([FromBody]Tag tag)
     {
         var checkResult = await _checker.CheckMasterData(tag, null);
@@ -82,7 +84,7 @@ public class TagController : ControllerBase
     
     [HttpPost("edit")]
     [SwaggerOperation("EditTag")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> EditTag(int id, [FromBody] Tag tag)
     {
         var checkResult = await _checker.CheckMasterData(tag, id);
@@ -105,7 +107,7 @@ public class TagController : ControllerBase
 
     [HttpDelete("delete")]
     [SwaggerOperation("DeleteTag")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> DeleteTag(int id)
     {
         using var scope = _serviceProvider.CreateScope();

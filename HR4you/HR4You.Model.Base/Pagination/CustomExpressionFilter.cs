@@ -1,4 +1,6 @@
 using System.Linq.Expressions;
+using HR4You.Model.Base.Models.HourEntry;
+using HR4You.Model.Base.Models.Project;
 
 namespace HR4You.Model.Base.Pagination;
 
@@ -38,6 +40,16 @@ public static class CustomExpressionFilter<T> where T : class
                 else if (property.Type == typeof(float))
                 {
                     var constant = Expression.Constant(float.Parse(filter.Value));
+                    comparisonOperation = Expression.Equal(property, constant);
+                }
+                else if (property.Type == typeof(ActivityType))
+                {
+                    var constant = Expression.Constant(Enum.Parse(typeof(ActivityType),filter.Value));
+                    comparisonOperation = Expression.Equal(property, constant);
+                }                
+                else if (property.Type == typeof(ProjectState))
+                {
+                    var constant = Expression.Constant(Enum.Parse(typeof(ProjectState),filter.Value));
                     comparisonOperation = Expression.Equal(property, constant);
                 }
                 else

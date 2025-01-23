@@ -2,6 +2,8 @@
 using HR4You.Model.Base;
 using HR4You.Model.Base.Models.HourEntry;
 using HR4You.Model.Base.Pagination;
+using HR4you.Security;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -20,7 +22,7 @@ public class HourEntryController : ControllerBase
     
     [HttpGet("get-all-paged")]
     [SwaggerOperation("GetAllPagedHourEntries")]
-    //[Authorize(Policy = )]
+    // [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> GetAllPagedHourEntries([FromQuery] List<ColumnFilter> columnFilters, bool addDeleted, int reference = 0, int pageSize = 10)
     {
         if (pageSize <= 0)
@@ -40,7 +42,7 @@ public class HourEntryController : ControllerBase
     
     [HttpGet("get-user-all-paged")]
     [SwaggerOperation("GetUserAllPagedHourEntries")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.Authenticated)]
     public async Task<IActionResult> GetUserAllPagedHourEntries([FromQuery] List<ColumnFilter> columnFilters, bool addDeleted, string userId, int reference = 0, int pageSize = 10)
     {
         if (pageSize <= 0)
@@ -60,7 +62,7 @@ public class HourEntryController : ControllerBase
     
     [HttpGet("get")]
     [SwaggerOperation("GetHourEntry")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.Authenticated)]
     public async Task<IActionResult> GetHourEntry(int id, bool addDeleted)
     {
         using var scope = _serviceProvider.CreateScope();
@@ -77,7 +79,7 @@ public class HourEntryController : ControllerBase
     
     [HttpPost("create")]
     [SwaggerOperation("CreateHourEntry")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.Authenticated)]
     public async Task<IActionResult> CreateHourEntry([FromBody]HourEntry hourEntry)
     {
         using var scope = _serviceProvider.CreateScope();
@@ -94,7 +96,7 @@ public class HourEntryController : ControllerBase
     
     [HttpPost("edit")]
     [SwaggerOperation("EditHourEntry")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.Authenticated)]
     public async Task<IActionResult> EditHourEntry(int id, [FromBody] HourEntry hourEntry)
     {
         using var scope = _serviceProvider.CreateScope();
@@ -111,7 +113,7 @@ public class HourEntryController : ControllerBase
 
     [HttpDelete("delete")]
     [SwaggerOperation("DeleteHourEntry")]
-    //[Authorize(Policy = )]
+    [Authorize(Policy = BuildInUserRoles.Authenticated)]
     public async Task<IActionResult> DeleteHourEntry(int id)
     {
         using var scope = _serviceProvider.CreateScope();
