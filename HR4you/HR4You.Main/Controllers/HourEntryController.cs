@@ -22,7 +22,7 @@ public class HourEntryController : ControllerBase
     
     [HttpGet("get-all-paged")]
     [SwaggerOperation("GetAllPagedHourEntries")]
-    // [Authorize(Policy = BuildInUserRoles.AdminRole)]
+    [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> GetAllPagedHourEntries([FromQuery] List<ColumnFilter> columnFilters, bool addDeleted, int reference = 0, int pageSize = 10)
     {
         if (pageSize <= 0)

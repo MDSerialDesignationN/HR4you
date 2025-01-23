@@ -68,6 +68,7 @@ public static class ModelContextHelper
         webApplicationBuilder.Services.AddSingleton<ModelChecker>();
 
         webApplicationBuilder.Services.AddScoped<ILocalStorageHandler, LocalStorageHandler>();
+        webApplicationBuilder.Services.AddScoped<LocalUserStorage>();
     }
 
     public static void MigrateModelDb(WebApplication webApplication)

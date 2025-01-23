@@ -3,7 +3,6 @@
 @using HR4You.Model.Base.Pagination
 @attribute [StreamRendering]
 @inject HttpClient HttpClient
-@inject IConfiguration Configuration
 @rendermode InteractiveServer
 
 <PageTitle>All Times</PageTitle>
@@ -20,7 +19,10 @@
             </div>
         </div>
     </div>
-
+    
+    <label>Show Deleted</label>
+    <input type="checkbox" checked="@addDeleted" @oninput="CheckboxChanged">
+    
     @if (entries == null)
     {
         <p>
@@ -29,27 +31,45 @@
     }
     else
     {
-        <HourEntrySearch Entries="entries.Data" />
-        <KeysetPagination entries="entries" OnPageChanged="EventCallback.Factory.Create<PagedResponseKeySet<HourEntry>>(this, UpdateEntries)" ApiEndpoint="http://localhost:5001/api/master-data/hour-entry/get-all-paged" />
+        <SearchComponent Options1="options1" Options2="options2" />
 
         <div class="table-wrapper overflow-auto">
-            <AllTimesTable entries="entries.Data"></AllTimesTable>
-        </div>
-
-
-
+            <AllTimesTable entries="entries.Data" projectNames="projectNames" tagNames="tagNames" @ref="popupRef2" OnAllTimesUpdated2="RefreshTable2">
+            </AllTimesTable>
+            </div>
+        <KeysetPagination entries="entries" OnPageChanged="EventCallback.Factory.Create<PagedResponseKeySet<HourEntry>>(this, UpdateEntries)" ApiEndpoint="http://localhost:5001/api/master-data/hour-entry/get-all-paged" />
     }
 </div>
 
 @code {
     public PagedResponseKeySet<HourEntry>? entries;
-    private AllTimesTable popupRef2;
+    public FilterOption[] options1 =
+    [
+        new() { Icon = "<i class='fa-solid fa-calendar-days'></i>", Name = "Date", InputType = "date" },
+        new() { Icon = "<i class='fa-regular fa-clock'></i>", Name = "StartTime", InputType = "time" },
+        new() { Icon = "<i class='fa-regular fa-clock'></i>", Name = "EndTime", InputType = "time" },
+        new() { Icon = "<i class='fa-solid fa-timeline'></i>", Name = "Duration", InputType = "number" },
+        new() { Icon = "<i class='fa-solid fa-tasks'></i>", Name = "Type", InputType = "select", Options = Enum.GetValues<ActivityType>().Select(e => e.ToString()).ToList() }
+    ];
+    public FilterOption[] options2 =
+    [
+        new() { Icon = "<i class='fa-solid fa-id-card'></i>", Name = "UserId", InputType = "string" },
+        new() { Icon = "<i class='fa-solid fa-diagram-project'></i>", Name = "ProjectId", InputType = "string" },
+        new() { Icon = "<i class='fa-solid fa-tag'></i>", Name = "TagId", InputType = "string" },
+        new() { Icon = "<i class='fa-solid fa-mug-hot'></i>", Name = "IsHoliday", InputType = "checkbox" },
+        new() { Icon = "<i class='fa-solid fa-money-bill'></i>", Name = "IsBillable", InputType = "checkbox" },
+        new() { Icon = "<i class='fa-solid fa-trash'></i>", Name = "Deleted", InputType = "checkbox" }
+    ];
+
+    
     private string HttpURL;
     public bool addDeleted;
+    
+    private AllTimesTable popupRef2;
 
-    public Dictionary<int, string> projectNames = new Dictionary<int, string>();
+    public Dictionary<int, string> projectNames = new();
 
-    public Dictionary<int?, string> tagNames = new Dictionary<int?, string>();
+    public Dictionary<int?, string> tagNames = new();
 
     public string RequestURLProject = "/api/master-data/project/get?addDeleted=true&Id=";
 
@@ -65,12 +85,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        //Get first value from appsettings.json "Urls"
-        var urls = Configuration["Urls"];
-        HttpURL = urls?.Split(';').FirstOrDefault();
-
         addDeleted = false;
         await LoadAllTimes();
+    }
+    
+    private void UpdateEntries(PagedResponseKeySet<HourEntry> newEntries)
+    {
+        entries = newEntries;
     }
 
     private async Task LoadAllTimes()
@@ -80,13 +101,27 @@
 
         try
         {
-            entries = await HttpClient.GetFromJsonAsync<PagedResponseKeySet<HourEntry>>("http://localhost:5001/api/master-data/hour-entry/get-all-paged?reference=0&pageSize=10");
+            entries = await HttpClient.GetFromJsonAsync<PagedResponseKeySet<HourEntry>>((HttpURL + RequestURL) + addDeleted);
+            Console.WriteLine((HttpURL + RequestURL) + addDeleted);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error fetching entries: {ex.Message}");
         }
-    }
+
+        // Fetch project and tag names for all entries
+        if (entries != null)
+            foreach (var entry in entries.Data)
+            {
+                if (!uniqueProjectIds.Contains(entry.ProjectId))
+                {
+                    uniqueProjectIds.Add(entry.ProjectId);
+                }
+                else if (!uniqueTagIds.Contains(entry.TagId.GetValueOrDefault()))
+                {
+                    uniqueTagIds.Add(entry.TagId.GetValueOrDefault());
+                }
+            }
 
     private void UpdateEntries(PagedResponseKeySet<HourEntry> newEntries)
     {
@@ -97,20 +132,54 @@
         // }
     }
 
-    //private async Task CheckboxChanged()
-    //{
-    //    if (addDeleted == false)
-    //    {
-    //        addDeleted = true;
-    //    }
-    //    else
-    //    {
-    //        addDeleted = false;
-    //    }
-    //
-    //    entries = await HttpClient.GetFromJsonAsync<List<HourEntry>>((HttpURL + RequestURL) + addDeleted);
-    //    StateHasChanged();
-    //}
+        foreach (var tagId in uniqueTagIds)
+        {
+            if (!tagNames.ContainsKey(tagId))
+            {
+                var tag = await FetchTagAsync(tagId);
+                tagNames[tagId] = tag?.Name ?? "No Tag";
+            }
+        }
+    }
+
+    private async Task<Project> FetchProjectAsync(int projectId)
+    {
+        try
+        {
+            return await HttpClient.GetFromJsonAsync<Project>((HttpURL + RequestURLProject) + projectId);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private async Task<Tag> FetchTagAsync(int tagId)
+    {
+        try
+        {
+            return await HttpClient.GetFromJsonAsync<Tag>((HttpURL + RequestURLTag) + tagId);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private async Task CheckboxChanged()
+    {
+        if (addDeleted == false)
+        {
+            addDeleted = true;
+        }
+        else
+        {
+            addDeleted = false;
+        }
+
+        entries = await HttpClient.GetFromJsonAsync<PagedResponseKeySet<HourEntry>>((HttpURL + RequestURL) + addDeleted);
+        StateHasChanged();
+    }
 
     private async Task RefreshTable2()
     {

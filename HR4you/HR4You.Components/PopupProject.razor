@@ -1,5 +1,6 @@
-﻿@rendermode InteractiveServer
+@rendermode InteractiveServer
 @inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
 
 @{
     var showClass = IsVisible ? "d-block" : "d-none";
@@ -80,7 +81,6 @@
     </div>
 </div>
 
-
 @code {
     [Parameter]
     public bool IsVisible { get; set; }
@@ -117,7 +117,7 @@
         StateHasChanged();
     }
 
-    async public Task ShowOverview(string requestURL, string headerText)
+    public async Task ShowOverview(string requestURL, string headerText)
     {
         HeaderText = headerText;
         IsVisible = true;
@@ -178,7 +178,7 @@
         }
     }
 
-    private void Close()
+    private async Task Close()
     {
         project = new Project();
         HeaderText = string.Empty;

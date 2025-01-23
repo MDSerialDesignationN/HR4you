@@ -1,28 +1,19 @@
 ﻿@page "/Customers"
 @using HR4You.Model.Base.Pagination
+@using Newtonsoft.Json
 @attribute [StreamRendering]
 @rendermode InteractiveServer
 @inject HttpClient HttpClient
-@inject IConfiguration Configuration
 
 <PageTitle>Customers</PageTitle>
 <div class="page-content min-h-[100vh] p-3 flex flex-col gap-2 select-none">
 
     <div class="flex flex-row justify-between">
         <h1 class="text-[2rem] font-bold flex flex-row gap-3 items-center"><i class="fa-solid fa-users"></i>Customers</h1>
-        <div class="bg-[whitesmoke] flex flex gap-3 items-center p-3 rounded-[10px] border border-2 border-[#c1c1c1]">
-            <div class="user-info">
-                <p class="font-bold p-1">Thel Vadam'ee</p>
-
-            </div>
-            <div class="user-actions">
-                <a class="cursor-pointer text-red-500 p-1 rounded-[5px] transition-all duration-500 hover:bg-gray-300">Logout</a>
-            </div>
-        </div>
     </div>
 
 
-    @if (entries == null)
+    @if (PagedResponseOffset == null)
     {
         <p>
             <em>Loading...</em>
@@ -37,10 +28,10 @@
                 <input class="h-4 w-4" id="showDeleted" type="checkbox" checked="@addDeleted" @oninput="CheckboxChanged">
             </div>
         </div>
-        <OffsetPagination entries="entries" OnPageChanged="EventCallback.Factory.Create<PagedResponseOffset<Customer>>(this, UpdateEntries)" ApiEndpoint="http://localhost:5001/api/master-data/customer/get-all-paged" />
+        <OffsetPagination entries="PagedResponseOffset" OnPageChanged="EventCallback.Factory.Create<PagedResponseOffset<Customer>>(this, UpdateEntries)" ApiEndpoint="http://localhost:5001/api/master-data/customer/get-all-paged" />
         <div class="table-wrapper overflow-auto">
 
-            <CustomersTable entries="entries.Data" @ref="popupRef2" OnCustomerUpdated2="RefreshTable2">
+            <CustomersTable entries="PagedResponseOffset.Data" @ref="popupRef2" OnCustomerUpdated2="RefreshTable2">
             </CustomersTable>
         </div>
 
@@ -50,16 +41,14 @@
 
 
 @code {
-    private string HttpURL;
+    private const string ApiEndpointRoute = "api/master-data/customer/";
+    private const string GetAllApiEndpoint = $"{ApiEndpointRoute}get-all-paged";
 
-    public PagedResponseOffset<Customer> entries;
-
-    //public bool IsChecked = true;
+    public PagedResponseOffset<Customer>? PagedResponseOffset;
+    public Dictionary<string, string> Parameters;
 
     public bool addDeleted;
-
-    public string RequestURL = "http://localhost:5001/api/master-data/customer/get-all-paged?pageNumber=1&pageSize=2&addDeleted=";
-
+    
     private CustomersTable popupRef2;
 
     protected override void OnAfterRender(bool firstRender)
@@ -70,22 +59,35 @@
         }
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        //Get first value from appsettings.json "Urls"
-        var urls = Configuration["Urls"];
-        HttpURL = urls?.Split(';').FirstOrDefault();
-
-        addDeleted = false;
-        await LoadCustomers();
+        if (firstRender)
+        {
+            addDeleted = false;
+            await LoadCustomers();
+        }
     }
 
     private async Task LoadCustomers()
     {
         try
         {
-            entries = await HttpClient.GetFromJsonAsync<PagedResponseOffset<Customer>>(RequestURL + addDeleted);
-            //Console.WriteLine(entries);
+            await LocalUserStorage.Load();
+            if (LocalUserStorage.UserInfo != null)
+            {
+                Parameters = new Dictionary<string, string>
+                {
+                    {nameof(addDeleted),addDeleted.ToString()}
+                };
+                
+                var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetAllApiEndpoint, Parameters, LocalUserStorage.UserInfo.AuthToken);
+                var response = await HttpClient.SendAsync(request);
+
+                var content = await response.Content.ReadAsStringAsync();
+                PagedResponseOffset = JsonConvert.DeserializeObject<PagedResponseOffset<Customer>>(content);
+                
+                StateHasChanged();
+            }
         }
         catch (Exception ex)
         {
@@ -103,8 +105,18 @@
         {
             addDeleted = false;
         }
+        
+        Parameters = new Dictionary<string, string>
+        {
+            {nameof(addDeleted),addDeleted.ToString()}
+        };
+        
+        var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetAllApiEndpoint, Parameters, LocalUserStorage.UserInfo.AuthToken);
+        var response = await HttpClient.SendAsync(request);
+        
+        var content = await response.Content.ReadAsStringAsync();
+        PagedResponseOffset = JsonConvert.DeserializeObject<PagedResponseOffset<Customer>>(content);
 
-        entries = await HttpClient.GetFromJsonAsync<PagedResponseOffset<Customer>>(RequestURL + addDeleted);
         StateHasChanged();
     }
 
@@ -118,6 +130,6 @@
 
     private void UpdateEntries(PagedResponseOffset<Customer> newEntries)
     {
-        this.entries = newEntries;
+        PagedResponseOffset = newEntries;
     }
 }

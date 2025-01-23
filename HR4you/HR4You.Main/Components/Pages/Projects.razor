@@ -1,4 +1,6 @@
 ﻿@page "/Projects"
+@using HR4You.Model.Base.Pagination
+@attribute [StreamRendering]
 @rendermode InteractiveServer
 @inject HttpClient HttpClient
 @inject IConfiguration Configuration
@@ -18,7 +20,7 @@
 }
 else
 {
-    <ProjectsTable entries="entries" customerNames="customerNames" @ref="popupRef2" OnProjectUpdated2="RefreshTable2">
+    <ProjectsTable entries="entries.Data" customerNames="customerNames" @ref="popupRef2" OnProjectUpdated2="RefreshTable2">
     </ProjectsTable>
 }
 
@@ -30,11 +32,10 @@ else
 
     public bool addDeleted;
 
-    public List<Project> entries = [];
-
     private ProjectsTable popupRef2;
 
-    public Dictionary<int, string> customerNames = new Dictionary<int, string>();
+    public Dictionary<int, string> customerNames = new();
+    public PagedResponseKeySet<Project> entries;
 
     public string RequestURLCustomer = "/api/master-data/customer/get?addDeleted=true&Id=";
 
@@ -75,7 +76,7 @@ else
 
         try
         {
-            entries = await HttpClient.GetFromJsonAsync<List<Project>>((HttpURL + RequestURL) + addDeleted);
+            entries = await HttpClient.GetFromJsonAsync<PagedResponseKeySet<Project>>((HttpURL + RequestURL) + addDeleted);
         }
         catch (Exception ex)
         {
@@ -83,13 +84,14 @@ else
         }        
        
         // Fetch customer names for all entries
-        foreach (var entry in entries)
-        {
-            if (!uniqueCustomerIds.Contains(entry.CustomerId))
+        if (entries != null)
+            foreach (var entry in entries.Data)
             {
-                uniqueCustomerIds.Add(entry.CustomerId);
+                if (!uniqueCustomerIds.Contains(entry.CustomerId))
+                {
+                    uniqueCustomerIds.Add(entry.CustomerId);
+                }
             }
-        }
 
         foreach (var customerId in uniqueCustomerIds)
         {

@@ -30,9 +30,9 @@ else
 
     private MyTimesTable popupRef2;
 
-    public Dictionary<int, string> projectNames = new Dictionary<int, string>();
+    public Dictionary<int, string> projectNames = new();
 
-    public Dictionary<int?, string> tagNames = new Dictionary<int?, string>();
+    public Dictionary<int?, string> tagNames = new();
 
     public string RequestURLProject = "/api/master-data/project/get?addDeleted=true&Id=";
 
@@ -72,17 +72,18 @@ else
         }
 
         // Fetch project and tag names for all entries
-        foreach (var entry in entries)
-        {
-            if (!uniqueProjectIds.Contains(entry.ProjectId))
+        if (entries != null)
+            foreach (var entry in entries)
             {
-                uniqueProjectIds.Add(entry.ProjectId);
+                if (!uniqueProjectIds.Contains(entry.ProjectId))
+                {
+                    uniqueProjectIds.Add(entry.ProjectId);
+                }
+                else if (!uniqueTagIds.Contains(entry.TagId.GetValueOrDefault()))
+                {
+                    uniqueTagIds.Add(entry.TagId.GetValueOrDefault());
+                }
             }
-            else if (!uniqueTagIds.Contains(entry.TagId.GetValueOrDefault()))
-            {
-                uniqueTagIds.Add(entry.TagId.GetValueOrDefault());
-            }
-        }
 
         foreach (var projectId in uniqueProjectIds)
         {

@@ -76,7 +76,7 @@
     {
         await HttpClient.DeleteFromJsonAsync<Customer>(RequestURLDelete + GivenId);
         Console.WriteLine("RefreshTable() was called from CustomersTable");
-        RefreshTable();
+        await RefreshTable();
     }
 
 

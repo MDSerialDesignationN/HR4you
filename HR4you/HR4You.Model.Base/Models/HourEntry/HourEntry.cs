@@ -46,7 +46,6 @@ namespace HR4You.Model.Base.Models.HourEntry
             }
 
             UserId = data.UserId;
-
             Date = data.Date;
             StartTime = data.StartTime;
             EndTime = data.EndTime;
