@@ -1,5 +1,4 @@
-﻿@using Microsoft.IdentityModel.Tokens
-@inherits LayoutComponentBase
+﻿@inherits LayoutComponentBase
 
 <body>
 <div class="page min-h-[100vh] flex flex-row flex-nowrap">
@@ -8,44 +7,32 @@
     </div>
 
     <main>
-            
+
 
         <div class="content">
-            <div class="user-display">
+            <div class="bg-[whitesmoke] flex flex gap-3 items-center p-3 rounded-[10px] border border-2 border-[#c1c1c1]">
                 <div class="user-info">
-                    <p class="user-name">@_userName</p>
-            
+                    <p class="font-bold p-1">@_userName</p>
                 </div>
                 <div class="user-actions">
-            
-                    <pö class="logout-text">Log out</pö>
+                    <a class="cursor-pointer text-red-500 p-1 rounded-[5px] transition-all duration-500 hover:bg-gray-300">Logout</a>
                 </div>
             </div>
-            @Body
         </div>
+        @Body
     </main>
 </div>
 </body>
 
 @code
 {
-    private string _userName = "test";//todo get to render + make logout possible !
+    private string _userName = "test"; //todo get to render + make logout possible !
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await Load();
-    }
-
-    
-    private async Task Load()
-    {
-        var storedItem = await LocalStorage.GetItem(ILocalStorageHandler.UserStorageName);
-        if (storedItem.IsNullOrEmpty())
-        {
-            return;
-        }
-
-        _userName = storedItem.FromJson()!.UserName!;
+        await LocalUserStorage.Load();
+        var storedName = LocalUserStorage.UserInfo!.UserName;
+        if (storedName != null) _userName = storedName;
     }
 
 }

@@ -1,6 +1,5 @@
 ﻿@page "/"
 @using HR4You.Components.Layout
-@using Microsoft.IdentityModel.Tokens
 @layout LoginLayout
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
@@ -26,21 +25,19 @@
     private const string LogInApiEndpoint = $"{ApiEndpointRoute}log-in-user";
     private const string TokenEndOfLifeApiEndpoint = $"{ApiEndpointRoute}get-token-expiry";
 
-    private UserInfo? _userInfo;
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         try
         {
-            await Load();
-            if (_userInfo != null)
+            await LocalUserStorage.Load();
+            if (LocalUserStorage.UserInfo != null)
             {
-                var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, TokenEndOfLifeApiEndpoint, new Dictionary<string, string>(), _userInfo.AuthToken);
+                var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, TokenEndOfLifeApiEndpoint, new Dictionary<string, string>(), LocalUserStorage.UserInfo.AuthToken);
                 var response = await HttpClient.SendAsync(request);
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    await LocalStorage.ClearData();
+                    await LocalUserStorage.Clear();
                     return;
                 }
 
@@ -72,8 +69,7 @@
             }
 
             var content = await response.Content.ReadAsStringAsync();
-            _userInfo = content.FromJson();
-            await Save();
+            await LocalUserStorage.Save(content);
 
             _isInvalid = false;
             NavigationManager.NavigateTo("/home");
@@ -83,22 +79,4 @@
             Console.WriteLine($"Error during check login: {ex.Message}");
         }
     }
-
-
-    private async Task Save()
-    {
-        await LocalStorage.SetItem(ILocalStorageHandler.UserStorageName, _userInfo!.ToJson());
-    }
-
-    private async Task Load()
-    {
-        var storedItem = await LocalStorage.GetItem(ILocalStorageHandler.UserStorageName);
-        if (storedItem.IsNullOrEmpty())
-        {
-            return;
-        }
-
-        _userInfo = storedItem.FromJson();
-    }
-
 }

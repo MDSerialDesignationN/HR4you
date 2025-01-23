@@ -1,11 +1,40 @@
-﻿using Microsoft.JSInterop;
+﻿using HR4you.Security;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.JSInterop;
 
 namespace HR4You.Components.Handler;
 
+public class LocalUserStorage(ILocalStorageHandler localStorageHandler)
+{
+    private const string UserStorageName = "UserStorage";
+    public UserInfo? UserInfo { get; set; }
+
+    public async Task Save(string userInfo)
+    {
+        UserInfo = userInfo.FromJson();
+        await localStorageHandler.SetItem(UserStorageName, userInfo);
+    }
+
+    public async Task Load()
+    {
+        var storedItem = await localStorageHandler.GetItem(UserStorageName);
+        if (storedItem.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        UserInfo = storedItem.FromJson();
+    }
+
+    public async Task Clear()
+    {
+        UserInfo = null;
+        await localStorageHandler.ClearData();
+    }
+}
+
 public interface ILocalStorageHandler
 {
-    public const string UserStorageName = "UserStorage";
-    
     Task SetItem(string key, string value);
     Task<string> GetItem(string key);
     Task RemoveItem(string key);
@@ -15,9 +44,10 @@ public interface ILocalStorageHandler
 public class LocalStorageHandler : ILocalStorageHandler
 {
     private readonly IJSRuntime _javaScript;
+
     public LocalStorageHandler(IJSRuntime javaScript)
     {
-        _javaScript = javaScript;   
+        _javaScript = javaScript;
     }
 
     public async Task SetItem(string key, string value)
