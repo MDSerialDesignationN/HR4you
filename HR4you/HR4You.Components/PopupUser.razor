@@ -15,17 +15,29 @@
             <button type="button" class="btn-close" aria-label="Close" @onclick="Close"></button>
         </div>
 
-        <EditForm Model="tag" OnValidSubmit="Submit">
+        <EditForm Model="user" OnValidSubmit="Submit">
             <DataAnnotationsValidator />
             <ValidationSummary />
 
             <div class="toast-body" style="padding: 20px;">
                 <div class="container">
                     <div class="row">
-                        <!-- Name -->
+                        <!-- FirstName and Roles -->
                         <div class="col-sm-4">
-                            <label>Name</label>
-                            <InputText @bind-Value="tag.Name" class="form-control mb-2" />
+                            <label>First Name</label>
+                            <InputText @bind-Value="user.FirstName" class="form-control mb-2" />
+                        </div>
+
+                        <!-- LastName and RoleGroups -->
+                        <div class="col-sm-4">
+                            <label>Last Name</label>
+                            <InputText @bind-Value="user.LastName" class="form-control mb-2" />
+                        </div> 
+
+                        <!-- UserName -->
+                        <div class="col-sm-4">
+                            <label>Username</label>
+                            <InputText @bind-Value="user.UserName" class="form-control mb-2" />                           
                         </div>
                     </div>
 
@@ -33,7 +45,7 @@
                     <div class="row">
                         <div class="col-sm-4">
                             <button type="submit" class="btn btn-dark">Save</button>
-                            <button type="button" class="btn btn-outline-secondary" @onclick="Close">Cancel</button>
+                            <button type="button" class="btn btn-outline-secondary" @onclick="Close">Cancel</button> 
                         </div>
                     </div>
                 </div>
@@ -50,7 +62,7 @@
     public EventCallback<bool> IsVisibleChanged { get; set; }
 
     [Parameter]
-    public EventCallback OnTagUpdated { get; set; }
+    public EventCallback OnUserUpdated { get; set; }
 
     [Parameter]
     public string? HeaderText { get; set; }
@@ -58,18 +70,18 @@
     [Parameter]
     public string? GivenId { get; set; }
 
-    public string editURL = "http://localhost:5001/api/tag/edit"; //replace with correct one
-    public string createURL = "http://localhost:5001/api/tag/create"; //replace with correct one
+    public string editURL = "http://localhost:5001/api/auth/change-user-data";
+    public string createURL = "http://localhost:5001/api/auth/add-new-user";
 
-    Tag tag = new Tag();
+    UserInfo user = new UserInfo();
 
     bool isEdit = false;
 
-    async public Task Show(int givenId, string requestURL, string headerText)
+    async public Task Show(string givenId, string requestURL, string headerText)
     {
         HeaderText = headerText;
         GivenId = givenId.ToString();
-        tag = await HttpClient.GetFromJsonAsync<Tag>(requestURL + GivenId);
+        user = await HttpClient.GetFromJsonAsync<UserInfo>(requestURL + GivenId);
         IsVisible = true;
         isEdit = true;
         StateHasChanged();
@@ -89,15 +101,15 @@
         {
             try
             {
-                var response = await HttpClient.PostAsJsonAsync(editURL, tag);
+                var response = await HttpClient.PostAsJsonAsync(editURL, user);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    Console.WriteLine("Tag saved successfully.");
+                    Console.WriteLine("User saved successfully.");
 
-                    if (OnTagUpdated.HasDelegate)
+                    if (OnUserUpdated.HasDelegate)
                     {
-                        await OnTagUpdated.InvokeAsync(); // Notify the parent component
+                        await OnUserUpdated.InvokeAsync(); // Notify the parent component
                     }
                     else
                     {
@@ -108,7 +120,7 @@
                 }
                 else
                 {
-                    Console.WriteLine("Error occurred while saving the Tag: " + response.ReasonPhrase);
+                    Console.WriteLine("Error occurred while saving the user: " + response.ReasonPhrase);
                 }
             }
             catch (Exception ex)
@@ -117,25 +129,25 @@
             }
         }
         else if (isEdit == false)
-        {
-            var response = await HttpClient.PostAsJsonAsync(createURL, tag);
+        {           
+            var response = await HttpClient.PostAsJsonAsync(createURL, user);
 
             if (response.IsSuccessStatusCode)
             {
-                Console.WriteLine("Tag created successfully.");
+                Console.WriteLine("User created successfully.");
 
                 Close();
             }
             else
             {
-                Console.WriteLine("Error occurred while creating the Tag: " + response.ReasonPhrase);
+                Console.WriteLine("Error occurred while creating the user: " + response.ReasonPhrase);
             }
         }
     }
 
     private void Close()
     {
-        tag = new Tag();
+        user = new UserInfo();
         HeaderText = string.Empty;
         GivenId = null;
         IsVisible = false;

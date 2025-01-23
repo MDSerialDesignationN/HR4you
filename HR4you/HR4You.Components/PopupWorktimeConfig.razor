@@ -15,18 +15,49 @@
             <button type="button" class="btn-close" aria-label="Close" @onclick="Close"></button>
         </div>
 
-        <EditForm Model="tag" OnValidSubmit="Submit">
+        <EditForm Model="worktime" OnValidSubmit="Submit">
             <DataAnnotationsValidator />
             <ValidationSummary />
 
             <div class="toast-body" style="padding: 20px;">
                 <div class="container">
                     <div class="row">
-                        <!-- Name -->
-                        <div class="col-sm-4">
-                            <label>Name</label>
-                            <InputText @bind-Value="tag.Name" class="form-control mb-2" />
+                        <!-- Project Number and Customer -->
+                        <div class="col-sm">
+                            <label>Monday (h)</label>
+                            <InputNumber @bind-Value="worktime.MinMonHours" class="form-control mb-2" />
                         </div>
+
+                        <div class="col-sm">
+                            <label>Tuesday (h)</label>
+                            <InputNumber @bind-Value="worktime.MinTueHours" class="form-control mb-2" />
+                        </div>
+                        
+                        <div class="col-sm">
+                            <label>Wednesday (h)</label>
+                            <InputNumber @bind-Value="worktime.MinWedHours" class="form-control mb-2" />
+                        </div>
+
+                        <div class="col-sm">
+                            <label>Thursday (h)</label>
+                            <InputNumber @bind-Value="worktime.MinThuHours" class="form-control mb-2" />
+                        </div>
+
+                        <div class="col-sm">
+                            <label>Friday (h)</label>
+                            <InputNumber @bind-Value="worktime.MinFriHours" class="form-control mb-2" />
+                        </div>
+
+                        <div class="col-sm">
+                            <label>Saturday (h)</label>
+                            <InputNumber @bind-Value="worktime.MinSatHours" class="form-control mb-2" />
+                        </div>
+
+                        <div class="col-sm">
+                            <label>Sunday (h)</label>
+                            <InputNumber @bind-Value="worktime.MinSunHours" class="form-control mb-2" />
+                        </div>
+
                     </div>
 
                     <!-- Buttons -->
@@ -42,6 +73,7 @@
     </div>
 </div>
 
+
 @code {
     [Parameter]
     public bool IsVisible { get; set; }
@@ -50,7 +82,7 @@
     public EventCallback<bool> IsVisibleChanged { get; set; }
 
     [Parameter]
-    public EventCallback OnTagUpdated { get; set; }
+    public EventCallback OnCustomerUpdated { get; set; }
 
     [Parameter]
     public string? HeaderText { get; set; }
@@ -58,57 +90,50 @@
     [Parameter]
     public string? GivenId { get; set; }
 
-    public string editURL = "http://localhost:5001/api/tag/edit"; //replace with correct one
-    public string createURL = "http://localhost:5001/api/tag/create"; //replace with correct one
 
-    Tag tag = new Tag();
+    WorkTime worktime = new WorkTime();
 
     bool isEdit = false;
 
-    async public Task Show(int givenId, string requestURL, string headerText)
+    async public void Show(int givenId, string requestURL, string headerText)
     {
         HeaderText = headerText;
         GivenId = givenId.ToString();
-        tag = await HttpClient.GetFromJsonAsync<Tag>(requestURL + GivenId);
+        worktime = await HttpClient.GetFromJsonAsync<WorkTime>(requestURL + GivenId);
         IsVisible = true;
         isEdit = true;
         StateHasChanged();
     }
 
-    async public Task ShowOverview(string headerText)
-    {
-        HeaderText = headerText;
-        IsVisible = true;
-        isEdit = false;
-        StateHasChanged();
-    }
-
     private async Task Submit()
     {
+        var editURL = "http://localhost:5001/api/master-data/work-time/edit?Id=";
+        var createURL = "http://localhost:5001/api/master-data/work-time/create";
+
         if (isEdit == true)
         {
             try
             {
-                var response = await HttpClient.PostAsJsonAsync(editURL, tag);
+                var response = await HttpClient.PostAsJsonAsync(editURL + GivenId, worktime);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    Console.WriteLine("Tag saved successfully.");
+                    Console.WriteLine("Worktime saved successfully.");
 
-                    if (OnTagUpdated.HasDelegate)
+                    if (OnCustomerUpdated.HasDelegate)
                     {
-                        await OnTagUpdated.InvokeAsync(); // Notify the parent component
+                        await OnCustomerUpdated.InvokeAsync(); // Notify the parent component
                     }
                     else
                     {
-                        Console.WriteLine("no delegate assigned.");
+                        Console.WriteLine("OnCustomerUpdated has no delegate assigned.");
                     }
 
                     Close();
                 }
                 else
                 {
-                    Console.WriteLine("Error occurred while saving the Tag: " + response.ReasonPhrase);
+                    Console.WriteLine("Error occurred while saving the Worktime: " + response.ReasonPhrase);
                 }
             }
             catch (Exception ex)
@@ -118,24 +143,19 @@
         }
         else if (isEdit == false)
         {
-            var response = await HttpClient.PostAsJsonAsync(createURL, tag);
-
+            var response = await HttpClient.PostAsJsonAsync(createURL, worktime);
             if (response.IsSuccessStatusCode)
             {
-                Console.WriteLine("Tag created successfully.");
+                Console.WriteLine("Worktime saved successfully.");
 
                 Close();
-            }
-            else
-            {
-                Console.WriteLine("Error occurred while creating the Tag: " + response.ReasonPhrase);
             }
         }
     }
 
     private void Close()
     {
-        tag = new Tag();
+        worktime = new WorkTime();
         HeaderText = string.Empty;
         GivenId = null;
         IsVisible = false;

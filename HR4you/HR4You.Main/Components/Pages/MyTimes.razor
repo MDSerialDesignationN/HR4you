@@ -1,0 +1,138 @@
+﻿@page "/MyTimes"
+@rendermode InteractiveServer
+@inject HttpClient HttpClient
+@inject IConfiguration Configuration
+
+<PageTitle>My Times</PageTitle>
+
+<h1>My Times</h1>
+
+@if (entries == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <MyTimesTable entries="entries" projectNames="projectNames" tagNames="tagNames" @ref="popupRef2" OnMyTimesUpdated2="RefreshTable2">
+    </MyTimesTable>
+}
+
+@code {
+    private string HttpURL;
+
+    public string RequestURL = "/api/master-data/hour-entry/get-all?addDeleted=";
+
+    public bool addDeleted;
+
+    public List<HourEntry> entries;
+
+    private MyTimesTable popupRef2;
+
+    public Dictionary<int, string> projectNames = new();
+
+    public Dictionary<int?, string> tagNames = new();
+
+    public string RequestURLProject = "/api/master-data/project/get?addDeleted=true&Id=";
+
+    public string RequestURLTag = "/api/master-data/tag/get?addDeleted=true&Id=";
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && popupRef2 != null)
+        {
+            popupRef2.OnMyTimesUpdated2 = EventCallback.Factory.Create(this, RefreshTable2);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        //Get first value from appsettings.json "Urls"
+        var urls = Configuration["Urls"];
+        HttpURL = urls?.Split(';').FirstOrDefault();
+
+        addDeleted = false;
+        await LoadAllTimes();
+    }
+
+    private async Task LoadAllTimes()
+    {
+        List<int> uniqueProjectIds = new List<int>();
+        List<int> uniqueTagIds = new List<int>();
+
+        try
+        {
+            entries = await HttpClient.GetFromJsonAsync<List<HourEntry>>((HttpURL + RequestURL) + addDeleted);
+            Console.WriteLine((HttpURL + RequestURL) + addDeleted);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching entries: {ex.Message}");
+        }
+
+        // Fetch project and tag names for all entries
+        if (entries != null)
+            foreach (var entry in entries)
+            {
+                if (!uniqueProjectIds.Contains(entry.ProjectId))
+                {
+                    uniqueProjectIds.Add(entry.ProjectId);
+                }
+                else if (!uniqueTagIds.Contains(entry.TagId.GetValueOrDefault()))
+                {
+                    uniqueTagIds.Add(entry.TagId.GetValueOrDefault());
+                }
+            }
+
+        foreach (var projectId in uniqueProjectIds)
+        {
+            if (!projectNames.ContainsKey(projectId))
+            {
+                var project = await FetchProjectAsync(projectId);
+                projectNames[projectId] = project?.Name ?? "No Project";
+            }
+        }
+
+        foreach (var tagId in uniqueTagIds)
+        {
+            if (!tagNames.ContainsKey(tagId))
+            {
+                var tag = await FetchTagAsync(tagId);
+                tagNames[tagId] = tag?.Name ?? "No Tag";
+            }
+        }
+    }
+
+    private async Task<Project> FetchProjectAsync(int projectId)
+    {
+        try
+        {
+            return await HttpClient.GetFromJsonAsync<Project>((HttpURL + RequestURLProject) + projectId);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private async Task<Tag> FetchTagAsync(int tagId)
+    {
+        try
+        {
+            return await HttpClient.GetFromJsonAsync<Tag>((HttpURL + RequestURLTag) + tagId);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private async Task RefreshTable2()
+    {
+        Console.WriteLine("RefreshTable2() was called from Project");
+        await LoadAllTimes();
+
+        StateHasChanged();
+    }
+}

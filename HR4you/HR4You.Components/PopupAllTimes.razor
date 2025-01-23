@@ -1,0 +1,218 @@
+﻿@rendermode InteractiveServer
+@inject HttpClient HttpClient
+
+@{
+    var showClass = IsVisible ? "d-block" : "d-none";
+}
+
+<div class="toast-container position-absolute @showClass" data-bs-autohide="true" data-bs-delay="50000"
+     style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
+
+    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true"
+         style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; background-color:white; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
+        <div class="toast-header">
+            <strong class="me-auto">@HeaderText</strong>
+            <button type="button" class="btn-close" aria-label="Close" @onclick="Close"></button>
+        </div>
+
+        <EditForm Model="allTimes" OnValidSubmit="Submit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="toast-body" style="padding: 20px;">
+                <div class="container">
+                    <div class="row">
+                        <!-- Project Number and Customer -->
+                        <div class="col-sm-4">
+                            <label>Project</label>
+                            <InputSelect @bind-Value="allTimes.ProjectId" class="form-select">
+                                @foreach (var value in projectList)
+                                {
+                                    if (@value.Id == allTimes.ProjectId)
+                                    {
+                                        <option selected value="@value.Id">@value.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@value.Id">@value.Name</option>
+                                    }
+
+                                }
+                            </InputSelect>
+
+                            <label>Type</label>
+                            <InputSelect @bind-Value="allTimes.Type" class="form-select">
+                                @foreach (var value in Enum.GetValues(typeof(ActivityType)))
+                                {
+                                    <option>@value</option>
+                                }
+                            </InputSelect>
+                        </div>
+
+                        <!-- Name and State -->
+                        <div class="col-sm-4">
+                            <label>Date</label>
+                            <InputDate @bind-Value="allTimes.Date" class="form-control mb-2" />
+
+                            <label>Tag</label>
+                            <InputSelect @bind-Value="allTimes.TagId" class="form-select">
+                                @foreach (var value in tagList)
+                                {
+                                    if (@value.Id == allTimes.TagId)
+                                    {
+                                        <option selected value="@value.Id">@value.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@value.Id">@value.Name</option>
+                                    }
+
+                                }
+                            </InputSelect>
+                        </div>
+
+                        <!-- Name and State -->
+                        <div class="col-sm-2">
+                            <label>Start Time</label>
+                            <InputDate Type="InputDateType.Time" @bind-Value="allTimes.StartTime" class="form-control mb-2" />
+
+                            <label>Is Holiday</label>
+                            <InputCheckbox @bind-Value="allTimes.IsHoliday" />
+                        </div>
+
+                        <!-- Name and State -->
+                        <div class="col-sm-2">
+                            <label>End Time</label>
+                            <InputDate Type="InputDateType.Time" @bind-Value="allTimes.EndTime" class="form-control mb-2" />
+
+                            <label>Is Billable</label>
+                            <InputCheckbox @bind-Value="allTimes.IsBillable" />
+
+                        </div>
+
+                        <!-- Description -->
+                        <div class="col-sm-8">
+                            <label>Description</label>
+                            <InputTextArea @bind-Value="allTimes.Description" rows="4" class="form-control mb-2" />
+                        </div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <button type="submit" class="btn btn-dark">Save</button>
+                            <button type="button" class="btn btn-outline-secondary" @onclick="Close">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsVisibleChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnAllTimesUpdated { get; set; }
+
+    [Parameter]
+    public string? HeaderText { get; set; }
+
+    [Parameter]
+    public string? GivenId { get; set; }
+
+    HourEntry allTimes = new HourEntry();
+
+    public List<Project> projectList = [];
+
+    public List<Tag> tagList = [];
+
+    public string RequestURLProject = "http://localhost:5001/api/master-data/project/get-all?addDeleted=true";
+
+    public string RequestURLTag = "http://localhost:5001/api/master-data/tag/get-all?addDeleted=true";
+
+    bool isEdit = false;
+
+    async public Task Show(int givenId, string requestURL, string headerText)
+    {
+        HeaderText = headerText;
+        GivenId = givenId.ToString();
+        allTimes = await HttpClient.GetFromJsonAsync<HourEntry>(requestURL + GivenId);
+        projectList = await HttpClient.GetFromJsonAsync<List<Project>>(RequestURLProject);
+        tagList = await HttpClient.GetFromJsonAsync<List<Tag>>(RequestURLTag);
+        IsVisible = true;
+        isEdit = true;
+        StateHasChanged();
+    }
+
+    async public Task ShowOverview(string requestURL, string headerText)
+    {
+        HeaderText = headerText;
+        IsVisible = true;
+        StateHasChanged();
+    }
+
+    private async Task Submit()
+    {
+        var editURL = "http://localhost:5001/api/master-data/hour-entry/edit?Id=";
+        var createURL = "http://localhost:5001/api/master-data/hour-entry/create";
+
+        if (isEdit == true)
+        {
+            try
+            {
+                var response = await HttpClient.PostAsJsonAsync(editURL + GivenId, allTimes);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("Project saved successfully.");
+
+                    if (OnAllTimesUpdated.HasDelegate)
+                    {
+                        await OnAllTimesUpdated.InvokeAsync(); // Notify the parent component
+                    }
+                    else
+                    {
+                        Console.WriteLine("OnCustomerUpdated has no delegate assigned.");
+                    }
+
+                    Close();
+                }
+                else
+                {
+                    Console.WriteLine("Error occurred while saving the project: " + response.ReasonPhrase);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception occurred: " + ex.Message);
+            }
+        }
+        else if (isEdit == false)
+        {
+            var response = await HttpClient.PostAsJsonAsync(createURL, allTimes);
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Project saved successfully.");
+
+                Close();
+            }
+        }
+    }
+
+    private void Close()
+    {
+        allTimes = new HourEntry();
+        HeaderText = string.Empty;
+        GivenId = null;
+        IsVisible = false;
+
+        StateHasChanged();
+    }
+}

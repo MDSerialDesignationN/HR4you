@@ -15,18 +15,29 @@
             <button type="button" class="btn-close" aria-label="Close" @onclick="Close"></button>
         </div>
 
-        <EditForm Model="tag" OnValidSubmit="Submit">
+        <EditForm Model="holiday" OnValidSubmit="Submit">
             <DataAnnotationsValidator />
             <ValidationSummary />
 
             <div class="toast-body" style="padding: 20px;">
                 <div class="container">
                     <div class="row">
-                        <!-- Name -->
-                        <div class="col-sm-4">
-                            <label>Name</label>
-                            <InputText @bind-Value="tag.Name" class="form-control mb-2" />
+                        <!-- Project Number and Customer -->
+                        <div class="col-sm">
+                            <label>Date</label>
+                            <InputDate Type="InputDateType.Date" @bind-Value="holiday.Date" class="form-control mb-2" />
                         </div>
+
+                        <div class="col-sm">
+                            <label>Name</label>
+                            <InputText @bind-Value="holiday.Name" class="form-control mb-2" />
+                        </div>
+
+                        <div class="col-sm">
+                            <label>Half Day</label>
+                            <InputCheckbox @bind-Value="holiday.HalfDay" />
+                        </div>
+
                     </div>
 
                     <!-- Buttons -->
@@ -42,6 +53,7 @@
     </div>
 </div>
 
+
 @code {
     [Parameter]
     public bool IsVisible { get; set; }
@@ -50,7 +62,7 @@
     public EventCallback<bool> IsVisibleChanged { get; set; }
 
     [Parameter]
-    public EventCallback OnTagUpdated { get; set; }
+    public EventCallback OnHolidayUpdated { get; set; }
 
     [Parameter]
     public string? HeaderText { get; set; }
@@ -58,57 +70,50 @@
     [Parameter]
     public string? GivenId { get; set; }
 
-    public string editURL = "http://localhost:5001/api/tag/edit"; //replace with correct one
-    public string createURL = "http://localhost:5001/api/tag/create"; //replace with correct one
 
-    Tag tag = new Tag();
+    Holiday holiday = new Holiday();
 
     bool isEdit = false;
 
-    async public Task Show(int givenId, string requestURL, string headerText)
+    async public void Show(int givenId, string requestURL, string headerText)
     {
         HeaderText = headerText;
         GivenId = givenId.ToString();
-        tag = await HttpClient.GetFromJsonAsync<Tag>(requestURL + GivenId);
+        holiday = await HttpClient.GetFromJsonAsync<Holiday>(requestURL + GivenId);
         IsVisible = true;
         isEdit = true;
         StateHasChanged();
     }
 
-    async public Task ShowOverview(string headerText)
-    {
-        HeaderText = headerText;
-        IsVisible = true;
-        isEdit = false;
-        StateHasChanged();
-    }
-
     private async Task Submit()
     {
+        var editURL = "http://localhost:5001/api/master-data/holiday/edit?Id=";
+        var createURL = "http://localhost:5001/api/master-data/holiday/create";
+
         if (isEdit == true)
         {
             try
             {
-                var response = await HttpClient.PostAsJsonAsync(editURL, tag);
+                var response = await HttpClient.PostAsJsonAsync(editURL + GivenId, holiday);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    Console.WriteLine("Tag saved successfully.");
+                    Console.WriteLine("Worktime saved successfully.");
 
-                    if (OnTagUpdated.HasDelegate)
+                    if (OnHolidayUpdated.HasDelegate)
                     {
-                        await OnTagUpdated.InvokeAsync(); // Notify the parent component
+                        await OnHolidayUpdated.InvokeAsync(); // Notify the parent component
                     }
                     else
                     {
-                        Console.WriteLine("no delegate assigned.");
+                        Console.WriteLine("no delegate assigned");
                     }
 
                     Close();
                 }
                 else
                 {
-                    Console.WriteLine("Error occurred while saving the Tag: " + response.ReasonPhrase);
+                    Console.WriteLine("Error occurred while saving the Worktime: " + response.ReasonPhrase);
                 }
             }
             catch (Exception ex)
@@ -118,24 +123,19 @@
         }
         else if (isEdit == false)
         {
-            var response = await HttpClient.PostAsJsonAsync(createURL, tag);
-
+            var response = await HttpClient.PostAsJsonAsync(createURL, holiday);
             if (response.IsSuccessStatusCode)
             {
-                Console.WriteLine("Tag created successfully.");
+                Console.WriteLine("Holiday saved successfully.");
 
                 Close();
-            }
-            else
-            {
-                Console.WriteLine("Error occurred while creating the Tag: " + response.ReasonPhrase);
             }
         }
     }
 
     private void Close()
     {
-        tag = new Tag();
+        holiday = new Holiday();
         HeaderText = string.Empty;
         GivenId = null;
         IsVisible = false;

@@ -8,8 +8,15 @@
 @using Microsoft.JSInterop
 @using HR4You
 @using HR4You.Components
+@using HR4You.Components.Handler
 @using HR4You.Model.Base.Models.HourEntry
 @using HR4You.Model.Base.Models.Customer
 @using HR4You.Model.Base.Models.Project
 @using HR4You.Model.Base.Models.Tag
 @using HR4You.Model.Base.Models.WorkTime
+@using HR4You.Model.Base.Models.Holiday
+@using HR4you.Security
+@using HR4you.Security.Models
+
+@inject HttpClient HttpClient
+@inject LocalUserStorage LocalUserStorage

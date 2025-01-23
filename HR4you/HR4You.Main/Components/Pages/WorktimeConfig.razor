@@ -1,0 +1,103 @@
+﻿@page "/WorktimeConfig"
+@rendermode InteractiveServer
+@inject HttpClient HttpClient
+@inject IConfiguration Configuration
+
+<PageTitle>WorktimeConfig</PageTitle>
+
+<h1>Worktime Config</h1>
+
+@if (entries == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <WorktimeConfigTable entries="entries" @ref="popupRef2" OnCustomerUpdated2="RefreshTable2">
+    </WorktimeConfigTable>
+}
+
+<br />
+<h1>Holiday</h1>
+
+@if (entriesHoliday == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <HolidayTable entriesHoliday="entriesHoliday" @ref="popupRefHoliday2" OnHolidayUpdated2="RefreshTable2">
+    </HolidayTable>
+}
+
+
+@code {
+    private string HttpURL;
+
+    public string RequestURL = "/api/master-data/work-time/get-all";
+    public string RequestURLHoliday = "/api/master-data/holiday/get-all";
+
+    public List<WorkTime> entries;
+    public List<Holiday> entriesHoliday;
+
+    private WorktimeConfigTable popupRef2;
+    private HolidayTable popupRefHoliday2;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && popupRef2 != null && popupRefHoliday2 != null)
+        {
+            popupRef2.OnCustomerUpdated2 = EventCallback.Factory.Create(this, RefreshTable2);
+            popupRefHoliday2.OnHolidayUpdated2 = EventCallback.Factory.Create(this, RefreshTable2);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        //Get first value from appsettings.json "Urls"
+        var urls = Configuration["Urls"];
+        HttpURL = urls?.Split(';').FirstOrDefault();
+
+        await LoadWorktime();
+        await LoadHoliday();
+    }
+
+    private async Task LoadWorktime()
+    {
+        try
+        {
+            entries = await HttpClient.GetFromJsonAsync<List<WorkTime>>(HttpURL + RequestURL);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching entries: {ex.Message}");
+        }
+    }
+
+    private async Task LoadHoliday()
+    {
+        try
+        {
+            entriesHoliday = await HttpClient.GetFromJsonAsync<List<Holiday>>(HttpURL + RequestURLHoliday);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching entries: {ex.Message}");
+        }
+    }
+
+    private async Task RefreshTable2()
+    {
+        Console.WriteLine("RefreshTable2() was called");
+        await LoadWorktime();
+        await LoadHoliday();
+
+        StateHasChanged();
+    }
+}
+
+

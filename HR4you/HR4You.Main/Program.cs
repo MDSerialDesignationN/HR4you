@@ -82,7 +82,7 @@ ModelContextHelper.ConfigureModelContexts(builder, connectionString);
 
 builder.Services.AddScoped(_ => new HttpClient
 {
-    BaseAddress = new Uri(builder.Configuration.GetValue<string>("url")!)
+    BaseAddress = new Uri(builder.Configuration.GetValue<string>("url")!.Split(';').FirstOrDefault()!)
 });
 
 var app = builder.Build();

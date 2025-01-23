@@ -17,6 +17,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\HR4You.Model.Base\HR4You.Model.Base.csproj" />
+      <ProjectReference Include="..\HR4you.Security\HR4you.Security.csproj" />
     </ItemGroup>
 
     <ItemGroup>

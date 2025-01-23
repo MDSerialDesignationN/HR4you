@@ -1,0 +1,92 @@
+﻿@page "/Tags"
+@rendermode InteractiveServer
+@inject HttpClient HttpClient
+@inject IConfiguration Configuration
+
+<PageTitle>Tags</PageTitle>
+
+<h1>Tags</h1>
+
+<label>Show Deleted</label>
+<input type="checkbox" checked="@addDeleted" @oninput="CheckboxChanged">
+
+@if (entries == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <TagTable entries="entries" @ref="popupRef2" OnTagUpdated2="RefreshTable2">
+    </TagTable>
+}
+
+
+@code {
+    private string HttpURL;
+
+    public string RequestURL = "/api/master-data/project/get-all?addDeleted="; //replace with correct one
+
+    public bool addDeleted;
+
+    public List<Tag> entries;
+
+    private TagTable popupRef2;
+
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && popupRef2 != null)
+        {
+            popupRef2.OnTagUpdated2 = EventCallback.Factory.Create(this, RefreshTable2);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        //Get first value from appsettings.json "Urls"
+        var urls = Configuration["Urls"];
+        HttpURL = urls?.Split(';').FirstOrDefault();
+
+        addDeleted = false;
+        await LoadTags();
+    }
+
+    private async Task LoadTags()
+    {
+        try
+        {
+            entries = await HttpClient.GetFromJsonAsync<List<Tag>>((HttpURL + RequestURL) + addDeleted);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching entries: {ex.Message}");
+        }
+    }
+
+    private async Task CheckboxChanged()
+    {
+        if (addDeleted == false)
+        {
+            addDeleted = true;
+        }
+        else
+        {
+            addDeleted = false;
+        }
+
+        await LoadTags();
+
+        StateHasChanged();
+    }
+
+    private async Task RefreshTable2()
+    {
+        Console.WriteLine("RefreshTable2() was called from Project");
+        await LoadTags();
+
+        StateHasChanged();
+    }
+}
+

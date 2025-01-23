@@ -1,0 +1,82 @@
+﻿@rendermode InteractiveServer
+@inject HttpClient HttpClient
+
+<PopupTag @ref="popupRef" OnTagUpdated="RefreshTable" />
+
+<table class="Table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Is Deleted</th>
+            <th> </th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var entry in entries)
+        {
+
+            <tr>
+                <td>@entry.Name</td>
+                <td>@(entry.Deleted ? "Yes" : "No")</td>
+                <button type="button" class="btn btn-outline-danger" @onclick="(() => DeleteEntry(entry.Id))"><i class="fa fa-trash"></i></button>                
+                <button type="button" class="btn btn-outline-info" @onclick="(() => EditEntry(entry.Id))"><i class="fa fa-pencil"></i></button>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@code {
+
+    [Parameter]
+    public List<Tag> entries { get; set; }
+
+    private PopupTag popupRef;
+
+    [Parameter]
+    public EventCallback OnTagUpdated2 { get; set; }
+
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && popupRef != null)
+        {
+            popupRef.OnTagUpdated = EventCallback.Factory.Create(this, RefreshTable);
+        }
+    }
+
+    public string RequestURLEdit = "http://localhost:5001/api/tag/get-user?Id="; //replace with correct one
+    public string RequestURLDelete = "http://localhost:5001/api/tag/delete?Id="; //replace with correct one
+
+    private void EditEntry(int GivenId)
+    {
+        popupRef.Show(GivenId, RequestURLEdit, "Edit Tag");
+    }
+
+    private async Task DeleteEntry(int GivenId)
+    {
+        var response = await HttpClient.DeleteFromJsonAsync<Tag>(RequestURLDelete + GivenId);
+        RefreshTable();
+    }
+
+    private void CreateUser()
+    {
+        popupRef.ShowOverview("Add User");
+    }
+
+    private async Task RefreshTable()
+    {
+        Console.WriteLine("RefreshTable() was called");
+        if (OnTagUpdated2.HasDelegate)
+        {
+            await OnTagUpdated2.InvokeAsync(); // Notify the parent component
+        }
+        else
+        {
+            Console.WriteLine("no delegate assigned.");
+        }
+    }
+
+
+}

@@ -1,4 +1,5 @@
 ﻿using HR4you.Security.Models;
+using Newtonsoft.Json;
 
 namespace HR4you.Security;
 
@@ -28,5 +29,19 @@ public class UserInfo
                 ? user.RoleGroups.Select(g => g.Name).ToArray()
                 : []
         };
+    }
+}
+
+//TODO - Yes, this uses Newtonsoft. Am I happy about it? Fuck no! Does it fucking work? Yes!
+public static class UserInfoSerializer
+{
+    public static UserInfo FromJson(this string json)
+    {
+        return JsonConvert.DeserializeObject<UserInfo>(json)!;
+    }
+
+    public static string ToJson(this UserInfo userInfo)
+    {
+        return JsonConvert.SerializeObject(userInfo);
     }
 }
