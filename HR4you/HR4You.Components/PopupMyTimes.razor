@@ -245,38 +245,38 @@
     // Selected values for hours and minutes start time
     private int selectedHourST
     {
-        get => allTimes.StartTime.Hour;
+        get => myTimes.StartTime.Hour;
         set
         {
-            allTimes.StartTime = new TimeOnly(value, allTimes.StartTime.Minute);
+            myTimes.StartTime = new TimeOnly(value, myTimes.StartTime.Minute);
         }
     }
 
     private int selectedMinuteST
     {
-        get => allTimes.StartTime.Minute;
+        get => myTimes.StartTime.Minute;
         set
         {
-            allTimes.StartTime = new TimeOnly(allTimes.StartTime.Hour, value);
+            myTimes.StartTime = new TimeOnly(myTimes.StartTime.Hour, value);
         }
     }
 
     // Selected values for hours and minutes end time
     private int selectedHourET
     {
-        get => allTimes.EndTime.Hour;
+        get => myTimes.EndTime.Hour;
         set
         {
-            allTimes.EndTime = new TimeOnly(value, allTimes.EndTime.Minute);
+            myTimes.EndTime = new TimeOnly(value, myTimes.EndTime.Minute);
         }
     }
 
     private int selectedMinuteET
     {
-        get => allTimes.EndTime.Minute;
+        get => myTimes.EndTime.Minute;
         set
         {
-            allTimes.EndTime = new TimeOnly(allTimes.EndTime.Hour, value);
+            myTimes.EndTime = new TimeOnly(myTimes.EndTime.Hour, value);
         }
     }
 

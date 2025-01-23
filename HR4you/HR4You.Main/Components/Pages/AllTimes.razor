@@ -3,6 +3,7 @@
 @using HR4You.Model.Base.Pagination
 @attribute [StreamRendering]
 @inject HttpClient HttpClient
+@inject IConfiguration Configuration
 @rendermode InteractiveServer
 
 <PageTitle>All Times</PageTitle>
@@ -43,6 +44,8 @@
 @code {
     public PagedResponseKeySet<HourEntry>? entries;
     private AllTimesTable popupRef2;
+    private string HttpURL;
+    public bool addDeleted;
 
     public Dictionary<int, string> projectNames = new Dictionary<int, string>();
 
@@ -74,7 +77,7 @@
     {
         List<int> uniqueProjectIds = new List<int>();
         List<int> uniqueTagIds = new List<int>();
-    
+
         try
         {
             entries = await HttpClient.GetFromJsonAsync<PagedResponseKeySet<HourEntry>>("http://localhost:5001/api/master-data/hour-entry/get-all-paged?reference=0&pageSize=10");
@@ -92,20 +95,22 @@
         // {
         //     entries = new PagedResponseKeySet<HourEntry>(newEntries, entries.Reference);
         // }
-    private async Task CheckboxChanged()
-    {
-        if (addDeleted == false)
-        {
-            addDeleted = true;
-        }
-        else
-        {
-            addDeleted = false;
-        }
-
-        entries = await HttpClient.GetFromJsonAsync<List<HourEntry>>((HttpURL + RequestURL) + addDeleted);
-        StateHasChanged();
     }
+
+    //private async Task CheckboxChanged()
+    //{
+    //    if (addDeleted == false)
+    //    {
+    //        addDeleted = true;
+    //    }
+    //    else
+    //    {
+    //        addDeleted = false;
+    //    }
+    //
+    //    entries = await HttpClient.GetFromJsonAsync<List<HourEntry>>((HttpURL + RequestURL) + addDeleted);
+    //    StateHasChanged();
+    //}
 
     private async Task RefreshTable2()
     {
