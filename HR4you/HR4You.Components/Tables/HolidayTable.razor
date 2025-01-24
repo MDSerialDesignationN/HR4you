@@ -1,4 +1,6 @@
-﻿@rendermode InteractiveServer
+﻿@using HR4You.Components.Popups
+@using HR4You.Model.Base.Models.Holiday
+@rendermode InteractiveServer
 @inject HttpClient HttpClient
 
 <PopupHoliday @ref="popupRefHoliday" OnHolidayUpdated="RefreshTable" />

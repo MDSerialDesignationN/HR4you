@@ -5,14 +5,14 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <base href="/"/>
-    <link rel="stylesheet" href="/bootstrap/bootstrap.min.css"/>
     <link rel="stylesheet" href="/app.css"/>
     <link rel="stylesheet" href="HR4You.Main.styles.css"/>
     <link href="css/output.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link href="//use.fontawesome.com/releases/v6.7.2/css/all.css" rel="stylesheet">
+    <script src="js/scripts.js"></script>
 
-    <HeadOutlet/>
+    <HeadOutlet />
 </head>
 
 <body>
@@ -22,19 +22,3 @@
 </body>
 
 </html>
-
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const dropdownButtons = document.querySelectorAll(".hr4you_dropdown-button");
-
-        dropdownButtons.forEach(button => {
-            button.addEventListener("click", () => {
-                const dropdown = button.closest(".hr4you_dropdown");
-                dropdown.classList.toggle("active");
-
-
-            });
-        });
-    });
-
-</script>

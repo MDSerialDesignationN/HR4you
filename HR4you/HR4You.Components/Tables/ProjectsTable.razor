@@ -1,4 +1,5 @@
-﻿@rendermode InteractiveServer
+﻿@using HR4You.Components.Popups
+@rendermode InteractiveServer
 @inject HttpClient HttpClient
 
 <PopupProject @ref="popupRef" OnProjectUpdated="RefreshTable" />
@@ -67,7 +68,7 @@
   
     private void EditEntry(int GivenId)
     {
-        popupRef.Show(GivenId, RequestURLEdit, "Edit Project");
+        // popupRef.Show(GivenId, RequestURLEdit, "Edit Project");
     }
 
     private async Task DeleteEntry(int GivenId)

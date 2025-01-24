@@ -20,8 +20,8 @@
 }
 else
 {
-    <ProjectsTable entries="entries.Data" customerNames="customerNames" @ref="popupRef2" OnProjectUpdated2="RefreshTable2">
-    </ProjectsTable>
+    @* <ProjectsTable entries="entries.Data" customerNames="customerNames" @ref="popupRef2" OnProjectUpdated2="RefreshTable2"> *@
+    @* </ProjectsTable> *@
 }
 
 
@@ -32,7 +32,7 @@ else
 
     public bool addDeleted;
 
-    private ProjectsTable popupRef2;
+    // private ProjectsTable popupRef2;
 
     public Dictionary<int, string> customerNames = new();
     public PagedResponseKeySet<Project> entries;
@@ -42,15 +42,15 @@ else
 
     protected override void OnAfterRender(bool firstRender)
     {
-        if (firstRender && popupRef2 != null)
-        {
-            popupRef2.OnProjectUpdated2 = EventCallback.Factory.Create(this, RefreshTable2);
-        }
+        // if (firstRender && popupRef2 != null)
+        // {
+        //     popupRef2.OnProjectUpdated2 = EventCallback.Factory.Create(this, RefreshTable2);
+        // }
     }
 
     protected override async Task OnInitializedAsync()
     {
-        //Get first value from appsettings.json "Urls"
+        // Get first value from appsettings.json "Urls"
         var urls = Configuration["Urls"];
         HttpURL = urls?.Split(';').FirstOrDefault();
 
