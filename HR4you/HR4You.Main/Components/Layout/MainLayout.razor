@@ -11,16 +11,3 @@
     </main>
 </div>
 </body>
-
-@code
-{
-    private string _userName = "test"; //todo get to render + make logout possible !
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await LocalUserStorage.Load();
-        var storedName = LocalUserStorage.UserInfo!.UserName;
-        if (storedName != null) _userName = storedName;
-    }
-
-}

@@ -1,0 +1,111 @@
+@using HR4You.Model.Base.Pagination
+@using Newtonsoft.Json
+@typeparam TItem
+
+
+<div class="pagination flex flex-row gap-3 justify-center">
+    <button @onclick="PreviousPage" class="flex flex-row gap-2 transition-all duration-300 bg-gray-200 hover:bg-gray-300 items-center border border-2 border-[#c1c1c1] rounded-[10px] p-1">
+        <i class="fa-solid fa-backward"></i> Previous-page
+    </button>
+    <button @onclick="NextPage" class="flex flex-row gap-2 transition-all duration-300 bg-gray-200 hover:bg-gray-300 items-center border border-2 border-[#c1c1c1] rounded-[10px] p-1">
+        Next-page <i class="fa-solid fa-forward"></i>
+    </button>
+</div>
+
+@code {
+    [Parameter] public PagedResponseOffset<TItem> entries { get; set; }
+    [Parameter] public EventCallback<PagedResponseOffset<TItem>> OnPageChanged { get; set; }
+
+    [Parameter] public required Dictionary<string, string> Parameters { get; set; }
+    [Parameter] public required string ApiEndpoint { get; set; }
+
+    [Parameter] public int PageSize { get; set; } = 10;
+
+    //TODO pagesize and PageNumber can be freely chosen as this is offset and not bound by reference -> add component for user selection
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            PageSize = entries.PageSize;
+        }
+    }
+
+    private async Task PreviousPage()
+    {
+        try
+        {
+            await LocalUserStorage.Load();
+
+            var pageNumber = entries.PageNumber <= 1 ? 1 : entries.PageNumber - 1;
+
+            var tempParameters = Parameters.ToDictionary(parameter => parameter.Key, parameter => parameter.Value);
+            tempParameters.Add(nameof(pageNumber), pageNumber.ToString());
+            tempParameters.Add(nameof(PageSize), PageSize.ToString());
+
+            var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, ApiEndpoint, tempParameters, LocalUserStorage.UserInfo!.AuthToken);
+            var response = await HttpClient.SendAsync(request);
+
+            var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
+            if (content != null)
+            {
+                var newEntries = JsonConvert.DeserializeObject<PagedResponseOffset<TItem>>(content);
+
+                await OnPageChanged.InvokeAsync(newEntries);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching entries: {ex.Message}");
+        }
+    }
+
+    private async Task NextPage()
+    {
+        try
+        {
+            await LocalUserStorage.Load();
+
+            var pageNumber = entries.PageNumber +1;
+
+            var tempParameters = Parameters.ToDictionary(parameter => parameter.Key, parameter => parameter.Value);
+            tempParameters.Add(nameof(pageNumber), $"{pageNumber}");
+            tempParameters.Add(nameof(PageSize), PageSize.ToString());
+
+            var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, ApiEndpoint, tempParameters, LocalUserStorage.UserInfo!.AuthToken);
+            var response = await HttpClient.SendAsync(request);
+
+            var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
+            if (content != null)
+            {
+                var newEntries = JsonConvert.DeserializeObject<PagedResponseOffset<TItem>>(content);
+
+                //If empty => navigate to page 1
+                if (newEntries?.Data.Count == 0)
+                {
+                    pageNumber = 1;
+                    tempParameters[nameof(pageNumber)] = pageNumber.ToString();
+
+                    request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, ApiEndpoint, tempParameters, LocalUserStorage.UserInfo!.AuthToken);
+                    response = await HttpClient.SendAsync(request);
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        Console.WriteLine($"PreviousPage request error - {response.StatusCode}");
+                        return;
+                    }
+
+                    content = await response.Content.ReadAsStringAsync();
+                    newEntries = JsonConvert.DeserializeObject<PagedResponseOffset<TItem>>(content);
+                }
+
+                await OnPageChanged.InvokeAsync(newEntries);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching entries: {ex.Message}");
+        }
+    }
+
+}

@@ -8,6 +8,7 @@
 @using Microsoft.JSInterop
 @using HR4You
 @using HR4You.Components
+@using HR4You.Components.Handler
 @using HR4You.Model.Base.Models.HourEntry
 @using HR4You.Model.Base.Models.Customer
 @using HR4You.Model.Base.Models.Project
@@ -17,7 +18,8 @@
 @using HR4you.Security
 @using HR4you.Security.Models
 
-@inject Handler.LocalUserStorage LocalUserStorage
+@inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
+@inject LocalUserStorage LocalUserStorage
 
 
