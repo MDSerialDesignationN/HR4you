@@ -3,7 +3,6 @@
 @using Newtonsoft.Json
 @attribute [StreamRendering]
 @rendermode InteractiveServer
-@inject HttpClient HttpClient
 
 <PageTitle>Customers</PageTitle>
 <div class="page-content min-h-[100vh] p-3 flex flex-col gap-2 select-none">
@@ -22,22 +21,21 @@
     else
     {
         <div class="flex flex-row gap-2 items-center">
-            <CustomerSearch Entries="entries.Data" />
+            <CustomerSearch Entries="entries.Data"/>
             <div class="bg-gray-200 p-[5px] rounded-[5px] border border-1 border-[#c1c1c1] flex flex-row gap-1 justify-center items-center">
                 <label for="showDeleted">Show Deleted</label>
                 <input class="h-4 w-4" id="showDeleted" type="checkbox" checked="@addDeleted" @oninput="CheckboxChanged">
             </div>
         </div>
-        <OffsetPagination entries="PagedResponseOffset" OnPageChanged="EventCallback.Factory.Create<PagedResponseOffset<Customer>>(this, UpdateEntries)" ApiEndpoint="http://localhost:5001/api/master-data/customer/get-all-paged" />
         <div class="table-wrapper overflow-auto">
 
             <CustomersTable entries="PagedResponseOffset.Data" @ref="popupRef2" OnCustomerUpdated2="RefreshTable2">
             </CustomersTable>
         </div>
 
+        <OffsetPagination entries="PagedResponseOffset" OnPageChanged="EventCallback.Factory.Create<PagedResponseOffset<Customer>>(this, UpdateEntries)" Parameters="Parameters" ApiEndpoint=@GetAllApiEndpoint/>
     }
 </div>
-
 
 
 @code {
@@ -48,7 +46,7 @@
     public Dictionary<string, string> Parameters;
 
     public bool addDeleted;
-    
+
     private CustomersTable popupRef2;
 
     protected override void OnAfterRender(bool firstRender)
@@ -73,21 +71,24 @@
         try
         {
             await LocalUserStorage.Load();
-            if (LocalUserStorage.UserInfo != null)
+            if (LocalUserStorage.UserInfo == null)
             {
-                Parameters = new Dictionary<string, string>
-                {
-                    {nameof(addDeleted),addDeleted.ToString()}
-                };
-                
-                var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetAllApiEndpoint, Parameters, LocalUserStorage.UserInfo.AuthToken);
-                var response = await HttpClient.SendAsync(request);
-
-                var content = await response.Content.ReadAsStringAsync();
-                PagedResponseOffset = JsonConvert.DeserializeObject<PagedResponseOffset<Customer>>(content);
-                
-                StateHasChanged();
+                NavigationManager.NavigateTo(NavigationManager.BaseUri);
+                return;
             }
+
+            Parameters = new Dictionary<string, string>
+            {
+                { nameof(addDeleted), addDeleted.ToString() }
+            };
+
+            var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetAllApiEndpoint, Parameters, LocalUserStorage.UserInfo.AuthToken);
+            var response = await HttpClient.SendAsync(request);
+            
+            var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
+            if (content != null) PagedResponseOffset = JsonConvert.DeserializeObject<PagedResponseOffset<Customer>>(content);
+
+            StateHasChanged();
         }
         catch (Exception ex)
         {
@@ -105,17 +106,17 @@
         {
             addDeleted = false;
         }
-        
+
         Parameters = new Dictionary<string, string>
         {
-            {nameof(addDeleted),addDeleted.ToString()}
+            { nameof(addDeleted), addDeleted.ToString() }
         };
-        
-        var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetAllApiEndpoint, Parameters, LocalUserStorage.UserInfo.AuthToken);
+
+        var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetAllApiEndpoint, Parameters, LocalUserStorage.UserInfo!.AuthToken);
         var response = await HttpClient.SendAsync(request);
         
-        var content = await response.Content.ReadAsStringAsync();
-        PagedResponseOffset = JsonConvert.DeserializeObject<PagedResponseOffset<Customer>>(content);
+        var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
+        if (content != null) PagedResponseOffset = JsonConvert.DeserializeObject<PagedResponseOffset<Customer>>(content);
 
         StateHasChanged();
     }
