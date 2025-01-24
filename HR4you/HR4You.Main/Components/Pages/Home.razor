@@ -1,10 +1,14 @@
 @page "/home"
+@using HR4You.Model.Base
 @using HR4You.Model.Base.Pagination
+@using HR4You.Components.Tables
+@using HR4You.Components.Other
 @using Microsoft.AspNetCore.WebUtilities
 @using Newtonsoft.Json
+
 @attribute [StreamRendering]
+@inject HttpClient HttpClient
 @rendermode InteractiveServer
-@inject IConfiguration Configuration
 
 <PageTitle>Overview</PageTitle>
 <div class="page-content min-h-[100vh] p-3 flex flex-col gap-2 select-none">
@@ -19,36 +23,58 @@
     else
     {
 
-        <HomeTable entries="entries">
-        </HomeTable>
+        @* <HomeTable entries="entries"> *@
+        @* </HomeTable> *@
+        <GenericTable TItem="HourEntry" Items="entries.Data" Columns="columns"></GenericTable>
+
+
     }
 </div>
 
 
 
 @code {
-    private string HttpURL;
 
-    public string RequestURL = "/api/master-data/hour-entry/get-user-all?userId=4e2a437c-879f-4b49-b216-0dc4b6470d67";
+    public PagedResponseKeySet<HourEntry> entries;//TODO pagination should cover this - remove from here
 
-    public PagedResponseKeySet<HourEntry> entries;
-
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private List<TableColumn<HourEntry>> columns = new List<TableColumn<HourEntry>>
     {
-        //Get first value from appsettings.json "Urls"
-        var urls = Configuration["Urls"];
-        HttpURL = urls?.Split(';').FirstOrDefault();
+        new TableColumn<HourEntry> { Header = "Date", CellTemplate = item => item.Date },
+        new TableColumn<HourEntry> { Header = "Start Time", CellTemplate = item => item.StartTime },
+        new TableColumn<HourEntry> { Header = "End Time", CellTemplate = item => item.EndTime },
+        new TableColumn<HourEntry> { Header = "Duration", CellTemplate = item => item.Duration },
+        new TableColumn<HourEntry> { Header = "Project", CellTemplate = item => item.Project},
+        new TableColumn<HourEntry> { Header = "Activity", CellTemplate = item => item.Type},
+        new TableColumn<HourEntry> { Header = "Tag", CellTemplate = item => item.Tag}
+    };
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        // try
+        // {
+        //     var parameters = new Dictionary<string, string>
+        //     {
+
+        //     };
+            
+            
+            
+        //     var result = await HttpClient.GetFromJsonAsync<PagedResponseKeySet<HourEntry>>("api/master-data/hour-entry/get-user-all-paged?userId=003c1ae2-acfc-495b-b91a-8cedf507568a&reference=0");
+        // }
+        // catch (Exception ex)
+        // {
+        //     Console.WriteLine($"Error fetching entries: {ex.Message}");
+        // }
+
         try
         {
-            //entries = await HttpClient.GetFromJsonAsync<List<HourEntry>>("http://localhost:5001/api/master-data/hour-entry/get-user-all-paged4e2a437c-879f-4b49-b216-0dc4b6470d67");
-            //entries = await HttpClient.GetFromJsonAsync<List<HourEntry>>(@Ur?userId=4e2a437c-879f-4b49-b216-0dc4b6470d67")api/master-data/hour-entry/get-user-all-paged?userId=4e2a437c-879f
             var param = new Dictionary<string, string>
             {
                 {"addDeleted", "false"},
-                {"userId", "4e2a437c-879f-4b49-b216-0dc4b6470d67"},
+                {"userId", "003c1ae2-acfc-495b-b91a-8cedf507568a"},
                 {"reference", "0"},
-                {"pagesize", "10"}
+                {"pagesize", "2"}
             };
 
             string methodName = "http://localhost:5001/api/master-data/hour-entry/get-user-all-paged";
@@ -61,7 +87,7 @@
             var json = response.Content.ReadAsStringAsync().Result;
 
             entries = JsonConvert.DeserializeObject<PagedResponseKeySet<HourEntry>>(json);
-            
+
             Console.WriteLine(entries);
         }
         catch (Exception ex)
@@ -69,6 +95,12 @@
             Console.WriteLine($"Error fetching entries: {ex.Message}");
         }
 
+
+    }
+
+    private void UpdateEntries(PagedResponseKeySet<HourEntry> newEntries)
+    {
+        this.entries = newEntries;
     }
 }
 

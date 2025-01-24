@@ -1,0 +1,11 @@
+.userInfo {
+    background: whitesmoke;
+    max-width: fit-content;
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 1rem;
+    align-items: center;
+    border-radius: 10px;
+    border: 2px solid #c1c1c1;
+    padding: 0.6rem;
+}

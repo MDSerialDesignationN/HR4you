@@ -1,4 +1,5 @@
-﻿@rendermode InteractiveServer
+﻿@using HR4You.Components.Popups
+@rendermode InteractiveServer
 @inject HttpClient HttpClient
 
 <PopupMyTimes @ref="popupRef" OnMyTimesUpdated="RefreshTable" />
