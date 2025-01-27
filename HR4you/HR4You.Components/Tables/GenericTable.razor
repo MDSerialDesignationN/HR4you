@@ -1,0 +1,32 @@
+@using HR4You.Model.Base
+@typeparam TItem
+
+<table>
+    <thead>
+        <tr>
+            @foreach (var column in Columns)
+            {
+                <th>@column.Header</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Items)
+        {
+            <tr>
+                @foreach (var column in Columns)
+                {
+                    <td>@column.CellTemplate(item)</td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    [Parameter]
+    public List<TItem>? Items { get; set; }
+
+    [Parameter]
+    public List<TableColumn<TItem>>? Columns { get; set; }
+}

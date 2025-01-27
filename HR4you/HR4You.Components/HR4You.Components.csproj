@@ -21,7 +21,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Update="OffsetPagination.razor">
+      <Content Update="Pagination\OffsetPagination.razor">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      </Content>
+      <Content Update="Tables\GenericTable.razor">
         <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       </Content>
     </ItemGroup>
