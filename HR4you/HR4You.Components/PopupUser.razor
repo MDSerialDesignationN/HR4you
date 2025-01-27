@@ -75,9 +75,11 @@
 
     UserInfo user = new UserInfo();
 
+    //string newUserCreation = { };
+
     bool isEdit = false;
 
-    async public Task Show(string givenId, string requestURL, string headerText)
+    async public Task ShowEdit(string givenId, string requestURL, string headerText)
     {
         HeaderText = headerText;
         GivenId = givenId.ToString();
@@ -87,7 +89,7 @@
         StateHasChanged();
     }
 
-    async public Task ShowOverview(string headerText)
+    async public Task ShowCreate(string headerText)
     {
         HeaderText = headerText;
         IsVisible = true;
@@ -129,8 +131,22 @@
             }
         }
         else if (isEdit == false)
-        {           
-            var response = await HttpClient.PostAsJsonAsync(createURL, user);
+        {
+            var newUserCreation = new
+            {
+                UserName = user.UserName,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Password = "1234",
+                //RoleGroups = "HR_UserRoleGroup_Authenticated"
+                RoleGroups = new string[] { "HR_UserRoleGroup_SysManagement", "HR_UserRoleGroup_Admin", "HR_UserRoleGroup_Authenticated" }
+            };
+
+            var content = new StringContent(JsonSerializer.Serialize(newUserCreation), Encoding.UTF8, "application/json");  
+            
+            Console.WriteLine(newUserCreation);
+
+            var response = await HttpClient.PostAsJsonAsync(createURL, content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -149,7 +165,7 @@
     {
         user = new UserInfo();
         HeaderText = string.Empty;
-        GivenId = null;
+        GivenId = null; 
         IsVisible = false;
 
         StateHasChanged();

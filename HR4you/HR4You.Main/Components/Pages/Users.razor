@@ -50,10 +50,10 @@ else
         HttpURL = urls?.Split(';').FirstOrDefault();
 
         addDeleted = false;
-        await LoadCustomers();
+        await LoadUsers();
     }
 
-    private async Task LoadCustomers()
+    private async Task LoadUsers()
     {
         try
         {
@@ -77,14 +77,15 @@ else
             addDeleted = false;
         }
 
-        entries = await HttpClient.GetFromJsonAsync<List<UserInfo>>((HttpURL + RequestURL) + addDeleted);
+        await LoadUsers();
+        //entries = await HttpClient.GetFromJsonAsync<List<UserInfo>>((HttpURL + RequestURL) + addDeleted);
         StateHasChanged();
     }
 
     private async Task RefreshTable2()
     {
         Console.WriteLine("RefreshTable2() was called");
-        await LoadCustomers(); 
+        await LoadUsers(); 
 
         StateHasChanged();
     }

@@ -19,10 +19,10 @@
             </div>
         </div>
     </div>
-    
+
     <label>Show Deleted</label>
     <input type="checkbox" checked="@addDeleted" @oninput="CheckboxChanged">
-    
+
     @if (entries == null)
     {
         <p>
@@ -36,7 +36,7 @@
         <div class="table-wrapper overflow-auto">
             <AllTimesTable entries="entries.Data" projectNames="projectNames" tagNames="tagNames" @ref="popupRef2" OnAllTimesUpdated2="RefreshTable2">
             </AllTimesTable>
-            </div>
+        </div>
         <KeysetPagination entries="entries" OnPageChanged="EventCallback.Factory.Create<PagedResponseKeySet<HourEntry>>(this, UpdateEntries)" ApiEndpoint="http://localhost:5001/api/master-data/hour-entry/get-all-paged" />
     }
 </div>
@@ -46,25 +46,28 @@
     public FilterOption[] options1 =
     [
         new() { Icon = "<i class='fa-solid fa-calendar-days'></i>", Name = "Date", InputType = "date" },
-        new() { Icon = "<i class='fa-regular fa-clock'></i>", Name = "StartTime", InputType = "time" },
-        new() { Icon = "<i class='fa-regular fa-clock'></i>", Name = "EndTime", InputType = "time" },
-        new() { Icon = "<i class='fa-solid fa-timeline'></i>", Name = "Duration", InputType = "number" },
-        new() { Icon = "<i class='fa-solid fa-tasks'></i>", Name = "Type", InputType = "select", Options = Enum.GetValues<ActivityType>().Select(e => e.ToString()).ToList() }
+    new() { Icon = "<i class='fa-regular fa-clock'></i>", Name = "StartTime", InputType = "time" },
+    new() { Icon = "<i class='fa-regular fa-clock'></i>", Name = "EndTime", InputType = "time" },
+    new() { Icon = "<i class='fa-solid fa-timeline'></i>", Name = "Duration", InputType = "number" },
+    new() { Icon = "<i class='fa-solid fa-tasks'></i>", Name = "Type", InputType = "select", Options = Enum.GetValues<ActivityType>().Select(e => e.ToString()).ToList() }
     ];
     public FilterOption[] options2 =
     [
         new() { Icon = "<i class='fa-solid fa-id-card'></i>", Name = "UserId", InputType = "string" },
-        new() { Icon = "<i class='fa-solid fa-diagram-project'></i>", Name = "ProjectId", InputType = "string" },
-        new() { Icon = "<i class='fa-solid fa-tag'></i>", Name = "TagId", InputType = "string" },
-        new() { Icon = "<i class='fa-solid fa-mug-hot'></i>", Name = "IsHoliday", InputType = "checkbox" },
-        new() { Icon = "<i class='fa-solid fa-money-bill'></i>", Name = "IsBillable", InputType = "checkbox" },
-        new() { Icon = "<i class='fa-solid fa-trash'></i>", Name = "Deleted", InputType = "checkbox" }
+    new() { Icon = "<i class='fa-solid fa-diagram-project'></i>", Name = "ProjectId", InputType = "string" },
+    new() { Icon = "<i class='fa-solid fa-tag'></i>", Name = "TagId", InputType = "string" },
+    new() { Icon = "<i class='fa-solid fa-mug-hot'></i>", Name = "IsHoliday", InputType = "checkbox" },
+    new() { Icon = "<i class='fa-solid fa-money-bill'></i>", Name = "IsBillable", InputType = "checkbox" },
+    new() { Icon = "<i class='fa-solid fa-trash'></i>", Name = "Deleted", InputType = "checkbox" }
     ];
 
-    
+
     private string HttpURL;
+
+    public string RequestURL = "/api/master-data/hour-entry/get-all?addDeleted=";
+
     public bool addDeleted;
-    
+
     private AllTimesTable popupRef2;
 
     public Dictionary<int, string> projectNames = new();
@@ -88,7 +91,7 @@
         addDeleted = false;
         await LoadAllTimes();
     }
-    
+
     private void UpdateEntries(PagedResponseKeySet<HourEntry> newEntries)
     {
         entries = newEntries;
@@ -123,14 +126,14 @@
                 }
             }
 
-    private void UpdateEntries(PagedResponseKeySet<HourEntry> newEntries)
-    {
-        this.entries = newEntries;
-        // if (entries != null)
-        // {
-        //     entries = new PagedResponseKeySet<HourEntry>(newEntries, entries.Reference);
-        // }
-    }
+        foreach (var projectId in uniqueProjectIds)
+        {
+            if (!projectNames.ContainsKey(projectId))
+            {
+                var project = await FetchProjectAsync(projectId);
+                projectNames[projectId] = project?.Name ?? "No Project";
+            }
+        }
 
         foreach (var tagId in uniqueTagIds)
         {

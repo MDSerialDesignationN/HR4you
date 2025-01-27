@@ -3,6 +3,8 @@
 
 <PopupUser @ref="popupRef" OnUserUpdated="RefreshTable" />
 
+<button type="button" class="btn btn-outline-danger" @onclick="(() => CreateUser())"><i class="fa fa-square-plus"></i></button>
+
 <table class="Table">
     <thead>
         <tr>
@@ -70,7 +72,7 @@
 
     private void EditEntry(string GivenId)
     {
-        popupRef.Show(GivenId, RequestURLEdit, "Edit User");
+        popupRef.ShowEdit(GivenId, RequestURLEdit, "Edit User");
     }
 
     private async Task DeleteEntry(string GivenId)
@@ -104,7 +106,8 @@
 
     private void CreateUser()
     {
-        popupRef.ShowOverview("Add User");
+        popupRef.ShowCreate("Add User");
+        RefreshTable();
     }
 
     private async Task RefreshTable()
