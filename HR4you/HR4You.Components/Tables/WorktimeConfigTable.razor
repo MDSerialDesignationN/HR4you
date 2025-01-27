@@ -44,7 +44,7 @@
     private PopupWorktimeConfig popupRef;
 
     [Parameter]
-    public EventCallback OnCustomerUpdated2 { get; set; }
+    public EventCallback OnWorktimeUpdated2 { get; set; }
 
 
     protected override void OnAfterRender(bool firstRender)
@@ -65,9 +65,9 @@
 
     private async Task RefreshTable()
     {
-        if (OnCustomerUpdated2.HasDelegate)
+        if (OnWorktimeUpdated2.HasDelegate)
         {
-            await OnCustomerUpdated2.InvokeAsync(); // Notify the parent component
+            await OnWorktimeUpdated2.InvokeAsync(); // Notify the parent component
         }
         else
         {

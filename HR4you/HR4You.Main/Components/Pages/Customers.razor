@@ -2,6 +2,8 @@
 @using HR4You.Components.Tables
 @using HR4You.Model.Base.Pagination
 @using Newtonsoft.Json
+@using HR4You.Components.Other
+@using HR4You.Model.Base
 @attribute [StreamRendering]
 @rendermode InteractiveServer
 
@@ -12,6 +14,7 @@
         <h1 class="text-[2rem] font-bold flex flex-row gap-3 items-center"><i class="fa-solid fa-users"></i>Customers</h1>
     </div>
 
+    <UserInfo></UserInfo>
 
     @if (PagedResponseOffset == null)
     {
@@ -22,14 +25,14 @@
     else
     {
         <div class="flex flex-row gap-2 items-center">
-            <CustomerSearch Entries="entries.Data"/>
+            <SearchComponent Options1="options1" Options2="options2"/>
             <div class="bg-gray-200 p-[5px] rounded-[5px] border border-1 border-[#c1c1c1] flex flex-row gap-1 justify-center items-center">
                 <label for="showDeleted">Show Deleted</label>
                 <input class="h-4 w-4" id="showDeleted" type="checkbox" checked="@addDeleted" @oninput="CheckboxChanged">
             </div>
         </div>
+        
         <div class="table-wrapper overflow-auto">
-
             <CustomersTable entries="PagedResponseOffset.Data" @ref="popupRef2" OnCustomerUpdated2="RefreshTable2">
             </CustomersTable>
         </div>
@@ -45,18 +48,19 @@
 
     public PagedResponseOffset<Customer>? PagedResponseOffset;
     public Dictionary<string, string> Parameters;
+    
+    //TODO create options
+    public FilterOption[] options1 =
+    [
+    ];
+
+    public FilterOption[] options2 =
+    [
+    ];
 
     public bool addDeleted;
 
-    private CustomersTable popupRef2;
-
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (firstRender && popupRef2 != null)
-        {
-            popupRef2.OnCustomerUpdated2 = EventCallback.Factory.Create(this, RefreshTable2);
-        }
-    }
+    private CustomersTable? popupRef2;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -65,6 +69,16 @@
             addDeleted = false;
             await LoadCustomers();
         }
+        
+        if (firstRender && popupRef2 != null)
+        {
+            popupRef2.OnCustomerUpdated2 = EventCallback.Factory.Create(this, RefreshTable2);
+        }
+    }
+    
+    private void UpdateEntries(PagedResponseOffset<Customer> newEntries)
+    {
+        PagedResponseOffset = newEntries;
     }
 
     private async Task LoadCustomers()
@@ -128,10 +142,5 @@
         await LoadCustomers();
 
         StateHasChanged();
-    }
-
-    private void UpdateEntries(PagedResponseOffset<Customer> newEntries)
-    {
-        PagedResponseOffset = newEntries;
     }
 }

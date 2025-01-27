@@ -3,17 +3,20 @@
 @using HR4You.Components.Tables
 @using HR4You.Model.Base
 @using HR4You.Model.Base.Pagination
+@using Newtonsoft.Json
 @attribute [StreamRendering]
 @rendermode InteractiveServer
 
 <PageTitle>All Times</PageTitle>
-<div class="page-content min-h-[100vh] p-3 flex flex-col gap-2">
+<div class="page-content min-h-[100vh] p-3 flex flex-col gap-2 select-none">
+
+    <div class="flex flex-row justify-between">
+        <h1 class="text-[2rem] font-bold flex flex-row gap-3 items-center"><i class="fa-solid fa-chart-area"></i>All Times</h1>
+    </div>
+    
     <UserInfo></UserInfo>
 
-    <label>Show Deleted</label>
-    <input type="checkbox" checked="@addDeleted" @oninput="CheckboxChanged">
-
-    @if (entries == null)
+    @if (PagedResponseKeySet == null)
     {
         <p>
             <em>Loading...</em>
@@ -21,142 +24,208 @@
     }
     else
     {
-        <SearchComponent Options1="options1" Options2="options2" />
+        <div class="flex flex-row gap-2 items-center">
+            <SearchComponent Options1="options1" Options2="options2"/>
+            <div class="bg-gray-200 p-[5px] rounded-[5px] border border-1 border-[#c1c1c1] flex flex-row gap-1 justify-center items-center">
+                <label for="showDeleted">Show Deleted</label>
+                <input class="h-4 w-4" id="showDeleted" type="checkbox" checked="@addDeleted" @oninput="CheckboxChanged">
+            </div>
+        </div>
 
         <div class="table-wrapper overflow-auto">
-            <AllTimesTable entries="entries.Data" projectNames="projectNames" tagNames="tagNames" @ref="popupRef2" OnAllTimesUpdated2="RefreshTable2">
+            <AllTimesTable entries="PagedResponseKeySet.Data" projectNames="projectNames" tagNames="tagNames" @ref="popupRef2" OnAllTimesUpdated2="RefreshTable2">
             </AllTimesTable>
         </div>
-        <KeysetPagination entries="entries" OnPageChanged="EventCallback.Factory.Create<PagedResponseKeySet<HourEntry>>(this, UpdateEntries)" ApiEndpoint="http://localhost:5001/api/master-data/hour-entry/get-all-paged" />
+        
+        <KeysetPagination entries="PagedResponseKeySet" OnPageChanged="EventCallback.Factory.Create<PagedResponseKeySet<HourEntry>>(this, UpdateEntries)" ApiEndpoint="http://localhost:5001/api/master-data/hour-entry/get-all-paged"/>
     }
 </div>
 
 @code {
-    public PagedResponseKeySet<HourEntry>? entries;
+    private const string ApiHourEndpointRoute = "api/master-data/hour-entry/";
+    private const string ApiProjectEndpointRoute = "api/master-data/project/";
+    private const string ApiTagEndpointRoute = "api/master-data/tag/";
+    private const string GetAllHourApiEndpoint = $"{ApiHourEndpointRoute}get-all-paged";
+    private const string GetProjectApiEndpoint = $"{ApiProjectEndpointRoute}get";
+    private const string GetTagApiEndpoint = $"{ApiTagEndpointRoute}get";
+    
+    public PagedResponseKeySet<HourEntry>? PagedResponseKeySet;
+    public Dictionary<string, string> Parameters;
+
     public FilterOption[] options1 =
     [
         new() { Icon = "<i class='fa-solid fa-calendar-days'></i>", Name = "Date", InputType = "date" },
-    new() { Icon = "<i class='fa-regular fa-clock'></i>", Name = "StartTime", InputType = "time" },
-    new() { Icon = "<i class='fa-regular fa-clock'></i>", Name = "EndTime", InputType = "time" },
-    new() { Icon = "<i class='fa-solid fa-timeline'></i>", Name = "Duration", InputType = "number" },
-    new() { Icon = "<i class='fa-solid fa-tasks'></i>", Name = "Type", InputType = "select", Options = Enum.GetValues<ActivityType>().Select(e => e.ToString()).ToList() }
+        new() { Icon = "<i class='fa-regular fa-clock'></i>", Name = "StartTime", InputType = "time" },
+        new() { Icon = "<i class='fa-regular fa-clock'></i>", Name = "EndTime", InputType = "time" },
+        new() { Icon = "<i class='fa-solid fa-timeline'></i>", Name = "Duration", InputType = "number" },
+        new() { Icon = "<i class='fa-solid fa-tasks'></i>", Name = "Type", InputType = "select", Options = Enum.GetValues<ActivityType>().Select(e => e.ToString()).ToList() }
     ];
+
     public FilterOption[] options2 =
     [
         new() { Icon = "<i class='fa-solid fa-id-card'></i>", Name = "UserId", InputType = "string" },
-    new() { Icon = "<i class='fa-solid fa-diagram-project'></i>", Name = "ProjectId", InputType = "string" },
-    new() { Icon = "<i class='fa-solid fa-tag'></i>", Name = "TagId", InputType = "string" },
-    new() { Icon = "<i class='fa-solid fa-mug-hot'></i>", Name = "IsHoliday", InputType = "checkbox" },
-    new() { Icon = "<i class='fa-solid fa-money-bill'></i>", Name = "IsBillable", InputType = "checkbox" },
-    new() { Icon = "<i class='fa-solid fa-trash'></i>", Name = "Deleted", InputType = "checkbox" }
+        new() { Icon = "<i class='fa-solid fa-diagram-project'></i>", Name = "ProjectId", InputType = "string" },
+        new() { Icon = "<i class='fa-solid fa-tag'></i>", Name = "TagId", InputType = "string" },
+        new() { Icon = "<i class='fa-solid fa-mug-hot'></i>", Name = "IsHoliday", InputType = "checkbox" },
+        new() { Icon = "<i class='fa-solid fa-money-bill'></i>", Name = "IsBillable", InputType = "checkbox" },
+        new() { Icon = "<i class='fa-solid fa-trash'></i>", Name = "Deleted", InputType = "checkbox" }
     ];
-
-
-    private string HttpURL;
-
-    public string RequestURL = "/api/master-data/hour-entry/get-all?addDeleted=";
-
+    
     public bool addDeleted;
 
-    private AllTimesTable popupRef2;
+    private AllTimesTable? popupRef2;
 
     public Dictionary<int, string> projectNames = new();
 
     public Dictionary<int?, string> tagNames = new();
+    
 
-    public string RequestURLProject = "/api/master-data/project/get?addDeleted=true&Id=";
-
-    public string RequestURLTag = "/api/master-data/tag/get?addDeleted=true&Id=";
-
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (firstRender)
+        {
+            addDeleted = false;
+            await LoadAllTimes();
+        }
+        
         if (firstRender && popupRef2 != null)
         {
             popupRef2.OnAllTimesUpdated2 = EventCallback.Factory.Create(this, RefreshTable2);
         }
     }
 
-    protected override async Task OnInitializedAsync()
-    {
-        addDeleted = false;
-        await LoadAllTimes();
-    }
-
     private void UpdateEntries(PagedResponseKeySet<HourEntry> newEntries)
     {
-        entries = newEntries;
+        PagedResponseKeySet = newEntries;
     }
 
     private async Task LoadAllTimes()
     {
-        List<int> uniqueProjectIds = new List<int>();
-        List<int> uniqueTagIds = new List<int>();
+        var uniqueProjectIds = new List<int>();
+        var uniqueTagIds = new List<int>();
 
         try
         {
-            entries = await HttpClient.GetFromJsonAsync<PagedResponseKeySet<HourEntry>>((HttpURL + RequestURL) + addDeleted);
-            Console.WriteLine((HttpURL + RequestURL) + addDeleted);
+            await LocalUserStorage.Load();
+            if (LocalUserStorage.UserInfo == null)
+            {
+                NavigationManager.NavigateTo(NavigationManager.BaseUri);
+                return;
+            }
+
+            Parameters = new Dictionary<string, string>
+            {
+                { nameof(addDeleted), addDeleted.ToString() }
+            };
+            
+            var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetAllHourApiEndpoint, Parameters, LocalUserStorage.UserInfo.AuthToken);
+            var response = await HttpClient.SendAsync(request);
+            
+            var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
+            if (content != null) PagedResponseKeySet = JsonConvert.DeserializeObject<PagedResponseKeySet<HourEntry>>(content);
+
+            // Fetch project and tag names for all entries
+            if (PagedResponseKeySet != null)
+                foreach (var entry in PagedResponseKeySet.Data)
+                {
+                    if (!uniqueProjectIds.Contains(entry.ProjectId))
+                    {
+                        uniqueProjectIds.Add(entry.ProjectId);
+                    }
+                    else if (!uniqueTagIds.Contains(entry.TagId.GetValueOrDefault()))
+                    {
+                        uniqueTagIds.Add(entry.TagId.GetValueOrDefault());
+                    }
+                }
+
+            foreach (var projectId in uniqueProjectIds)
+            {
+                if (!projectNames.ContainsKey(projectId))
+                {
+                    var project = await FetchProjectAsync(projectId);
+                    projectNames[projectId] = project?.Name ?? "No Project";
+                }
+            }
+
+            foreach (var tagId in uniqueTagIds)
+            {
+                if (!tagNames.ContainsKey(tagId))
+                {
+                    var tag = await FetchTagAsync(tagId);
+                    tagNames[tagId] = tag?.Name ?? "No Tag";
+                }
+            }
+            
+            StateHasChanged();            
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error fetching entries: {ex.Message}");
         }
-
-        // Fetch project and tag names for all entries
-        if (entries != null)
-            foreach (var entry in entries.Data)
-            {
-                if (!uniqueProjectIds.Contains(entry.ProjectId))
-                {
-                    uniqueProjectIds.Add(entry.ProjectId);
-                }
-                else if (!uniqueTagIds.Contains(entry.TagId.GetValueOrDefault()))
-                {
-                    uniqueTagIds.Add(entry.TagId.GetValueOrDefault());
-                }
-            }
-
-        foreach (var projectId in uniqueProjectIds)
-        {
-            if (!projectNames.ContainsKey(projectId))
-            {
-                var project = await FetchProjectAsync(projectId);
-                projectNames[projectId] = project?.Name ?? "No Project";
-            }
-        }
-
-        foreach (var tagId in uniqueTagIds)
-        {
-            if (!tagNames.ContainsKey(tagId))
-            {
-                var tag = await FetchTagAsync(tagId);
-                tagNames[tagId] = tag?.Name ?? "No Tag";
-            }
-        }
     }
 
-    private async Task<Project> FetchProjectAsync(int projectId)
+    private async Task<Project?> FetchProjectAsync(int projectId)
     {
         try
         {
-            return await HttpClient.GetFromJsonAsync<Project>((HttpURL + RequestURLProject) + projectId);
+            await LocalUserStorage.Load();
+            if (LocalUserStorage.UserInfo == null)
+            {
+                NavigationManager.NavigateTo(NavigationManager.BaseUri);
+                return null;
+            }
+
+            Parameters = new Dictionary<string, string>
+            {
+                {"id", projectId.ToString()},
+                { nameof(addDeleted), addDeleted.ToString() }
+            };
+
+            var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetProjectApiEndpoint, Parameters, LocalUserStorage.UserInfo.AuthToken);
+            var response = await HttpClient.SendAsync(request);
+            
+            var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
+            if (content != null) return JsonConvert.DeserializeObject<Project>(content)!;
         }
-        catch
+        catch(Exception ex)
         {
+            Console.WriteLine($"Error fetching project id {projectId} Error: {ex.Message}");
             return null;
         }
+
+        return null;
     }
 
-    private async Task<Tag> FetchTagAsync(int tagId)
+    private async Task<Tag?> FetchTagAsync(int tagId)
     {
         try
         {
-            return await HttpClient.GetFromJsonAsync<Tag>((HttpURL + RequestURLTag) + tagId);
+            await LocalUserStorage.Load();
+            if (LocalUserStorage.UserInfo == null)
+            {
+                NavigationManager.NavigateTo(NavigationManager.BaseUri);
+                return null;
+            }
+
+            Parameters = new Dictionary<string, string>
+            {
+                {"id", tagId.ToString()},
+                { nameof(addDeleted), addDeleted.ToString() }
+            };
+
+            var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetTagApiEndpoint, Parameters, LocalUserStorage.UserInfo.AuthToken);
+            var response = await HttpClient.SendAsync(request);
+            
+            var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
+            if (content != null) return JsonConvert.DeserializeObject<Tag>(content)!;
         }
-        catch
+        catch(Exception ex)
         {
+            Console.WriteLine($"Error fetching project id {tagId} Error: {ex.Message}");
             return null;
         }
+
+        return null;
     }
 
     private async Task CheckboxChanged()
@@ -170,13 +239,23 @@
             addDeleted = false;
         }
 
-        entries = await HttpClient.GetFromJsonAsync<PagedResponseKeySet<HourEntry>>((HttpURL + RequestURL) + addDeleted);
+        Parameters = new Dictionary<string, string>
+        {
+            { nameof(addDeleted), addDeleted.ToString() }
+        };
+
+        var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetAllHourApiEndpoint, Parameters, LocalUserStorage.UserInfo!.AuthToken);
+        var response = await HttpClient.SendAsync(request);
+        
+        var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
+        if (content != null) PagedResponseKeySet = JsonConvert.DeserializeObject<PagedResponseKeySet<HourEntry>>(content);
+
         StateHasChanged();
     }
 
     private async Task RefreshTable2()
     {
-        Console.WriteLine("RefreshTable2() was called from Project");
+        Console.WriteLine("RefreshTable2() was called from AllTimes");
         await LoadAllTimes();
 
         StateHasChanged();

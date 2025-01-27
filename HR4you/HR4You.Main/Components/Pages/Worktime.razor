@@ -1,13 +1,21 @@
 ﻿@page "/Worktime"
+@using HR4You.Components.Tables
+@using HR4You.Components.Other
+@using HR4You.Model.Base.Pagination
+@using Newtonsoft.Json
 @rendermode InteractiveServer
 @inject HttpClient HttpClient
-@inject IConfiguration Configuration
 
 <PageTitle>Worktime</PageTitle>
+<div class="page-content min-h-[100vh] p-3 flex flex-col gap-2 select-none">
 
-<h1>Worktime</h1>
+    <div class="flex flex-row justify-between">
+        <h1 class="text-[2rem] font-bold flex flex-row gap-3 items-center"><i class="fa-solid fa-calendar-days"></i>Worktime</h1>
+    </div>
 
-@if (entries == null)
+    <UserInfo></UserInfo>
+
+@if (PagedResponseOffset == null)
 {
     <p>
         <em>Loading...</em>
@@ -15,34 +23,53 @@
 }
 else
 {
-    <WorktimeTable entries="entries">
-    </WorktimeTable>
-}
+    <div class="table-wrapper overflow-auto">
+        <WorktimeTable entries="PagedResponseOffset.Data">
+        </WorktimeTable>
+    </div>
 
+    <OffsetPagination entries="PagedResponseOffset" OnPageChanged="EventCallback.Factory.Create<PagedResponseOffset<WorkTime>>(this, UpdateEntries)" Parameters="new Dictionary<string, string>()" ApiEndpoint=@GetAllApiEndpoint/>
+}
+</div>
 
 @code {
-    private string HttpURL;
+    
+    private const string ApiEndpointRoute = "api/master-data/work-time/";
+    private const string GetAllApiEndpoint = $"{ApiEndpointRoute}get-all-paged";
 
-    public string RequestURL = "/api/master-data/work-time/get-all";
+    public PagedResponseOffset<WorkTime>? PagedResponseOffset;
 
-    public List<WorkTime> entries;
-
-
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        //Get first value from appsettings.json "Urls"
-        var urls = Configuration["Urls"];
-        HttpURL = urls?.Split(';').FirstOrDefault();
-
-        await LoadWorktime();
+        if (firstRender)
+        {
+            await LoadWorktime();
+        }
     }
-
+    
+    private void UpdateEntries(PagedResponseOffset<WorkTime> newEntries)
+    {
+        PagedResponseOffset = newEntries;
+    }
+    
     private async Task LoadWorktime()
     {
         try
         {
-            entries = await HttpClient.GetFromJsonAsync<List<WorkTime>>(HttpURL + RequestURL);
-            //Console.WriteLine(entries);
+            await LocalUserStorage.Load();
+            if (LocalUserStorage.UserInfo == null)
+            {
+                NavigationManager.NavigateTo(NavigationManager.BaseUri);
+                return;
+            }
+
+            var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetAllApiEndpoint, new Dictionary<string, string>(), LocalUserStorage.UserInfo.AuthToken);
+            var response = await HttpClient.SendAsync(request);
+            
+            var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
+            if (content != null) PagedResponseOffset = JsonConvert.DeserializeObject<PagedResponseOffset<WorkTime>>(content);
+
+            StateHasChanged();
         }
         catch (Exception ex)
         {

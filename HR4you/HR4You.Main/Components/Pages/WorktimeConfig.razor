@@ -1,95 +1,242 @@
 ﻿@page "/WorktimeConfig"
 @using HR4You.Components.Tables
+@using HR4You.Components.Other
+@using HR4You.Model.Base
+@using HR4You.Model.Base.Pagination
+@using Newtonsoft.Json
 @rendermode InteractiveServer
 @inject HttpClient HttpClient
-@inject IConfiguration Configuration
 
 <PageTitle>WorktimeConfig</PageTitle>
+<div class="page-content min-h-[100vh] p-3 flex flex-col gap-2 select-none">
 
-<h1>Worktime Config</h1>
+    <div class="flex flex-row justify-between">
+        <h1 class="text-[2rem] font-bold flex flex-row gap-3 items-center"><i class="fa-solid fa-calendar-days"></i>Worktime</h1>
+    </div>
 
-@if (entries == null)
-{
+    <UserInfo></UserInfo>
+
+    @if (PagedResponseOffsetWorktime == null)
+    {
     <p>
         <em>Loading...</em>
     </p>
-}
-else
-{
-    <WorktimeConfigTable entries="entries" @ref="popupRef2" OnCustomerUpdated2="RefreshTable2">
-    </WorktimeConfigTable>
-}
+    }
+    else
+    {
+        <div class="flex flex-row gap-2 items-center">
+            <div class="bg-gray-200 p-[5px] rounded-[5px] border border-1 border-[#c1c1c1] flex flex-row gap-1 justify-center items-center">
+                <label for="showDeleted">Show Deleted</label>
+                <input class="h-4 w-4" id="showDeleted" type="checkbox" checked="@addDeletedWorktime" @oninput="CheckboxChangedWorktime">
+            </div>
+        </div>
+        
+    <div class="table-wrapper overflow-auto">
+        <WorktimeConfigTable entries="PagedResponseOffsetWorktime.Data" @ref="popupRefWorktime2" OnWorktimeUpdated2="RefreshTable2">
+        </WorktimeConfigTable>
+    </div>
 
-<br />
-<h1>Holiday</h1>
+    <OffsetPagination entries="PagedResponseOffsetWorktime" OnPageChanged="EventCallback.Factory.Create<PagedResponseOffset<WorkTime>>(this, UpdateEntriesWorktime)" Parameters=@ParametersWorktime ApiEndpoint=@GetAllWorktimeApiEndpoint/>
+    }
+</div>
 
-@if (entriesHoliday == null)
-{
-    <p>
-        <em>Loading...</em>
-    </p>
-}
-else
-{
-    <HolidayTable entriesHoliday="entriesHoliday" @ref="popupRefHoliday2" OnHolidayUpdated2="RefreshTable2">
-    </HolidayTable>
-}
+
+<div class="page-content min-h-[100vh] p-3 flex flex-col gap-2 select-none">
+
+    <div class="flex flex-row justify-between">
+        <h1 class="text-[2rem] font-bold flex flex-row gap-3 items-center"><i class="fa-solid fa-calendar-days"></i>Holiday</h1>
+    </div>
+    
+    @if (PagedResponseOffsetHoliday == null)
+    {
+        <p>
+            <em>Loading...</em>
+        </p>
+    }
+    else
+    {
+        <div class="flex flex-row gap-2 items-center">
+            <SearchComponent Options1="options1" Options2="options2"/>
+            <div class="bg-gray-200 p-[5px] rounded-[5px] border border-1 border-[#c1c1c1] flex flex-row gap-1 justify-center items-center">
+                <label for="showDeleted">Show Deleted</label>
+                <input class="h-4 w-4" id="showDeleted" type="checkbox" checked="@addDeletedHoliday" @oninput="CheckboxChangedHoliday">
+            </div>
+        </div>
+
+        <div class="table-wrapper overflow-auto">
+            <HolidayTable entriesHoliday="PagedResponseOffsetHoliday.Data" @ref="popupRefHoliday2" OnHolidayUpdated2="RefreshTable2">
+            </HolidayTable>
+        </div>
+
+        <OffsetPagination entries="PagedResponseOffsetHoliday" OnPageChanged="EventCallback.Factory.Create<PagedResponseOffset<Holiday>>(this, UpdateEntriesHoliday)" Parameters=@ParametersHoliday ApiEndpoint=@GetAllHolidayApiEndpoint/>
+    }
+</div>
 
 
 @code {
-    private string HttpURL;
+    private const string ApiWorktimeEndpointRoute = "api/master-data/work-time/";
+    private const string ApiHolidayEndpointRoute = "api/master-data/holiday/";
+    private const string GetAllWorktimeApiEndpoint = $"{ApiWorktimeEndpointRoute}get-all-paged";
+    private const string GetAllHolidayApiEndpoint = $"{ApiHolidayEndpointRoute}get-all-paged";
 
-    public string RequestURL = "/api/master-data/work-time/get-all";
-    public string RequestURLHoliday = "/api/master-data/holiday/get-all";
+    public PagedResponseOffset<WorkTime>? PagedResponseOffsetWorktime;
+    public PagedResponseOffset<Holiday>? PagedResponseOffsetHoliday;
+    public Dictionary<string, string> ParametersWorktime;
+    public Dictionary<string, string> ParametersHoliday;
+    
+    //TODO create options
+    public FilterOption[] options1 =
+    [
+    ];
 
-    public List<WorkTime> entries;
-    public List<Holiday> entriesHoliday;
+    public FilterOption[] options2 =
+    [
+    ];
 
-    private WorktimeConfigTable popupRef2;
-    private HolidayTable popupRefHoliday2;
+    public bool addDeletedWorktime;
+    public bool addDeletedHoliday;
 
-    protected override void OnAfterRender(bool firstRender)
+    private WorktimeConfigTable? popupRefWorktime2;
+    private HolidayTable? popupRefHoliday2;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && popupRef2 != null && popupRefHoliday2 != null)
+        if (firstRender)
         {
-            popupRef2.OnCustomerUpdated2 = EventCallback.Factory.Create(this, RefreshTable2);
+            addDeletedWorktime = false;
+            addDeletedHoliday = false;
+            
+            await LoadWorktime();
+            await LoadHoliday();
+        }
+        
+        if (firstRender && popupRefWorktime2 != null && popupRefHoliday2 != null)
+        {
+            popupRefWorktime2.OnWorktimeUpdated2 = EventCallback.Factory.Create(this, RefreshTable2);
             popupRefHoliday2.OnHolidayUpdated2 = EventCallback.Factory.Create(this, RefreshTable2);
         }
     }
-
-    protected override async Task OnInitializedAsync()
+    
+    private void UpdateEntriesWorktime(PagedResponseOffset<WorkTime> newEntries)
     {
-        //Get first value from appsettings.json "Urls"
-        var urls = Configuration["Urls"];
-        HttpURL = urls?.Split(';').FirstOrDefault();
-
-        await LoadWorktime();
-        await LoadHoliday();
+        PagedResponseOffsetWorktime = newEntries;
+    }
+    
+    private void UpdateEntriesHoliday(PagedResponseOffset<Holiday> newEntries)
+    {
+        PagedResponseOffsetHoliday = newEntries;
     }
 
     private async Task LoadWorktime()
     {
         try
         {
-            entries = await HttpClient.GetFromJsonAsync<List<WorkTime>>(HttpURL + RequestURL);
+            await LocalUserStorage.Load();
+            if (LocalUserStorage.UserInfo == null)
+            {
+                NavigationManager.NavigateTo(NavigationManager.BaseUri);
+                return;
+            }
+
+            ParametersWorktime = new Dictionary<string, string>
+            {
+                { "addDeleted", addDeletedWorktime.ToString() }
+            };
+
+            var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetAllWorktimeApiEndpoint, ParametersWorktime, LocalUserStorage.UserInfo.AuthToken);
+            var response = await HttpClient.SendAsync(request);
+            
+            var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
+            if (content != null) PagedResponseOffsetWorktime = JsonConvert.DeserializeObject<PagedResponseOffset<WorkTime>>(content);
+
+            StateHasChanged();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error fetching entries: {ex.Message}");
         }
     }
-
+    
     private async Task LoadHoliday()
     {
         try
         {
-            entriesHoliday = await HttpClient.GetFromJsonAsync<List<Holiday>>(HttpURL + RequestURLHoliday);
+            await LocalUserStorage.Load();
+            if (LocalUserStorage.UserInfo == null)
+            {
+                NavigationManager.NavigateTo(NavigationManager.BaseUri);
+                return;
+            }
+
+            ParametersHoliday = new Dictionary<string, string>
+            {
+                { "addDeleted", addDeletedHoliday.ToString() }
+            };
+
+            var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetAllHolidayApiEndpoint, ParametersHoliday, LocalUserStorage.UserInfo.AuthToken);
+            var response = await HttpClient.SendAsync(request);
+            
+            var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
+            if (content != null) PagedResponseOffsetHoliday = JsonConvert.DeserializeObject<PagedResponseOffset<Holiday>>(content);
+
+            StateHasChanged();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error fetching entries: {ex.Message}");
         }
     }
+    
+    private async Task CheckboxChangedWorktime()
+    {
+        if (addDeletedWorktime == false)
+        {
+            addDeletedWorktime = true;
+        }
+        else
+        {
+            addDeletedWorktime = false;
+        }
+
+        ParametersWorktime = new Dictionary<string, string>
+        {
+            { "addDeleted", addDeletedWorktime.ToString() }
+        };
+
+        var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetAllWorktimeApiEndpoint, ParametersWorktime, LocalUserStorage.UserInfo!.AuthToken);
+        var response = await HttpClient.SendAsync(request);
+        
+        var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
+        if (content != null) PagedResponseOffsetWorktime = JsonConvert.DeserializeObject<PagedResponseOffset<WorkTime>>(content);
+
+        StateHasChanged();
+    }
+
+    private async Task CheckboxChangedHoliday()
+    {
+        if (addDeletedHoliday == false)
+        {
+            addDeletedHoliday = true;
+        }
+        else
+        {
+            addDeletedHoliday = false;
+        }
+
+        ParametersHoliday = new Dictionary<string, string>
+        {
+            { "addDeleted", addDeletedHoliday.ToString() }
+        };
+
+        var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetAllHolidayApiEndpoint, ParametersHoliday, LocalUserStorage.UserInfo!.AuthToken);
+        var response = await HttpClient.SendAsync(request);
+        
+        var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
+        if (content != null) PagedResponseOffsetHoliday = JsonConvert.DeserializeObject<PagedResponseOffset<Holiday>>(content);
+
+        StateHasChanged();
+    }
+
 
     private async Task RefreshTable2()
     {
