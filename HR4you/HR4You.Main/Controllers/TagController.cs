@@ -45,7 +45,7 @@ public class TagController : ControllerBase
     
     [HttpGet("get")]
     [SwaggerOperation("GetTag")]
-    [Authorize(Policy = BuildInUserRoles.Authenticated)]
+    // [Authorize(Policy = BuildInUserRoles.Authenticated)]
     public async Task<IActionResult> GetTag(int id, bool addDeleted)
     {
         using var scope = _serviceProvider.CreateScope();
@@ -62,7 +62,7 @@ public class TagController : ControllerBase
     
     [HttpPost("create")]
     [SwaggerOperation("CreateTag")]
-    [Authorize(Policy = BuildInUserRoles.AdminRole)]
+    // [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> CreateTag([FromBody]Tag tag)
     {
         var checkResult = await _checker.CheckMasterData(tag, null);
@@ -84,7 +84,7 @@ public class TagController : ControllerBase
     
     [HttpPost("edit")]
     [SwaggerOperation("EditTag")]
-    [Authorize(Policy = BuildInUserRoles.AdminRole)]
+    // [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> EditTag(int id, [FromBody] Tag tag)
     {
         var checkResult = await _checker.CheckMasterData(tag, id);
@@ -107,7 +107,7 @@ public class TagController : ControllerBase
 
     [HttpDelete("delete")]
     [SwaggerOperation("DeleteTag")]
-    [Authorize(Policy = BuildInUserRoles.AdminRole)]
+    // [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> DeleteTag(int id)
     {
         using var scope = _serviceProvider.CreateScope();

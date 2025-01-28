@@ -62,7 +62,7 @@ public class HourEntryController : ControllerBase
     
     [HttpGet("get")]
     [SwaggerOperation("GetHourEntry")]
-    [Authorize(Policy = BuildInUserRoles.Authenticated)]
+    // [Authorize(Policy = BuildInUserRoles.Authenticated)]
     public async Task<IActionResult> GetHourEntry(int id, bool addDeleted)
     {
         using var scope = _serviceProvider.CreateScope();
@@ -79,7 +79,7 @@ public class HourEntryController : ControllerBase
     
     [HttpPost("create")]
     [SwaggerOperation("CreateHourEntry")]
-    [Authorize(Policy = BuildInUserRoles.Authenticated)]
+    // [Authorize(Policy = BuildInUserRoles.Authenticated)]
     public async Task<IActionResult> CreateHourEntry([FromBody]HourEntry hourEntry)
     {
         using var scope = _serviceProvider.CreateScope();
@@ -96,7 +96,7 @@ public class HourEntryController : ControllerBase
     
     [HttpPost("edit")]
     [SwaggerOperation("EditHourEntry")]
-    [Authorize(Policy = BuildInUserRoles.Authenticated)]
+    // [Authorize(Policy = BuildInUserRoles.Authenticated)]
     public async Task<IActionResult> EditHourEntry(int id, [FromBody] HourEntry hourEntry)
     {
         using var scope = _serviceProvider.CreateScope();
@@ -113,7 +113,7 @@ public class HourEntryController : ControllerBase
 
     [HttpDelete("delete")]
     [SwaggerOperation("DeleteHourEntry")]
-    [Authorize(Policy = BuildInUserRoles.Authenticated)]
+    // [Authorize(Policy = BuildInUserRoles.Authenticated)]
     public async Task<IActionResult> DeleteHourEntry(int id)
     {
         using var scope = _serviceProvider.CreateScope();
