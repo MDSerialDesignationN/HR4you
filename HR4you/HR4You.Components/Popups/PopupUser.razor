@@ -138,15 +138,10 @@
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Password = "1234",
-                //RoleGroups = "HR_UserRoleGroup_Authenticated"
-                RoleGroups = new string[] { "HR_UserRoleGroup_SysManagement", "HR_UserRoleGroup_Admin", "HR_UserRoleGroup_Authenticated" }
+                RoleGroups = new string[] { "HR_UserRoleGroup_Authenticated" }
             };
-
-            var content = new StringContent(JsonSerializer.Serialize(newUserCreation), Encoding.UTF8, "application/json");  
             
-            Console.WriteLine(newUserCreation);
-
-            var response = await HttpClient.PostAsJsonAsync(createURL, content);
+            var response = await HttpClient.PostAsJsonAsync(createURL, newUserCreation);
 
             if (response.IsSuccessStatusCode)
             {
