@@ -77,7 +77,7 @@
 
     bool isEdit = false;
 
-    async public Task Show(string givenId, string requestURL, string headerText)
+    async public Task ShowEdit(string givenId, string requestURL, string headerText)
     {
         HeaderText = headerText;
         GivenId = givenId.ToString();
@@ -87,7 +87,7 @@
         StateHasChanged();
     }
 
-    async public Task ShowOverview(string headerText)
+    async public Task ShowCreate(string headerText)
     {
         HeaderText = headerText;
         IsVisible = true;

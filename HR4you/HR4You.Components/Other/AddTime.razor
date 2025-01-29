@@ -1,0 +1,14 @@
+﻿@using HR4You.Components.Popups
+@rendermode InteractiveServer
+
+<PopupMyTimes @ref="popupRef" />
+<button type="button" class="btn btn-dark AddTime" @onclick="(() => CreateEntry())"><i class="fa-solid fa-plus"></i></button>
+
+@code {
+    private PopupMyTimes popupRef;
+
+    private async Task CreateEntry()
+    {
+        await popupRef.ShowCreate("http://localhost:5001/api/master-data/hour-entry/create", "Add Hour Entry");
+    }
+}

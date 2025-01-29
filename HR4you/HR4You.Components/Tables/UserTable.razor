@@ -72,7 +72,7 @@
 
     private void EditEntry(string GivenId)
     {
-        popupRef.Show(GivenId, RequestURLEdit, "Edit User");
+        popupRef.ShowEdit(GivenId, RequestURLEdit, "Edit User");
     }
 
     private async Task DeleteEntry(string GivenId)
@@ -106,7 +106,7 @@
 
     private void CreateUser()
     {
-        popupRef.ShowOverview("Add User");
+        popupRef.ShowCreate("Add User");
     }
 
     private async Task RefreshTable()
