@@ -49,10 +49,11 @@
                             </InputSelect>
                         </div>
 
-                        <!-- Name and State -->
+                        <!-- Name and Tag -->
                         <div class="col-sm-4">
                             <label>Date</label>
                             <InputDate @bind-Value="allTimes.Date" class="form-control mb-2" />
+                            <ValidationMessage For="(() => allTimes.Date)" class="text-red-600 font-light mb-2"/>
 
                             <label>Tag</label>
                             <InputSelect @bind-Value="allTimes.TagId" class="form-select">
@@ -73,18 +74,56 @@
 
                         <!-- Name and State -->
                         <div class="col-sm-2">
-                            <label>Start Time</label>
-                            <InputDate Type="InputDateType.Time" @bind-Value="allTimes.StartTime" class="form-control mb-2" />
+                            <label for="startTime">Start Time (hh:mm)</label>
+                            <div class="d-flex align-items-center">
+                                <!-- Hour Selection -->
+                                <InputSelect @bind-Value="selectedHourST" TValue="int" class="form-select me-2" style="width: 70px; overflow-y: auto;">
+                                    @for (int hour = 0; hour < 24; hour++)
+                                    {
+                                        <option value="@hour">@hour.ToString("D2")</option>
+                                    }
+                                </InputSelect>
+                            
+                                <!-- Minute Selection -->
+                                <InputSelect @bind-Value="selectedMinuteST" TValue="int" class="form-select" style="width: 70px; overflow-y: auto;">
+                                    @foreach (var minute in minuteIntervals)
+                                    {
+                                        <option value="@minute">@minute.ToString("D2")</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                        <!--   <InputDate Type="InputDateType.Time" @bind-Value="allTimes.StartTime" class="form-control mb-2" /> --> 
+                            <ValidationMessage For="(() => allTimes.StartTime)" class="text-red-600 font-light mb-2"/>
 
+                                <br />
                             <label>Is Holiday</label>
                             <InputCheckbox @bind-Value="allTimes.IsHoliday" />
                         </div>
 
                         <!-- Name and State -->
                         <div class="col-sm-2">
-                            <label>End Time</label>
-                            <InputDate Type="InputDateType.Time" @bind-Value="allTimes.EndTime" class="form-control mb-2" />
-
+                            <label for="endTime">End Time (hh:mm)</label>
+                            <div class="d-flex align-items-center">
+                                <!-- Hour Selection -->
+                                <InputSelect @bind-Value="selectedHourET" TValue="int" class="form-select me-2" style="width: 70px; overflow-y: auto;">
+                                    @for (int hour = 0; hour < 24; hour++)
+                                    {
+                                        <option value="@hour">@hour.ToString("D2")</option>
+                                    }
+                                </InputSelect>
+                            
+                                <!-- Minute Selection -->
+                                <InputSelect @bind-Value="selectedMinuteET" TValue="int" class="form-select" style="width: 70px; overflow-y: auto;">
+                                    @foreach (var minute in minuteIntervals)
+                                    {
+                                        <option value="@minute">@minute.ToString("D2")</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                            <!-- <InputDate Type="InputDateType.Time" @bind-Value="allTimes.EndTime" class="form-control mb-2" /> -->
+                            <ValidationMessage For="(() => allTimes.EndTime)" class="text-red-600 font-light mb-2"/>
+                            
+                                <br />
                             <label>Is Billable</label>
                             <InputCheckbox @bind-Value="allTimes.IsBillable" />
 
@@ -129,13 +168,15 @@
 
     HourEntry allTimes = new HourEntry();
 
+    private List<int> minuteIntervals = new List<int> { 0, 15, 30, 45 };
+
     public List<Project> projectList = [];
 
     public List<Tag> tagList = [];
 
-    public string RequestURLProject = "http://localhost:5001/api/master-data/project/get-all?addDeleted=true";
+    public string RequestURLProject = "http://localhost:5001/api/master-data/project/get-all?addDeleted=true"; //replace with correct one
 
-    public string RequestURLTag = "http://localhost:5001/api/master-data/tag/get-all?addDeleted=true";
+    public string RequestURLTag = "http://localhost:5001/api/master-data/tag/get-all?addDeleted=true"; //replace with correct one
 
     bool isEdit = false;
 
@@ -160,8 +201,8 @@
 
     private async Task Submit()
     {
-        var editURL = "http://localhost:5001/api/master-data/hour-entry/edit?Id=";
-        var createURL = "http://localhost:5001/api/master-data/hour-entry/create";
+        var editURL = "http://localhost:5001/api/master-data/hour-entry/edit?Id="; //replace with correct one
+        var createURL = "http://localhost:5001/api/master-data/hour-entry/create"; //replace with correct one
 
         if (isEdit == true)
         {
@@ -203,6 +244,44 @@
 
                 Close();
             }
+        }
+    }
+
+    // Selected values for hours and minutes start time
+    private int selectedHourST
+    {
+        get => allTimes.StartTime.Hour;
+        set
+        {
+            allTimes.StartTime = new TimeOnly(value, allTimes.StartTime.Minute);
+        }
+    }
+
+    private int selectedMinuteST
+    {
+        get => allTimes.StartTime.Minute;
+        set
+        {
+            allTimes.StartTime = new TimeOnly(allTimes.StartTime.Hour, value);
+        }
+    }
+
+    // Selected values for hours and minutes end time
+    private int selectedHourET
+    {
+        get => allTimes.EndTime.Hour;
+        set
+        {
+            allTimes.EndTime = new TimeOnly(value, allTimes.EndTime.Minute);
+        }
+    }
+
+    private int selectedMinuteET
+    {
+        get => allTimes.EndTime.Minute;
+        set
+        {
+            allTimes.EndTime = new TimeOnly(allTimes.EndTime.Hour, value);
         }
     }
 

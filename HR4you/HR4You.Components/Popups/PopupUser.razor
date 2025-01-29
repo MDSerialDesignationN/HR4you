@@ -39,6 +39,16 @@
                             <label>Username</label>
                             <InputText @bind-Value="user.UserName" class="form-control mb-2" />                           
                         </div>
+
+                        @if (isEdit == false)
+                        {
+                            <!-- Password -->
+                            <div class="col-sm-4">
+                                <label>Password</label>
+                                <input type="text" @bind="txtPassword" class="form-control mb-2" />
+                            </div>
+                        }
+
                     </div>
 
                     <!-- Buttons -->
@@ -75,9 +85,13 @@
 
     UserInfo user = new UserInfo();
 
+    private string txtPassword = "";
+
+    //string newUserCreation = { };
+
     bool isEdit = false;
 
-    async public Task Show(string givenId, string requestURL, string headerText)
+    async public Task ShowEdit(string givenId, string requestURL, string headerText)
     {
         HeaderText = headerText;
         GivenId = givenId.ToString();
@@ -87,7 +101,7 @@
         StateHasChanged();
     }
 
-    async public Task ShowOverview(string headerText)
+    async public Task ShowCreate(string headerText)
     {
         HeaderText = headerText;
         IsVisible = true;
@@ -129,18 +143,32 @@
             }
         }
         else if (isEdit == false)
-        {           
-            var response = await HttpClient.PostAsJsonAsync(createURL, user);
-
-            if (response.IsSuccessStatusCode)
+        {
+            if(txtPassword != null)
             {
-                Console.WriteLine("User created successfully.");
+                var newUserCreation = new
+                {
+                    UserName = user.UserName,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Password = txtPassword,
+                    RoleGroups = new string[] { "HR_UserRoleGroup_Authenticated" }
+                };
+                
+                var response = await HttpClient.PostAsJsonAsync(createURL, newUserCreation);
 
-                Close();
-            }
-            else
-            {
-                Console.WriteLine("Error occurred while creating the user: " + response.ReasonPhrase);
+                if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("User created successfully.");
+                    txtPassword = "";
+                    Close();
+                }
+                else
+                {
+                    Console.WriteLine("Error occurred while creating the user: " + response.ReasonPhrase);
+                    txtPassword = "";
+                }
+
             }
         }
     }
@@ -149,7 +177,7 @@
     {
         user = new UserInfo();
         HeaderText = string.Empty;
-        GivenId = null;
+        GivenId = null; 
         IsVisible = false;
 
         StateHasChanged();

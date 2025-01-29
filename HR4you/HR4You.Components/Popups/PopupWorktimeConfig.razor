@@ -26,36 +26,43 @@
                         <div class="col-sm">
                             <label>Monday (h)</label>
                             <InputNumber @bind-Value="worktime.MinMonHours" class="form-control mb-2" />
+                            <ValidationMessage For="(() => worktime.MinMonHours)" class="text-red-600 font-light mb-2" />
                         </div>
 
                         <div class="col-sm">
                             <label>Tuesday (h)</label>
                             <InputNumber @bind-Value="worktime.MinTueHours" class="form-control mb-2" />
+                            <ValidationMessage For="(() => worktime.MinTueHours)" class="text-red-600 font-light mb-2" />
                         </div>
                         
                         <div class="col-sm">
                             <label>Wednesday (h)</label>
                             <InputNumber @bind-Value="worktime.MinWedHours" class="form-control mb-2" />
+                            <ValidationMessage For="(() => worktime.MinWedHours)" class="text-red-600 font-light mb-2" />
                         </div>
 
                         <div class="col-sm">
                             <label>Thursday (h)</label>
                             <InputNumber @bind-Value="worktime.MinThuHours" class="form-control mb-2" />
+                            <ValidationMessage For="(() => worktime.MinThuHours)" class="text-red-600 font-light mb-2" />
                         </div>
 
                         <div class="col-sm">
                             <label>Friday (h)</label>
                             <InputNumber @bind-Value="worktime.MinFriHours" class="form-control mb-2" />
+                            <ValidationMessage For="(() => worktime.MinFriHours)" class="text-red-600 font-light mb-2" />
                         </div>
 
                         <div class="col-sm">
                             <label>Saturday (h)</label>
                             <InputNumber @bind-Value="worktime.MinSatHours" class="form-control mb-2" />
+                            <ValidationMessage For="(() => worktime.MinSatHours)" class="text-red-600 font-light mb-2" />
                         </div>
 
                         <div class="col-sm">
                             <label>Sunday (h)</label>
                             <InputNumber @bind-Value="worktime.MinSunHours" class="form-control mb-2" />
+                            <ValidationMessage For="(() => worktime.MinSunHours)" class="text-red-600 font-light mb-2" />
                         </div>
 
                     </div>

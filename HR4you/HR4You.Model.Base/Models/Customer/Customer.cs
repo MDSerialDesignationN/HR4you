@@ -7,11 +7,11 @@ namespace HR4You.Model.Base.Models.Customer
     [Table("hr4you_customer")]
     public class Customer : ModelBase
     {
-        [Required] public int CustomerNumber { get; set; } //todo set constraint for unique
-        [Required] public string Name { get; set; } = null!;
+        [Required(ErrorMessage = "Customer number required!")] public int CustomerNumber { get; set; } //todo set constraint for unique
+        [Required(ErrorMessage = "Name required!")] public string Name { get; set; } = null!;
         public string? Description { get; set; }
         public string? Address { get; set; }
-        public string? Email { get; set; }
+        [EmailAddress(ErrorMessage = "Please enter a valid email address")] public string? Email { get; set; }
         public string? Website { get; set; }
         public string? PhoneNumber { get; set; }
         [JsonIgnore] public ICollection<Project.Project>? Projects { get; } = new List<Project.Project>();

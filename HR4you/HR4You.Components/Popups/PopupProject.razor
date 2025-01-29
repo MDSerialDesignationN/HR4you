@@ -27,6 +27,7 @@
                         <div class="col-sm-4">
                             <label>Project Number</label>
                             <InputNumber @bind-Value="project.ProjectNumber" class="form-control mb-2" />
+                            <ValidationMessage For="(() => project.ProjectNumber)" class="text-red-600 font-light mb-2"/>
 
                             <label>Customer</label>
                             <InputSelect @bind-Value="project.CustomerId">

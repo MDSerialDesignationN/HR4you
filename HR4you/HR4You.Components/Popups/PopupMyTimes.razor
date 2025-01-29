@@ -22,7 +22,7 @@
             <div class="toast-body" style="padding: 20px;">
                 <div class="container">
                     <div class="row">
-                        <!-- Project Number and Customer -->
+                        <!-- Project Number and Type -->
                         <div class="col-sm-4">
                             <label>Project</label>
                             <InputSelect @bind-Value="myTimes.ProjectId" class="form-select">
@@ -49,10 +49,11 @@
                             </InputSelect>
                         </div>
 
-                        <!-- Name and State -->
+                        <!-- Date and Tag -->
                         <div class="col-sm-4">
                             <label>Date</label>
                             <InputDate @bind-Value="myTimes.Date" class="form-control mb-2" />
+                            <ValidationMessage For="(() => myTimes.Date)" class="text-red-600 font-light mb-2"/>
 
                             <label>Tag</label>
                             <InputSelect @bind-Value="myTimes.TagId" class="form-select">
@@ -71,23 +72,56 @@
                             </InputSelect>
                         </div>
 
-                        <!-- Name and State -->
+                        <!-- StartTime and IsHoliday -->
                         <div class="col-sm-2">
-                            <label>Start Time</label>
-                            <InputDate Type="InputDateType.Time" @bind-Value="myTimes.StartTime" class="form-control mb-2" />
+                            <label for="startTime">Start Time (hh:mm)</label>
+                            <div class="d-flex align-items-center">
+                                <!-- Hour Selection -->
+                                <InputSelect @bind-Value="selectedHourST" TValue="int" class="form-select me-2" style="width: 70px; overflow-y: auto;">
+                                    @for (int hour = 0; hour < 24; hour++)
+                                    {
+                                        <option value="@hour">@hour.ToString("D2")</option>
+                                    }
+                                </InputSelect>
+                            
+                                <!-- Minute Selection -->
+                                <InputSelect @bind-Value="selectedMinuteST" TValue="int" class="form-select" style="width: 70px; overflow-y: auto;">
+                                    @foreach (var minute in minuteIntervals)
+                                    {
+                                        <option value="@minute">@minute.ToString("D2")</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                            <ValidationMessage For="(() => myTimes.StartTime)" class="text-red-600 font-light mb-2"/>
 
                             <label>Is Holiday</label>
                             <InputCheckbox @bind-Value="myTimes.IsHoliday" />
                         </div>
 
-                        <!-- Name and State -->
+                        <!-- EndTime and IsBillable -->
                         <div class="col-sm-2">
-                            <label>End Time</label>
-                            <InputDate Type="InputDateType.Time" @bind-Value="myTimes.EndTime" class="form-control mb-2" />
+                            <label for="endTime">End Time (hh:mm)</label>
+                            <div class="d-flex align-items-center">
+                                <!-- Hour Selection -->
+                                <InputSelect @bind-Value="selectedHourET" TValue="int" class="form-select me-2" style="width: 70px; overflow-y: auto;">
+                                    @for (int hour = 0; hour < 24; hour++)
+                                    {
+                                        <option value="@hour">@hour.ToString("D2")</option>
+                                    }
+                                </InputSelect>
+                            
+                                <!-- Minute Selection -->
+                                <InputSelect @bind-Value="selectedMinuteET" TValue="int" class="form-select" style="width: 70px; overflow-y: auto;">
+                                    @foreach (var minute in minuteIntervals)
+                                    {
+                                        <option value="@minute">@minute.ToString("D2")</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                            <ValidationMessage For="(() => myTimes.EndTime)" class="text-red-600 font-light mb-2"/>
 
                             <label>Is Billable</label>
                             <InputCheckbox @bind-Value="myTimes.IsBillable" />
-
                         </div>
 
                         <!-- Description -->
@@ -126,6 +160,8 @@
 
     [Parameter]
     public string? GivenId { get; set; }
+
+    private List<int> minuteIntervals = new List<int> { 0, 15, 30, 45 };
 
     HourEntry myTimes = new HourEntry();
 
@@ -203,6 +239,44 @@
 
                 Close();
             }
+        }
+    }
+
+    // Selected values for hours and minutes start time
+    private int selectedHourST
+    {
+        get => myTimes.StartTime.Hour;
+        set
+        {
+            myTimes.StartTime = new TimeOnly(value, myTimes.StartTime.Minute);
+        }
+    }
+
+    private int selectedMinuteST
+    {
+        get => myTimes.StartTime.Minute;
+        set
+        {
+            myTimes.StartTime = new TimeOnly(myTimes.StartTime.Hour, value);
+        }
+    }
+
+    // Selected values for hours and minutes end time
+    private int selectedHourET
+    {
+        get => myTimes.EndTime.Hour;
+        set
+        {
+            myTimes.EndTime = new TimeOnly(value, myTimes.EndTime.Minute);
+        }
+    }
+
+    private int selectedMinuteET
+    {
+        get => myTimes.EndTime.Minute;
+        set
+        {
+            myTimes.EndTime = new TimeOnly(myTimes.EndTime.Hour, value);
         }
     }
 
