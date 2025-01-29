@@ -39,6 +39,12 @@
                             <label>Username</label>
                             <InputText @bind-Value="user.UserName" class="form-control mb-2" />                           
                         </div>
+
+                        <!-- Password -->
+                        <div class="col-sm-4">
+                            <label>Password</label>
+                            <input type="text" @bind="txtPassword" class="form-control mb-2" />
+                        </div>
                     </div>
 
                     <!-- Buttons -->
@@ -74,6 +80,8 @@
     public string createURL = "http://localhost:5001/api/auth/add-new-user";
 
     UserInfo user = new UserInfo();
+
+    private string txtPassword = "";
 
     //string newUserCreation = { };
 
@@ -132,26 +140,31 @@
         }
         else if (isEdit == false)
         {
-            var newUserCreation = new
+            if(txtPassword != null)
             {
-                UserName = user.UserName,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Password = "1234",
-                RoleGroups = new string[] { "HR_UserRoleGroup_Authenticated" }
-            };
-            
-            var response = await HttpClient.PostAsJsonAsync(createURL, newUserCreation);
+                var newUserCreation = new
+                {
+                    UserName = user.UserName,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Password = txtPassword,
+                    RoleGroups = new string[] { "HR_UserRoleGroup_Authenticated" }
+                };
+                
+                var response = await HttpClient.PostAsJsonAsync(createURL, newUserCreation);
 
-            if (response.IsSuccessStatusCode)
-            {
-                Console.WriteLine("User created successfully.");
+                if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("User created successfully.");
+                    txtPassword = "";
+                    Close();
+                }
+                else
+                {
+                    Console.WriteLine("Error occurred while creating the user: " + response.ReasonPhrase);
+                    txtPassword = "";
+                }
 
-                Close();
-            }
-            else
-            {
-                Console.WriteLine("Error occurred while creating the user: " + response.ReasonPhrase);
             }
         }
     }
