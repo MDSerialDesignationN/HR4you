@@ -45,7 +45,7 @@ public class ProjectController : ControllerBase
     
     [HttpGet("get")]
     [SwaggerOperation("GetProject")]
-    [Authorize(Policy = BuildInUserRoles.Authenticated)]
+    // [Authorize(Policy = BuildInUserRoles.Authenticated)]
     public async Task<IActionResult> GetProject(int id, bool addDeleted)
     {
         using var scope = _serviceProvider.CreateScope();
@@ -62,7 +62,7 @@ public class ProjectController : ControllerBase
     
     [HttpPost("create")]
     [SwaggerOperation("CreateProject")]
-    [Authorize(Policy = BuildInUserRoles.AdminRole)]
+    // [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> CreateProject([FromBody]Project project)
     {
         var checkResult = await _checker.CheckMasterData(project, null);
@@ -84,7 +84,7 @@ public class ProjectController : ControllerBase
     
     [HttpPost("edit")]
     [SwaggerOperation("EditProject")]
-    [Authorize(Policy = BuildInUserRoles.AdminRole)]
+    // [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> EditProject(int id, [FromBody] Project project)
     {
         var checkResult = await _checker.CheckMasterData(project, id);
@@ -107,7 +107,7 @@ public class ProjectController : ControllerBase
 
     [HttpDelete("delete")]
     [SwaggerOperation("DeleteProject")]
-    [Authorize(Policy = BuildInUserRoles.AdminRole)]
+    // [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> DeleteProject(int id)
     {
         using var scope = _serviceProvider.CreateScope();

@@ -45,7 +45,7 @@ public class HolidayController : ControllerBase
     
     [HttpGet("get")]
     [SwaggerOperation("GetHoliday")]
-    [Authorize(Policy = BuildInUserRoles.Authenticated)]
+    // [Authorize(Policy = BuildInUserRoles.Authenticated)]
     public async Task<IActionResult> GetHoliday(int id, bool addDeleted)
     {
         using var scope = _serviceProvider.CreateScope();
@@ -62,7 +62,7 @@ public class HolidayController : ControllerBase
     
     [HttpPost("create")]
     [SwaggerOperation("CreateHoliday")]
-    [Authorize(Policy = BuildInUserRoles.AdminRole)]
+    // [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> CreateHoliday([FromBody]Holiday holiday)
     {
         var checkResult = await _checker.CheckMasterData(holiday, null);
@@ -84,7 +84,7 @@ public class HolidayController : ControllerBase
 
     [HttpPost("edit")]
     [SwaggerOperation("EditHoliday")]
-    [Authorize(Policy = BuildInUserRoles.AdminRole)]
+    // [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> EditHoliday(int id, [FromBody] Holiday holiday)
     {
         var checkResult = await _checker.CheckMasterData(holiday, id);
@@ -107,7 +107,7 @@ public class HolidayController : ControllerBase
 
     [HttpDelete("delete")]
     [SwaggerOperation("DeleteHoliday")]
-    [Authorize(Policy = BuildInUserRoles.AdminRole)]
+    // [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> DeleteHoliday(int id)
     {
         using var scope = _serviceProvider.CreateScope();

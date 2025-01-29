@@ -1,106 +1,174 @@
 ﻿@page "/Projects"
 @using HR4You.Model.Base.Pagination
+@using HR4You.Components.Other
+@using HR4You.Components.Tables
+@using Newtonsoft.Json
+@using HR4You.Model.Base
 @attribute [StreamRendering]
 @rendermode InteractiveServer
 @inject HttpClient HttpClient
-@inject IConfiguration Configuration
 
 <PageTitle>Projects</PageTitle>
+<div class="page-content min-h-[100vh] p-3 flex flex-col gap-2 select-none">
 
-<h1>Projects</h1>
+    <div class="flex flex-row justify-between">
+        <h1 class="text-[2rem] font-bold flex flex-row gap-3 items-center"><i class="fa-solid fa-sheet-plastic"></i>Projects</h1>
+    </div>
 
-<label>Show Deleted</label>
-<input type="checkbox" checked="@addDeleted" @oninput="CheckboxChanged">
+    <UserInfo></UserInfo>
 
-@if (entries == null)
-{
-    <p>
-        <em>Loading...</em>
-    </p>
-}
-else
-{
-    @* <ProjectsTable entries="entries.Data" customerNames="customerNames" @ref="popupRef2" OnProjectUpdated2="RefreshTable2"> *@
-    @* </ProjectsTable> *@
-}
+
+    @if (PagedResponseOffset == null)
+    {
+        <p>
+            <em>Loading...</em>
+        </p>
+    }
+    else
+    {
+        <div class="flex flex-row gap-2 items-center">
+            <SearchComponent Options1="options1" Options2="options2"/>
+            <div class="bg-gray-200 p-[5px] rounded-[5px] border border-1 border-[#c1c1c1] flex flex-row gap-1 justify-center items-center">
+                <label for="showDeleted">Show Deleted</label>
+                <input class="h-4 w-4" id="showDeleted" type="checkbox" checked="@addDeleted" @oninput="CheckboxChanged">
+            </div>
+        </div>
+
+        <div class="table-wrapper overflow-auto">
+            <ProjectsTable entries="PagedResponseOffset.Data" customerNames="customerNames" @ref="popupRef2" OnProjectUpdated2="RefreshTable2">
+            </ProjectsTable>
+        </div>
+
+        <OffsetPagination entries="PagedResponseOffset" OnPageChanged="EventCallback.Factory.Create<PagedResponseOffset<Project>>(this, UpdateEntries)" Parameters="Parameters" ApiEndpoint=@GetAllProjectApiEndpoint/>
+    }
+</div>
 
 
 @code {
-    private string HttpURL;
+    private const string ApiProjectEndpointRoute = "api/master-data/project/";
+    private const string ApiCustomerEndpointRoute = "api/master-data/project/";
+    private const string GetAllProjectApiEndpoint = $"{ApiProjectEndpointRoute}get-all-paged";
+    private const string GetCustomerApiEndpoint = $"{ApiCustomerEndpointRoute}get";
 
-    public string RequestURL = "/api/master-data/project/get-all?addDeleted=";
+    public PagedResponseOffset<Project>? PagedResponseOffset;
+    public Dictionary<string, string> Parameters;
+
+    //TODO create options
+    public FilterOption[] options1 =
+    [
+    ];
+
+    public FilterOption[] options2 =
+    [
+    ];
 
     public bool addDeleted;
 
-    // private ProjectsTable popupRef2;
+    private ProjectsTable? popupRef2;
 
     public Dictionary<int, string> customerNames = new();
-    public PagedResponseKeySet<Project> entries;
 
-    public string RequestURLCustomer = "/api/master-data/customer/get?addDeleted=true&Id=";
-
-
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        // if (firstRender && popupRef2 != null)
-        // {
-        //     popupRef2.OnProjectUpdated2 = EventCallback.Factory.Create(this, RefreshTable2);
-        // }
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        // Get first value from appsettings.json "Urls"
-        var urls = Configuration["Urls"];
-        HttpURL = urls?.Split(';').FirstOrDefault();
-
-        addDeleted = false;
-        await LoadProjects();
-    }
-
-    private async Task<Customer> FetchCustomerAsync(int customerId)
-    {
-        try
+        if (firstRender)
         {
-            return await HttpClient.GetFromJsonAsync<Customer>((HttpURL + RequestURLCustomer) + customerId);
+            addDeleted = false;
+            await LoadProjects();
         }
-        catch
+
+        if (firstRender && popupRef2 != null)
         {
-            return null;
+            popupRef2.OnProjectUpdated2 = EventCallback.Factory.Create(this, RefreshTable2);
         }
+    }
+    
+    private void UpdateEntries(PagedResponseOffset<Project> newEntries)
+    {
+        PagedResponseOffset = newEntries;
     }
 
     private async Task LoadProjects()
     {
-        List<int> uniqueCustomerIds = new List<int>();
+        var uniqueCustomerIds = new List<int>();
 
         try
         {
-            entries = await HttpClient.GetFromJsonAsync<PagedResponseKeySet<Project>>((HttpURL + RequestURL) + addDeleted);
+            await LocalUserStorage.Load();
+            if (LocalUserStorage.UserInfo == null)
+            {
+                NavigationManager.NavigateTo(NavigationManager.BaseUri);
+                return;
+            }
+
+            Parameters = new Dictionary<string, string>
+            {
+                { nameof(addDeleted), addDeleted.ToString() }
+            };
+
+            var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetAllProjectApiEndpoint, Parameters, LocalUserStorage.UserInfo.AuthToken);
+            var response = await HttpClient.SendAsync(request);
+
+            var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
+            if (content != null) PagedResponseOffset = JsonConvert.DeserializeObject<PagedResponseOffset<Project>>(content);
+
+
+            // Fetch customer names for all entries
+            if (PagedResponseOffset != null)
+                foreach (var entry in PagedResponseOffset.Data)
+                {
+                    if (!uniqueCustomerIds.Contains(entry.CustomerId))
+                    {
+                        uniqueCustomerIds.Add(entry.CustomerId);
+                    }
+                }
+
+            foreach (var customerId in uniqueCustomerIds)
+            {
+                if (!customerNames.ContainsKey(customerId))
+                {
+                    var customer = await FetchCustomerAsync(customerId);
+                    customerNames[customerId] = customer?.Name ?? "No Customer";
+                }
+            }
+            
+            StateHasChanged();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error fetching entries: {ex.Message}");
-        }        
-       
-        // Fetch customer names for all entries
-        if (entries != null)
-            foreach (var entry in entries.Data)
+        }
+    }
+
+    private async Task<Customer?> FetchCustomerAsync(int customerId)
+    {
+        try
+        {
+            await LocalUserStorage.Load();
+            if (LocalUserStorage.UserInfo == null)
             {
-                if (!uniqueCustomerIds.Contains(entry.CustomerId))
-                {
-                    uniqueCustomerIds.Add(entry.CustomerId);
-                }
+                NavigationManager.NavigateTo(NavigationManager.BaseUri);
+                return null;
             }
 
-        foreach (var customerId in uniqueCustomerIds)
-        {
-            if (!customerNames.ContainsKey(customerId))
+            Parameters = new Dictionary<string, string>
             {
-                var customer = await FetchCustomerAsync(customerId);
-                customerNames[customerId] = customer?.Name ?? "No Customer";
-            }
+                { "id", customerId.ToString() },
+                { nameof(addDeleted), addDeleted.ToString() }
+            };
+
+            var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetCustomerApiEndpoint, Parameters, LocalUserStorage.UserInfo.AuthToken);
+            var response = await HttpClient.SendAsync(request);
+
+            var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
+            if (content != null) return JsonConvert.DeserializeObject<Customer>(content)!;
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching customer id {customerId} Error: {ex.Message}");
+            return null;
+        }
+
+        return null;
     }
 
     private async Task CheckboxChanged()
@@ -114,7 +182,16 @@ else
             addDeleted = false;
         }
 
-        await LoadProjects();
+        Parameters = new Dictionary<string, string>
+        {
+            { nameof(addDeleted), addDeleted.ToString() }
+        };
+
+        var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetAllProjectApiEndpoint, Parameters, LocalUserStorage.UserInfo!.AuthToken);
+        var response = await HttpClient.SendAsync(request);
+
+        var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
+        if (content != null) PagedResponseOffset = JsonConvert.DeserializeObject<PagedResponseOffset<Project>>(content);
 
         StateHasChanged();
     }
@@ -122,9 +199,9 @@ else
     private async Task RefreshTable2()
     {
         Console.WriteLine("RefreshTable2() was called from Project");
-        await LoadProjects(); 
+        await LoadProjects();
 
         StateHasChanged();
     }
-}
 
+}

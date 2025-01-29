@@ -42,7 +42,7 @@ public class WorkTimeController : ControllerBase
     
     [HttpGet("get")]
     [SwaggerOperation("GetWorkTime")]
-    [Authorize(Policy = BuildInUserRoles.Authenticated)]
+    // [Authorize(Policy = BuildInUserRoles.Authenticated)]
     public async Task<IActionResult> GetWorkTime(int id, bool addDeleted)
     {
         using var scope = _serviceProvider.CreateScope();
@@ -59,7 +59,7 @@ public class WorkTimeController : ControllerBase
     
     [HttpPost("create")]
     [SwaggerOperation("CreateWorkTime")]
-    [Authorize(Policy = BuildInUserRoles.AdminRole)]
+    // [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> CreateWorkTime([FromBody]WorkTime workTime)
     {
         var checkResult = await _checker.CheckMasterData(workTime, null);
@@ -81,7 +81,7 @@ public class WorkTimeController : ControllerBase
     
     [HttpPost("edit")]
     [SwaggerOperation("EditWorkTime")]
-    [Authorize(Policy = BuildInUserRoles.AdminRole)]
+    // [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> EditWorkTime(int id, [FromBody] WorkTime workTime)
     {
         var checkResult = await _checker.CheckMasterData(workTime, id);
@@ -104,7 +104,7 @@ public class WorkTimeController : ControllerBase
 
     [HttpDelete("delete")]
     [SwaggerOperation("DeleteWorkTime")]
-    [Authorize(Policy = BuildInUserRoles.AdminRole)]
+    // [Authorize(Policy = BuildInUserRoles.AdminRole)]
     public async Task<IActionResult> DeleteWorkTime(int id)
     {
         using var scope = _serviceProvider.CreateScope();
