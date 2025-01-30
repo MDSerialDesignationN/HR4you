@@ -37,7 +37,7 @@
             </AllTimesTable>
         </div>
         
-        <KeysetPagination entries="PagedResponseKeySet" OnPageChanged="EventCallback.Factory.Create<PagedResponseKeySet<HourEntry>>(this, UpdateEntries)" ApiEndpoint="http://localhost:5001/api/master-data/hour-entry/get-all-paged"/>
+        <KeysetPagination entries="PagedResponseKeySet" Parameters="Parameters" OnPageChanged="EventCallback.Factory.Create<PagedResponseKeySet<HourEntry>>(this, UpdateEntries)" ApiEndpoint="http://localhost:5001/api/master-data/hour-entry/get-all-paged"/>
     }
 </div>
 

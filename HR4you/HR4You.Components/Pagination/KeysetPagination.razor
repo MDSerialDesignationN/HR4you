@@ -1,12 +1,13 @@
 @using HR4You.Model.Base.Pagination
+@using Newtonsoft.Json
 @inject HttpClient HttpClient
 @typeparam TItem
 
 <div class="pagination flex flex-row gap-3 justify-center">
-    <button @onclick="previousPage" class="flex flex-row gap-2 transition-all duration-300 bg-gray-200 hover:bg-gray-300 items-center border border-2 border-[#c1c1c1] rounded-[10px] p-1">
+    <button @onclick="PreviousPage" class="flex flex-row gap-2 transition-all duration-300 bg-gray-200 hover:bg-gray-300 items-center border border-2 border-[#c1c1c1] rounded-[10px] p-1">
         <i class="fa-solid fa-backward"></i> Previous-page
     </button>
-    <button @onclick="nextPage" class="flex flex-row gap-2 transition-all duration-300 bg-gray-200 hover:bg-gray-300 items-center border border-2 border-[#c1c1c1] rounded-[10px] p-1">
+    <button @onclick="NextPage" class="flex flex-row gap-2 transition-all duration-300 bg-gray-200 hover:bg-gray-300 items-center border border-2 border-[#c1c1c1] rounded-[10px] p-1">
         Next-page <i class="fa-solid fa-forward"></i>
     </button>
 </div>
@@ -14,17 +15,31 @@
 @code {
     [Parameter] public PagedResponseKeySet<TItem>? entries { get; set; }
     [Parameter] public EventCallback<PagedResponseKeySet<TItem>> OnPageChanged { get; set; }
+    [Parameter] public required Dictionary<string, string> Parameters { get; set; }
     [Parameter] public string ApiEndpoint { get; set; } = string.Empty;
 
     private const int pageSize = 10;
 
-    private async Task previousPage()
+    private async Task PreviousPage()
     {
         try
         {
-            var newEntries = await HttpClient.GetFromJsonAsync<PagedResponseKeySet<TItem>>($"{ApiEndpoint}?reference={(entries.Reference - 1) - pageSize}");
-            OnPageChanged.InvokeAsync(newEntries);
+            await LocalUserStorage.Load();
+            var reference = (entries.Reference - 1) - pageSize;
+            
+            var tempParameters = Parameters.ToDictionary(parameter => parameter.Key, parameter => parameter.Value);
+            tempParameters.Add(nameof(reference), reference.ToString());
+            
+            var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, ApiEndpoint, tempParameters, LocalUserStorage.UserInfo!.AuthToken);
+            var response = await HttpClient.SendAsync(request);
 
+            var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
+            if (content != null)
+            {
+                var newEntries = JsonConvert.DeserializeObject<PagedResponseKeySet<TItem>>(content);
+
+                await OnPageChanged.InvokeAsync(newEntries);
+            }
         }
         catch (Exception ex)
         {
@@ -32,18 +47,26 @@
         }
     }
 
-    private async Task nextPage()
+    private async Task NextPage()
     {
         try
         {
-            var newEntries = await HttpClient.GetFromJsonAsync<PagedResponseKeySet<TItem>>($"{ApiEndpoint}?reference={(entries.Reference - 1) + pageSize}");
-            if (newEntries?.Data.Count == 0)
+            await LocalUserStorage.Load();
+            var reference = (entries.Reference - 1) + pageSize;
+            
+            var tempParameters = Parameters.ToDictionary(parameter => parameter.Key, parameter => parameter.Value);
+            tempParameters.Add(nameof(reference), reference.ToString());
+            
+            var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, ApiEndpoint, tempParameters, LocalUserStorage.UserInfo!.AuthToken);
+            var response = await HttpClient.SendAsync(request);
+
+            var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
+            if (content != null)
             {
-                newEntries = await HttpClient.GetFromJsonAsync<PagedResponseKeySet<TItem>>($"{ApiEndpoint}?reference=0");
+                var newEntries = JsonConvert.DeserializeObject<PagedResponseKeySet<TItem>>(content);
 
+                await OnPageChanged.InvokeAsync(newEntries);
             }
-            OnPageChanged.InvokeAsync(newEntries);
-
         }
         catch (Exception ex)
         {
