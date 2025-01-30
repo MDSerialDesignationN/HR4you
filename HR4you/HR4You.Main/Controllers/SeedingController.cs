@@ -114,43 +114,33 @@ public class SeedingController : ControllerBase
         {
             new()
             {
-                CustomerNumber = 42,
+                CustomerNumber = 10,
                 Name = "MARS",
                 Description = null,
                 Address = "irgendwos in bruck an der muhr",
                 Email = "irgendwasMit@wirMachenKatzenfutter",
-                Website = "k i gibs auf",
+                Website = "N/A",
                 PhoneNumber = "123456789"
             },
             new()
             {
-                CustomerNumber = 420,
-                Name = "Test2",
-                Description = "description N2",
-                Address = "Erinnerungsstraße 1, 4310 Mauthausen",
-                Email = "haraldTitler@gasmail.com",
-                Website = "https://www.mauthausen-memorial.org/de",
-                PhoneNumber = "07238 22690"
+                CustomerNumber = 20,
+                Name = "DCC",
+                Description = "Tanklager in Enns",
+                Address = "Ennnshafenstraße 36, 4470 Enns",
+                Email = "buchhaltung@dcc-energy.at",
+                Website = "energiedirect.at",
+                PhoneNumber = string.Empty
             },
             new()
             {
-                CustomerNumber = 69,
-                Name = "BadDragon",
-                Description = "dont look it up",
-                Address = "dont look it up",
-                Email = "dont look it up",
-                Website = "dont look it up",
-                PhoneNumber = "seriously dont look it up!"
-            },
-            new()
-            {
-                CustomerNumber = 1234,
+                CustomerNumber = 30,
                 Name = "Internal",
                 Description = "Project for company internal use",
-                Address = "not looking it up",
+                Address = "Handelstraße 7, A-9112 Griffen",
                 Email = "Alexander.Binder@zh-tech.at",
-                Website = "also not looking",
-                PhoneNumber = "nope"
+                Website = "zh-tech.at",
+                PhoneNumber = "+43 720 / 317370"
             }
         };
 
@@ -202,19 +192,19 @@ public class SeedingController : ControllerBase
             },
             new()
             {
-                ProjectNumber = 420,
-                CustomerId = customerResult.Entity!.FirstOrDefault(c => c.Name == "Test2")!.Id,
-                Name = "New shower heads",
+                ProjectNumber = 400,
+                CustomerId = customerResult.Entity!.FirstOrDefault(c => c.Name == "DCC")!.Id,
+                Name = "New pump valves and terminals",
                 State = ProjectState.Open,
-                Description = "yeah u know where this is going, i was bored ok"
+                Description = "Replacement project for new valves on B02 pumps and new driver dispo terminals"
             },
             new()
             {
-                ProjectNumber = 69420,
-                CustomerId = customerResult.Entity!.FirstOrDefault(c => c.Name == "BadDragon")!.Id,
-                Name = "I was bored on this one as well lel",
+                ProjectNumber = 302,
+                CustomerId = customerResult.Entity!.FirstOrDefault(c => c.Name == "Internal")!.Id,
+                Name = "Test project for new hour sheet checking tool",
                 State = ProjectState.Open,
-                Description = "smth smth we dont need to know"
+                Description = string.Empty
             }
         };
 
@@ -365,9 +355,9 @@ public class SeedingController : ControllerBase
                 EndTime = new TimeOnly(21,00),
                 Duration = 8,
                 Type = ActivityType.Planning,
-                ProjectId = projectResult.Entity!.FirstOrDefault(p => p.Name == "New shower heads")!.Id,
+                ProjectId = projectResult.Entity!.FirstOrDefault(p => p.Name == "New pump valves and terminals")!.Id,
                 TagId = null,
-                Description = "don`t ask why there are furnaces on the premise",
+                Description = "test description 2",
                 IsBillable = false
             }
         };
