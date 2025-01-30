@@ -20,3 +20,8 @@
     .Table th {
         background-color: #f4f4f4;
     }
+
+    .AddTime{
+        float: right;
+        margin: 10px;
+    }

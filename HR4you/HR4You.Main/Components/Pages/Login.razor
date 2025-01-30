@@ -40,7 +40,7 @@
                     return;
                 }
 
-                NavigationManager.NavigateTo("/home");
+                NavigationManager.NavigateTo("/MyTimes");
             }
         }
         catch (Exception ex)
@@ -71,7 +71,7 @@
             await LocalUserStorage.Save(content);
 
             _isInvalid = false;
-            NavigationManager.NavigateTo("/home");
+            NavigationManager.NavigateTo("/MyTimes");
         }
         catch (Exception ex)
         {

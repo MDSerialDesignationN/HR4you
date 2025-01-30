@@ -73,9 +73,9 @@
         }
     }
 
-    private void EditEntry(int GivenId)
+    private async Task EditEntry(int GivenId)
     {
-        popupRef.Show(GivenId, RequestURLEdit, "Edit Project");
+        await popupRef.ShowEdit(GivenId, RequestURLEdit, "Edit Project");
     }
 
     private async Task DeleteEntry(int GivenId)
