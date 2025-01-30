@@ -17,8 +17,6 @@
         </div>
 
         <EditForm Model="myTimes" OnValidSubmit="Submit">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
 
             <div class="toast-body" style="padding: 20px;">
                 <div class="container">
@@ -201,6 +199,7 @@
         projectList = await HttpClient.GetFromJsonAsync<PagedResponseOffset<Project>>(RequestURLProject);
         tagList = await HttpClient.GetFromJsonAsync<PagedResponseOffset<Tag>>(RequestURLTag);
         IsVisible = true;
+        isEdit = false;
         StateHasChanged();
     }
 
@@ -242,6 +241,8 @@
         }
         else if (isEdit == false)
         {
+            await LocalUserStorage.Load();
+            myTimes.UserId = LocalUserStorage.UserInfo.Id;
             var response = await HttpClient.PostAsJsonAsync(createURL, myTimes);
             if (response.IsSuccessStatusCode)
             {
