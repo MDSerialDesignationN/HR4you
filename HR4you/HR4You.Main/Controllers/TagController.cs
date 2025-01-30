@@ -25,7 +25,7 @@ public class TagController : ControllerBase
     
     [HttpGet("get-all-paged")]
     [SwaggerOperation("GetAllPagedTags")]
-    [Authorize(Policy = BuildInUserRoles.Authenticated)]
+    //[Authorize(Policy = BuildInUserRoles.Authenticated)]
     public async Task<IActionResult> GetAllPagedTags([FromQuery] List<ColumnFilter> columnFilters, bool addDeleted, int pageNumber = 1, int pageSize = 10)
     { 
         if (pageNumber <= 0 || pageSize <= 0)

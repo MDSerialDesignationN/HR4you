@@ -3,12 +3,12 @@
             <p class="font-bold p-1">@_userName</p>
         </div>
         <div class="user-actions">
-            <a class="cursor-pointer text-red-500 p-1 rounded-[5px] transition-all duration-500 hover:bg-gray-300">Logout</a>
+            <button class="cursor-pointer text-red-500 p-1 rounded-[5px] transition-all duration-500 hover:bg-gray-300" @onclick="Logout">Logout</button>
         </div>
     </div>
 @code {
 
-    private string _userName { get; set; } = "Undefined User"; //todo get to render + make logout possible !
+    private string _userName { get; set; } = "Undefined User";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -19,4 +19,11 @@
             StateHasChanged();
         }
     }
+
+    private async Task Logout()
+    {
+        await LocalUserStorage.Clear();
+        NavigationManager.NavigateTo(NavigationManager.BaseUri);
+    }
+
 }
