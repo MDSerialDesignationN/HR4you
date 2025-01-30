@@ -25,7 +25,7 @@ public class ProjectController : ControllerBase
     
     [HttpGet("get-all-paged")]
     [SwaggerOperation("GetAllPagedProjects")]
-    [Authorize(Policy = BuildInUserRoles.Authenticated)]
+    //[Authorize(Policy = BuildInUserRoles.Authenticated)]
     public async Task<IActionResult> GetAllPagedProjects([FromQuery] List<ColumnFilter> columnFilters, bool addDeleted, int pageNumber = 1, int pageSize = 10)
     {
         if (pageNumber <= 0 || pageSize <= 0)

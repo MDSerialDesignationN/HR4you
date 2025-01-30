@@ -1,4 +1,5 @@
-﻿@rendermode InteractiveServer
+﻿@using HR4You.Model.Base.Pagination
+@rendermode InteractiveServer
 @inject HttpClient HttpClient
 
 @{
@@ -26,17 +27,20 @@
                         <div class="col-sm-4">
                             <label>Project</label>
                             <InputSelect @bind-Value="myTimes.ProjectId" class="form-select">
-                                @foreach (var value in projectList)
+                                @if (projectList != null)
                                 {
-                                    if (@value.Id == myTimes.ProjectId)
+                                    @foreach (var value in projectList.Data)
                                     {
-                                        <option selected value="@value.Id">@value.Name</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@value.Id">@value.Name</option>
-                                    }
+                                        if (@value.Id == myTimes.ProjectId)
+                                        {
+                                            <option selected value="@value.Id">@value.Name</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@value.Id">@value.Name</option>
+                                        }
 
+                                    } 
                                 }
                             </InputSelect>
 
@@ -57,17 +61,20 @@
 
                             <label>Tag</label>
                             <InputSelect @bind-Value="myTimes.TagId" class="form-select">
-                                @foreach (var value in tagList)
+                                @if (tagList != null)
                                 {
-                                    if (@value.Id == myTimes.TagId)
+                                    @foreach (var value in tagList.Data)
                                     {
-                                        <option selected value="@value.Id">@value.Name</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@value.Id">@value.Name</option>
-                                    }
+                                        if (@value.Id == myTimes.TagId)
+                                        {
+                                            <option selected value="@value.Id">@value.Name</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@value.Id">@value.Name</option>
+                                        }
 
+                                    } 
                                 }
                             </InputSelect>
                         </div>
@@ -165,23 +172,24 @@
 
     HourEntry myTimes = new HourEntry();
 
-    public List<Project> projectList = [];
+    public PagedResponseOffset<Project>? projectList;
 
-    public List<Tag> tagList = [];
+    public PagedResponseOffset<Tag>? tagList;
 
-    public string RequestURLProject = "http://localhost:5001/api/master-data/project/get-all?addDeleted=true";
+    public string RequestURLProject = "http://localhost:5001/api/master-data/project/get-all-paged";
 
-    public string RequestURLTag = "http://localhost:5001/api/master-data/tag/get-all?addDeleted=true";
+    public string RequestURLTag = "http://localhost:5001/api/master-data/tag/get-all-paged";
 
     bool isEdit = false;
+    
 
     async public Task ShowEdit(int givenId, string requestURL, string headerText)
     {
         HeaderText = headerText;
         GivenId = givenId.ToString();
         myTimes = await HttpClient.GetFromJsonAsync<HourEntry>(requestURL + GivenId);
-        projectList = await HttpClient.GetFromJsonAsync<List<Project>>(RequestURLProject);
-        tagList = await HttpClient.GetFromJsonAsync<List<Tag>>(RequestURLTag);
+        projectList = await HttpClient.GetFromJsonAsync<PagedResponseOffset<Project>>(RequestURLProject);
+        tagList = await HttpClient.GetFromJsonAsync<PagedResponseOffset<Tag>>(RequestURLTag);
         IsVisible = true;
         isEdit = true;
         StateHasChanged();
@@ -190,6 +198,8 @@
     async public Task ShowCreate(string requestURL, string headerText)
     {
         HeaderText = headerText;
+        projectList = await HttpClient.GetFromJsonAsync<PagedResponseOffset<Project>>(RequestURLProject);
+        tagList = await HttpClient.GetFromJsonAsync<PagedResponseOffset<Tag>>(RequestURLTag);
         IsVisible = true;
         StateHasChanged();
     }
