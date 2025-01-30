@@ -205,7 +205,7 @@
         }
         else if (isEdit == false)
         {
-            LocalUserStorage.Load();
+            await LocalUserStorage.Load();
             myTimes.UserId = LocalUserStorage.UserInfo.Id;
             var response = await HttpClient.PostAsJsonAsync(createURL, myTimes);
             if (response.IsSuccessStatusCode)
