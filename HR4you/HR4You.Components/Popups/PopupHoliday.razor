@@ -77,13 +77,21 @@
 
     bool isEdit = false;
 
-    async public void ShowEdit(int givenId, string requestURL, string headerText)
+    public async void ShowEdit(int givenId, string requestURL, string headerText)
     {
         HeaderText = headerText;
         GivenId = givenId.ToString();
         holiday = await HttpClient.GetFromJsonAsync<Holiday>(requestURL + GivenId);
         IsVisible = true;
         isEdit = true;
+        StateHasChanged();
+    }
+    
+    public async Task ShowCreate(string headerText)
+    {
+        HeaderText = headerText;
+        IsVisible = true;
+        isEdit = false;
         StateHasChanged();
     }
 

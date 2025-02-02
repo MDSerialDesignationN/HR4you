@@ -1,6 +1,7 @@
 @rendermode InteractiveServer
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
+@using HR4You.Model.Base.Pagination
 
 @{
     var showClass = IsVisible ? "d-block" : "d-none";
@@ -153,14 +154,14 @@ style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 999
                 {
                     Console.WriteLine("Project saved successfully.");
 
-                if (OnProjectUpdated.HasDelegate)
-                {
-                    await OnProjectUpdated.InvokeAsync(); // Notify the parent component
-                }
-                else
-                {
-                    Console.WriteLine("OnCustomerUpdated has no delegate assigned.");
-                }
+                    if (OnProjectUpdated.HasDelegate)
+                    {
+                        await OnProjectUpdated.InvokeAsync(); // Notify the parent component
+                    }
+                    else
+                    {
+                        Console.WriteLine("OnCustomerUpdated has no delegate assigned.");
+                    }
 
                     Close();
                 }
@@ -177,6 +178,10 @@ style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 999
         else if (isEdit == false)
         {
             var response = await HttpClient.PostAsJsonAsync(createURL, project);
+            if (OnProjectUpdated.HasDelegate)
+            {
+                await OnProjectUpdated.InvokeAsync(); // Notify the parent component
+            }
             if (response.IsSuccessStatusCode)
             {
                 Console.WriteLine("Project saved successfully.");

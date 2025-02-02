@@ -6,7 +6,7 @@ namespace HR4You.Model.Base.Models.Holiday;
 [Table("hr4you_holiday")]
 public class Holiday : ModelBase
 {
-    [Required(ErrorMessage = "Date required!")] public DateOnly Date { get; set; } //todo make unique
+    [Required(ErrorMessage = "Date required!")] public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Now);
     [Required(ErrorMessage = "Name required!")] public string Name { get; set; } = string.Empty;
     [Required] public bool HalfDay { get; set; }
 

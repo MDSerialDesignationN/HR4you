@@ -1,0 +1,14 @@
+@using HR4You.Components.Popups
+@rendermode InteractiveServer
+
+<PopupTag @ref="popupRef" />
+<button type="button" class="btn btn-dark AddTime" @onclick="(() => CreateEntry())"><i class="fa-solid fa-plus"></i></button>
+
+@code {
+    private PopupTag popupRef;
+
+    private async Task CreateEntry()
+    {
+        await popupRef.ShowCreate("Add Tag");
+    }
+}

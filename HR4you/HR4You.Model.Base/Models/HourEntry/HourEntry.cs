@@ -8,7 +8,7 @@ namespace HR4You.Model.Base.Models.HourEntry
     public class HourEntry : ModelBase
     {
         [Required] public string UserId { get; set; } = null!;
-        [Required(ErrorMessage = "Date required!")] public DateOnly Date { get; set; }
+        [Required(ErrorMessage = "Date required!")] public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Now);
         [Required(ErrorMessage = "Start time required!")] public TimeOnly StartTime { get; set; }
         [Required(ErrorMessage = "End time required!")] public TimeOnly EndTime { get; set; }
         /// <summary>
