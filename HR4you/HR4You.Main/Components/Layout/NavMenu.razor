@@ -1,64 +1,118 @@
-﻿<aside class="hr4you_navbar">
+﻿@rendermode InteractiveServer
+
+<aside class="hr4you_navbar">
     <div class="hr4you_navbar-header">
-        <img src=images/HR.png alt="Logo" class="hr4you_navbar-logo" />
+        <img src="images/HR.png" alt="Logo" class="hr4you_navbar-logo" />
     </div>
-    <div class="hr4you_navbar-content">
-        <div class="hr4you_dropdown">
-            <button class="hr4you_dropdown-button"><i class="fa-regular fa-calendar"></i>Time Tracking<i class="fa-solid fa-chevron-down"></i></button>
-            <ul class="hr4you_dropdown-menu">
-                <li class="hr4you_dropdown-link">
-                    <a href="MyTimes">
-                        <i class="fa-solid fa-hourglass-start"></i><span>My Times</span>
-                    </a>
-                </li>
-                <li class="hr4you_dropdown-link">
-                    <a href="WorkTime">
-                        <i class="fa-solid fa-calendar-days"></i><span>Work Time</span>
-                    </a>
-                </li>
-                <li class="hr4you_dropdown-link">
-                    <a href="AllTimes">
-                        <i class="fa-solid fa-chart-area"></i><span>All Times</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-        <hr>
-        <div class="hr4you_dropdown">
-            <button class="hr4you_dropdown-button"><i class="fa-solid fa-gear"></i>Administration<i class="fa-solid fa-chevron-down"></i></button>
-            <ul class="hr4you_dropdown-menu">
-                <li class="hr4you_dropdown-link">
-                    <a href="WorkTimeConfig">
-                        <i class="fa-solid fa-calendar-days"></i><span>Work Time Config</span>
-                    </a>
-                </li>
-                <li class="hr4you_dropdown-link">
-                    <a href="Customers">
-                        <i class="fa-solid fa-users"></i><span>Customers</span>
-                    </a>
-                </li>
-                <li class="hr4you_dropdown-link">
-                    <a href="Projects">
-                        <i class="fa-solid fa-sheet-plastic"></i><span>Projects</span>
-                    </a>
-                </li>
-                <li class="hr4you_dropdown-link">
-                    <a href="Tags">
-                        <i class="fa-solid fa-filter"></i><span>Tags</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-        <hr>
-        <div class="hr4you_dropdown">
-            <button class="hr4you_dropdown-button"><i class="fa-solid fa-gear"></i>System<i class="fa-solid fa-chevron-down"></i></button>
-            <ul class="hr4you_dropdown-menu">
-                <li class="hr4you_dropdown-link">
-                    <a href="Users">
-                        <i class="fa-solid fa-user"></i><span>Users</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
+    <hr>
+    @if (currentUser == null)
+    {
+        <span class="text-white">Loading...</span>
+    }
+    else
+    {
+
+
+        @foreach (var section in sections)
+        {
+            @if (currentUser.Roles.Contains(section.PermissionLevel))
+            {
+                <div class="hr4you_navbar-content">
+                    <div class="hr4you_dropdown">
+                        <button class="hr4you_dropdown-button">
+                            <i class="@(section.Icon)"></i>@(section.Name)<i class="fa-solid fa-chevron-down"></i>
+                        </button>
+                        <ul class="hr4you_dropdown-menu">
+                            @foreach (var option in section.Options)
+                            {
+                                <li class="hr4you_dropdown-link">
+                                    <a href="@option.Url">
+                                        <i class="@option.Icon"></i><span>@option.Name</span>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    <hr>
+                </div>
+            }
+        }
+    }
 </aside>
+
+@code {
+
+    public UserInfo currentUser { get; set; }
+
+    public class NavbarSection
+    {
+        public string? Icon { get; set; }
+        public string? Name { get; set; }
+        public List<NavbarOption>? Options { get; set; }
+        public string? PermissionLevel { get; set; }
+    }
+
+    public class NavbarOption
+    {
+        public string? Icon { get; set; }
+        public string? Name { get; set; }
+        public string? Url { get; set; }
+    }
+
+    public NavbarSection[] sections =
+    {
+        new NavbarSection
+        {
+            Icon = "fa-regular fa-calendar",
+            Name = "Time Tracking",
+            Options = new List<NavbarOption>
+            {
+                new NavbarOption { Icon = "fa-solid fa-hourglass-start", Name = "My Times", Url = "MyTimes" },
+                new NavbarOption { Icon = "fa-solid fa-calendar-days", Name = "Work Time", Url = "WorkTime" },
+                new NavbarOption { Icon = "fa-solid fa-chart-area", Name = "All Times", Url = "AllTimes" }
+            },
+            PermissionLevel = "UserRole_Authenticated"
+        },
+        new NavbarSection
+        {
+            Icon = "fa-solid fa-gear",
+            Name = "Administration",
+            Options = new List<NavbarOption>
+            {
+                new NavbarOption { Icon = "fa-solid fa-calendar-days", Name = "Work Time Config", Url = "WorkTimeConfig" },
+                new NavbarOption { Icon = "fa-solid fa-users", Name = "Customers", Url = "Customers" },
+                new NavbarOption { Icon = "fa-solid fa-sheet-plastic", Name = "Projects", Url = "Projects" },
+                new NavbarOption { Icon = "fa-solid fa-filter", Name = "Tags", Url = "Tags" }
+            },
+            PermissionLevel = "UserRole_Admin"
+        },
+        new NavbarSection
+        {
+            Icon = "fa-solid fa-gear",
+            Name = "System",
+            Options = new List<NavbarOption>
+            {
+                new NavbarOption { Icon = "fa-solid fa-user", Name = "Users", Url = "Users" }
+            },
+            PermissionLevel = "UserRole_SysManagement"
+        }
+    };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LocalUserStorage.Load();
+            if (LocalUserStorage.UserInfo == null)
+            {
+                NavigationManager.NavigateTo(NavigationManager.BaseUri);
+                return;
+            }
+
+            currentUser = LocalUserStorage.UserInfo;
+            StateHasChanged();
+
+        }
+    }
+
+}

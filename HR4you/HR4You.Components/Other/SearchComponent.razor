@@ -3,21 +3,21 @@
 @using HR4You.Model.Base.Pagination
 @rendermode InteractiveServer
 
-<div>
-    <div class="searchBar border border-1 border-[#c1c1c1] rounded-[5px] w-[fit-content] flex flex-row">
+<div class="component-search">
+    <div class="searchBar">
         @if (Options1 != null)
         {
-            <button @onclick="ToggleFilterOptions">
+            <button class="button-option" @onclick="ToggleFilterOptions">
                 <i class="fa-solid fa-filter"></i>
             </button>
         }
         @if (Options2.Length != 0)
         {
-            <button @onclick="ToggleFilterOptionsAdmin">
+            <button class="button-option" @onclick="ToggleFilterOptionsAdmin">
                 <i class="fa-solid fa-user-tie"></i>
             </button>
         }
-        <button class="flex flex-row gap-2 items-center bg-gray-200" id="Submit" type="submit" value="Search" @onclick="Filter">Search<i class="fa-solid fa-magnifying-glass"></i></button>
+        <button class="button-search" id="Submit" type="submit" value="Search" @onclick="Filter">Search<i class="fa-solid fa-magnifying-glass"></i></button>
     </div>
     @if (Options1 != null)
     {

@@ -99,4 +99,5 @@ main {*/
 
 main {
     width: calc(100vw - 300px);
+    background: #12171e;
 }
