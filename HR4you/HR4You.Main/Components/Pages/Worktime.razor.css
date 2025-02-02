@@ -1,4 +1,50 @@
-﻿
-.Add_Time {
-    float: right;
+﻿.page {
+    min-height: 100vh;
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 1rem;
+}
+
+.page-header {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    align-items: center;
+    /*    background: linear-gradient(to right, #0f0c29, #302b63, #24243e);*/
+    color: white;
+    padding: 1rem;
+}
+
+h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 1rem;
+}
+
+.page-content {
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    &::-webkit-scrollbar
+
+{
+    display: block;
+    height: 5px
+}
+
+&::-webkit-scrollbar-track {
+    background: #29303d;
+}
+
+&::-webkit-scrollbar-thumb {
+    background: #6b6eaf;
+    border-radius: 3px;
+}
 }

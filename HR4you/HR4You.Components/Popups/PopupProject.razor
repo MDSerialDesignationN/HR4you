@@ -1,3 +1,5 @@
+@using HR4You.Model.Base.Pagination
+@using Newtonsoft.Json
 @rendermode InteractiveServer
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
@@ -7,19 +9,19 @@
 }
 
 <div class="toast-container position-absolute @showClass" data-bs-autohide="true" data-bs-delay="50000"
-    style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
+style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
 
     <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true"
-        style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; background-color:white; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
-            <div class="toast-header">
-                <strong class="me-auto">@HeaderText</strong>
-                <button type="button" class="btn-close" aria-label="Close" @onclick="Close"></button>
-            </div>
+    style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; background-color:white; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
+        <div class="toast-header">
+            <strong class="me-auto">@HeaderText</strong>
+            <button type="button" class="btn-close" aria-label="Close" @onclick="Close"></button>
+        </div>
 
         <EditForm Model="project" OnValidSubmit="Submit">
             <DataAnnotationsValidator />
             <ValidationSummary />
-        
+
             <div class="toast-body" style="padding: 20px;">
                 <div class="container">
                     <div class="row">
@@ -40,10 +42,10 @@
                                     {
                                         <option value="@value.Id">@value.Name</option>
                                     }
-                                    
+
                                 }
                             </InputSelect>
-                            
+
                         </div>
 
                         <!-- Name and State -->
@@ -51,7 +53,7 @@
                             <label>Name</label>
                             <InputText @bind-Value="project.Name" class="form-control mb-2" />
 
-                             <label>State</label>                        
+                            <label>State</label>                        
                             <InputSelect @bind-Value="project.State">
                                 @foreach (var value in Enum.GetValues(typeof(ProjectState)))
                                 {
@@ -100,20 +102,61 @@
 
     public List<Customer> customerList = [];
 
-    public string RequestURLCustomer = "http://localhost:5001/api/master-data/customer/get-all?addDeleted=true";
+    public string RequestURLCustomer = "http://localhost:5001/api/master-data/customer/get-all-paged";
 
     bool isEdit = false;
 
-    async public Task ShowEdit(int givenId, string requestURL, string headerText)
+    public Dictionary<string, string> Parameters;
+    public PagedResponseOffset<Customer>? PagedResponseOffset;
+
+
+
+    public async Task ShowEdit(int givenId, string requestURL, string headerText)
     {
         HeaderText = headerText;
-        GivenId = givenId.ToString(); 
-        customerList = await HttpClient.GetFromJsonAsync<List<Customer>>(RequestURLCustomer);
-        project = await HttpClient.GetFromJsonAsync<Project>(requestURL + GivenId);
+        GivenId = givenId.ToString();
 
-        IsVisible = true;
-        isEdit = true;
-        StateHasChanged();
+        try
+        {
+            await LocalUserStorage.Load();
+            if (LocalUserStorage.UserInfo == null)
+            {
+                NavigationManager.NavigateTo(NavigationManager.BaseUri);
+                return;
+            }
+
+            Parameters = new Dictionary<string, string>
+            {
+                { "addDeleted", "false" }
+            };
+
+            // Fetch customer list
+            var customerRequest = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, RequestURLCustomer, Parameters, LocalUserStorage.UserInfo.AuthToken);
+            var customerResponse = await HttpClient.SendAsync(customerRequest);
+            var customerContent = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, customerResponse);
+            if (customerContent != null)
+            {
+                PagedResponseOffset = JsonConvert.DeserializeObject<PagedResponseOffset<Customer>>(customerContent);
+                customerList = PagedResponseOffset.Data;
+            }
+
+            // Fetch project
+            var projectRequest = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, requestURL + GivenId, Parameters, LocalUserStorage.UserInfo.AuthToken);
+            var projectResponse = await HttpClient.SendAsync(projectRequest);
+            var projectContent = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, projectResponse);
+            if (projectContent != null)
+            {
+                project = JsonConvert.DeserializeObject<Project>(projectContent);
+            }
+
+            IsVisible = true;
+            isEdit = true;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching data: {ex.Message}");
+        }
     }
 
     public async Task ShowCreate(string requestURL, string headerText)

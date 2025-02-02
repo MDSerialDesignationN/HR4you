@@ -9,38 +9,48 @@
 @inject HttpClient HttpClient
 
 <PageTitle>Projects</PageTitle>
-<div class="page-content min-h-[100vh] p-3 flex flex-col gap-2 select-none">
+<div class="page">
 
-    <div class="flex flex-row justify-between">
-        <h1 class="text-[2rem] font-bold flex flex-row gap-3 items-center"><i class="fa-solid fa-sheet-plastic"></i>Projects</h1>
+    <div class="page-header">
+        <h1><i class="fa-solid fa-sheet-plastic"></i>Projects</h1>
+        <UserInfo></UserInfo>
+
     </div>
 
-    <UserInfo></UserInfo>
+    <div class="page-content">
+
 
 
     @if (PagedResponseOffset == null)
     {
-        <p>
-            <em>Loading...</em>
-        </p>
+            <div class="loading-overlay">
+                <div class="loading-content">
+                    <svg class="animate-spin h-20 w-20 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50">
+                        <circle class="opacity-25" cx="25" cy="25" r="20" stroke="currentColor" stroke-width="5" fill="none">
+                        </circle>
+                        <circle class="opacity-75" cx="25" cy="25" r="20" stroke="currentColor" stroke-width="5"
+                                stroke-linecap="round" fill="none" stroke-dasharray="31.415, 31.415" transform="rotate(90 25 25)">
+                            <animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="5s"
+                                              keyTimes="0;1" values="0 25 25;360 25 25"></animateTransform>
+                        </circle>
+                    </svg>
+                </div>
+            </div>
     }
     else
     {
         <div class="flex flex-row gap-2 items-center">
             <SearchComponent Options1="options1" Options2="options2"/>
-            <div class="bg-gray-200 p-[5px] rounded-[5px] border border-1 border-[#c1c1c1] flex flex-row gap-1 justify-center items-center">
-                <label for="showDeleted">Show Deleted</label>
-                <input class="h-4 w-4" id="showDeleted" type="checkbox" checked="@addDeleted" @oninput="CheckboxChanged">
-            </div>
         </div>
 
-        <div class="table-wrapper overflow-auto">
+        <div class="table-wrapper">
             <ProjectsTable entries="PagedResponseOffset.Data" customerNames="customerNames" @ref="popupRef2" OnProjectUpdated2="RefreshTable2">
             </ProjectsTable>
         </div>
 
         <OffsetPagination entries="PagedResponseOffset" OnPageChanged="EventCallback.Factory.Create<PagedResponseOffset<Project>>(this, UpdateEntries)" Parameters="Parameters" ApiEndpoint=@GetAllProjectApiEndpoint/>
     }
+    </div>
 </div>
 
 

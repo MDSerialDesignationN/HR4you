@@ -1,17 +1,74 @@
-﻿.page-header {
+﻿.page {
+    min-height: 100vh;
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 1rem;
+}
+
+.page-header {
     display: flex;
     flex-flow: row wrap;
     justify-content: space-between;
-    background: linear-gradient(to right, #0f0c29, #302b63, #24243e);
+    align-items: center;
+    /*    background: linear-gradient(to right, #0f0c29, #302b63, #24243e);*/
     color: white;
     padding: 1rem;
 }
 
-.page-content {
-    padding: 1rem;
+h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 1rem;
 }
 
+.page-content {
+    position: relative;
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 1rem;
+    padding: 1rem;
+    min-height: 100px
+}
 
-.Add_Time {
-    float: right;
+.table-wrapper {
+    overflow-x: auto;
+    
+    &::-webkit-scrollbar
+    {
+        display: block;
+        height: 5px
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #29303d;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #6b6eaf;
+        border-radius: 3px;
+    }
+}
+
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+/*    background: rgba(0, 0, 0, 0.5);*/
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.loading-content {
+    text-align: center;
+}
+.loading-content > svg {
+        width: 5rem;
+        height: 5rem;
+        color: #6B7280;
 }

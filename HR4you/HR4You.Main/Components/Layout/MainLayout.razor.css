@@ -96,8 +96,11 @@ main {*/
     display: none;
 }*/
 
-
+.page {
+    background: linear-gradient(to bottom, #0f0c29, #24243e);
+}
 main {
     width: calc(100vw - 300px);
-    background: #12171e;
+    /*    background: #12171e;*/
+/*    background: linear-gradient(to bottom, #0f0c29, #24243e);*/
 }

@@ -1,18 +1,19 @@
-﻿    <div class="userInfo">
-        <div class="user-info">
-            <p class="font-bold p-1">@_userName</p>
-        </div>
-        <div class="user-actions">
-            <button class="cursor-pointer text-red-500 p-1 rounded-[5px] transition-all duration-500 hover:bg-gray-300" @onclick="Logout">Logout</button>
-        </div>
+﻿<div class="userInfo">
+    <div class="user-info">
+        <p class="userinfo-username">@_userName</p>
     </div>
+    <div class="user-actions">
+        <button class="userinfo-button-logout" @onclick="Logout">Logout</button>
+    </div>
+</div>
 @code {
 
     private string _userName { get; set; } = "Undefined User";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender) {
+        if (firstRender)
+        {
             await LocalUserStorage.Load();
             var storedName = LocalUserStorage.UserInfo!.UserName;
             if (storedName != null) _userName = storedName;

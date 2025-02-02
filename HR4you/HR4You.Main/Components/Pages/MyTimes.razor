@@ -7,9 +7,9 @@
 @rendermode InteractiveServer
 
 <PageTitle>My Times</PageTitle>
-<div class="min-h-[100vh] flex flex-col gap-2 select-none">
+<div class="page">
     <div class="page-header">
-        <h1 class="text-[2rem] font-bold flex flex-row gap-3 items-center"><i class="fa-solid fa-hourglass-start"></i>My Times</h1>
+        <h1><i class="fa-solid fa-hourglass-start"></i>My Times</h1>
 
         <UserInfo></UserInfo>
     </div>
@@ -17,9 +17,19 @@
 
         @if (PagedResponseKeySet == null)
         {
-            <p>
-                <em>Loading...</em>
-            </p>
+            <div class="loading-overlay">
+                <div class="loading-content">
+                    <svg class="animate-spin h-20 w-20 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50">
+                        <circle class="opacity-25" cx="25" cy="25" r="20" stroke="currentColor" stroke-width="5" fill="none">
+                        </circle>
+                        <circle class="opacity-75" cx="25" cy="25" r="20" stroke="currentColor" stroke-width="5"
+                                stroke-linecap="round" fill="none" stroke-dasharray="31.415, 31.415" transform="rotate(90 25 25)">
+                            <animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="5s"
+                                              keyTimes="0;1" values="0 25 25;360 25 25"></animateTransform>
+                        </circle>
+                    </svg>
+                </div>
+            </div>
         }
         else
         {
@@ -28,7 +38,7 @@
                 <AddTime></AddTime>
             </div>
 
-            <div class="table-wrapper overflow-auto">
+            <div class="table-wrapper">
                 <MyTimesTable entries="PagedResponseKeySet.Data" projectNames="projectNames" tagNames="tagNames" @ref="popupRef2" OnMyTimesUpdated2="RefreshTable2">
                 </MyTimesTable>
             </div>

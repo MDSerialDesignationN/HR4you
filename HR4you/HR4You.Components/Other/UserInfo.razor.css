@@ -1,11 +1,26 @@
 .userInfo {
-    background: whitesmoke;
+    background: #24243e;
     max-width: fit-content;
     display: flex;
     flex-flow: row nowrap;
-    gap: 1rem;
+    gap: 2rem;
     align-items: center;
     border-radius: 10px;
-    border: 2px solid #c1c1c1;
-    padding: 0.6rem;
+    padding: 1rem 2rem;
+}
+
+.userinfo-username {
+    font-weight: bold;
+    font-size: 1.25rem
+}
+
+.userinfo-button-logout {
+    color: red;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: all 0.5s ease;
+
+    &:hover {
+        color: darkred
+            }
 }
