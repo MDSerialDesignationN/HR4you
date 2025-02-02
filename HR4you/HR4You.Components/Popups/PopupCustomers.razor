@@ -93,7 +93,7 @@
 
     bool isEdit = false;
 
-    async public Task ShowEdit(int givenId, string requestURL, string headerText)
+    public async Task ShowEdit(int givenId, string requestURL, string headerText)
     {
         HeaderText = headerText;
         GivenId = givenId.ToString(); 
@@ -103,7 +103,7 @@
         StateHasChanged();
     }
 
-    async public Task ShowCreate(string headerText)
+    public async Task ShowCreate(string headerText)
     {
         HeaderText = headerText;
         IsVisible = true;

@@ -193,7 +193,7 @@
         StateHasChanged();
     }
 
-    async public Task ShowCreate(string requestURL, string headerText)
+    async public Task ShowCreate(string headerText)
     {
         HeaderText = headerText;
         projectList = await HttpClient.GetFromJsonAsync<PagedResponseOffset<Project>>(RequestURLProject);

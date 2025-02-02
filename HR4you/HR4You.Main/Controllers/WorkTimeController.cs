@@ -25,7 +25,7 @@ public class WorkTimeController : ControllerBase
     
     [HttpGet("get-all-paged")]
     [SwaggerOperation("GetAllPagedWorkTimes")]
-    [Authorize(Policy = BuildInUserRoles.Authenticated)]
+    //[Authorize(Policy = BuildInUserRoles.Authenticated)]
     public async Task<IActionResult> GetAllPagedWorkTimes([FromQuery] List<ColumnFilter> columnFilters, bool addDeleted, int pageNumber = 1, int pageSize = 10)
     {
         using var scope = _serviceProvider.CreateScope();

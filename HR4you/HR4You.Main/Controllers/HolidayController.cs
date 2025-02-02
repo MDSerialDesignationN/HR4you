@@ -25,7 +25,7 @@ public class HolidayController : ControllerBase
     
     [HttpGet("get-all-paged")]
     [SwaggerOperation("GetAllPagedHolidays")]
-    [Authorize(Policy = BuildInUserRoles.Authenticated)]
+    //[Authorize(Policy = BuildInUserRoles.Authenticated)]
     public async Task<IActionResult> GetAllPagedHolidays([FromQuery] List<ColumnFilter> columnFilters, bool addDeleted, int pageNumber = 1, int pageSize = 10)
     {
         if (pageNumber <= 0 || pageSize <= 0)
