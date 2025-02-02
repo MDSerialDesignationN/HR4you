@@ -7,39 +7,35 @@
 @rendermode InteractiveServer
 
 <PageTitle>My Times</PageTitle>
-<div class="page-content min-h-[100vh] p-3 flex flex-col gap-2 select-none">
-
-    <div class="flex flex-row justify-between">
+<div class="min-h-[100vh] flex flex-col gap-2 select-none">
+    <div class="page-header">
         <h1 class="text-[2rem] font-bold flex flex-row gap-3 items-center"><i class="fa-solid fa-hourglass-start"></i>My Times</h1>
+
+        <UserInfo></UserInfo>
     </div>
+    <div class="page-content">
 
-    <UserInfo></UserInfo>
-
-    @if (PagedResponseKeySet == null)
-    {
-        <p>
-            <em>Loading...</em>
-        </p>
-    }
-    else
-    {
-        <div class="flex flex-row gap-2 items-center">
-            <SearchComponent Options1="options1" Options2="options2"/>
-            <div class="bg-gray-200 p-[5px] rounded-[5px] border border-1 border-[#c1c1c1] flex flex-row gap-1 justify-center items-center">
-                <label for="showDeleted">Show Deleted</label>
-                <input class="h-4 w-4" id="showDeleted" type="checkbox" checked="@addDeleted" @oninput="CheckboxChanged">
-                
+        @if (PagedResponseKeySet == null)
+        {
+            <p>
+                <em>Loading...</em>
+            </p>
+        }
+        else
+        {
+            <div class="flex flex-row gap-2 items-center">
+                <SearchComponent Options1="options1" Options2="options2" />
+                <AddTime></AddTime>
             </div>
-            <AddTime></AddTime>
-        </div>
-        
-        <div class="table-wrapper overflow-auto">
-            <MyTimesTable entries="PagedResponseKeySet.Data" projectNames="projectNames" tagNames="tagNames" @ref="popupRef2" OnMyTimesUpdated2="RefreshTable2">
-            </MyTimesTable>
-        </div>
-        
-        <KeysetPagination entries="PagedResponseKeySet" Parameters="Parameters" OnPageChanged="EventCallback.Factory.Create<PagedResponseKeySet<HourEntry>>(this, UpdateEntries)" ApiEndpoint="http://localhost:5001/api/master-data/hour-entry/get-all-paged"/>
-    }
+
+            <div class="table-wrapper overflow-auto">
+                <MyTimesTable entries="PagedResponseKeySet.Data" projectNames="projectNames" tagNames="tagNames" @ref="popupRef2" OnMyTimesUpdated2="RefreshTable2">
+                </MyTimesTable>
+            </div>
+
+            <KeysetPagination entries="PagedResponseKeySet" OnPageChanged="EventCallback.Factory.Create<PagedResponseKeySet<HourEntry>>(this, UpdateEntries)" ApiEndpoint="http://localhost:5001/api/master-data/hour-entry/get-all-paged" />
+        }
+    </div>
 </div>
 
 
@@ -50,27 +46,27 @@
     private const string GetAllHourApiEndpoint = $"{ApiHourEndpointRoute}get-user-all-paged";
     private const string GetProjectApiEndpoint = $"{ApiProjectEndpointRoute}get";
     private const string GetTagApiEndpoint = $"{ApiTagEndpointRoute}get";
-    
+
     public PagedResponseKeySet<HourEntry>? PagedResponseKeySet;
     public Dictionary<string, string> Parameters;
-    
+
     public FilterOption[] options1 =
     [
         new() { Icon = "<i class='fa-solid fa-calendar-days'></i>", Name = "Date", InputType = "date" },
-        new() { Icon = "<i class='fa-regular fa-clock'></i>", Name = "StartTime", InputType = "time" },
-        new() { Icon = "<i class='fa-regular fa-clock'></i>", Name = "EndTime", InputType = "time" },
-        new() { Icon = "<i class='fa-solid fa-timeline'></i>", Name = "Duration", InputType = "number" },
-        new() { Icon = "<i class='fa-solid fa-tasks'></i>", Name = "Type", InputType = "select", Options = Enum.GetValues<ActivityType>().Select(e => e.ToString()).ToList() }
+    new() { Icon = "<i class='fa-regular fa-clock'></i>", Name = "StartTime", InputType = "time" },
+    new() { Icon = "<i class='fa-regular fa-clock'></i>", Name = "EndTime", InputType = "time" },
+    new() { Icon = "<i class='fa-solid fa-timeline'></i>", Name = "Duration", InputType = "number" },
+    new() { Icon = "<i class='fa-solid fa-tasks'></i>", Name = "Type", InputType = "select", Options = Enum.GetValues<ActivityType>().Select(e => e.ToString()).ToList() }
     ];
 
     public FilterOption[] options2 =
     [
         new() { Icon = "<i class='fa-solid fa-id-card'></i>", Name = "UserId", InputType = "string" },
-        new() { Icon = "<i class='fa-solid fa-diagram-project'></i>", Name = "ProjectId", InputType = "string" },
-        new() { Icon = "<i class='fa-solid fa-tag'></i>", Name = "TagId", InputType = "string" },
-        new() { Icon = "<i class='fa-solid fa-mug-hot'></i>", Name = "IsHoliday", InputType = "checkbox" },
-        new() { Icon = "<i class='fa-solid fa-money-bill'></i>", Name = "IsBillable", InputType = "checkbox" },
-        new() { Icon = "<i class='fa-solid fa-trash'></i>", Name = "Deleted", InputType = "checkbox" }
+    new() { Icon = "<i class='fa-solid fa-diagram-project'></i>", Name = "ProjectId", InputType = "string" },
+    new() { Icon = "<i class='fa-solid fa-tag'></i>", Name = "TagId", InputType = "string" },
+    new() { Icon = "<i class='fa-solid fa-mug-hot'></i>", Name = "IsHoliday", InputType = "checkbox" },
+    new() { Icon = "<i class='fa-solid fa-money-bill'></i>", Name = "IsBillable", InputType = "checkbox" },
+    new() { Icon = "<i class='fa-solid fa-trash'></i>", Name = "Deleted", InputType = "checkbox" }
     ];
 
     public bool addDeleted;

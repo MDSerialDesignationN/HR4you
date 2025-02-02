@@ -1,15 +1,56 @@
-﻿.searchBar {
+﻿
+
+
+.searchBar {
     position: relative;
+/*    border: 2px solid #0f0c29;*/
+    display: flex;
+    flex-flow: row nowrap;
+    border-radius: 10px;
+    overflow: hidden;
+    /*    rounded-[5px] w-[fit-content] flex flex-row*/
 }
 
-button {
+/*button {
     border-right: 1px solid #c1c1c1;
     padding: 5px 20px
 }
 
     button:last-of-type {
         border: none;
+    }*/
+
+/*#302b63, #24243e*/
+
+.button-option {
+    padding: 10px 30px;
+    background: #302b63;
+    color: white;
+    transition: all 0.5s ease;
+    &:hover
+{
+    background: #24243e;
+}
+
+}
+
+.button-search {
+    padding: 10px 50px;
+    background: #24243e;
+/*    border-left: 2px solid #c1c1c1;*/
+    transition: all 0.5s ease;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    color: white;
+
+    &:hover
+    {
+        background: black;
     }
+}
 
 .FilterOptions {
     flex-direction: column;

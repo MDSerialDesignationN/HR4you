@@ -3,6 +3,7 @@
 
     dropdownButtons.forEach(button => {
         button.addEventListener("click", () => {
+            console.log("clicked")
             const dropdown = button.closest(".hr4you_dropdown");
             dropdown.classList.toggle("active");
 

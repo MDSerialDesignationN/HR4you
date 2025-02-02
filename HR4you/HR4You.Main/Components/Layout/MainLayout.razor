@@ -11,3 +11,22 @@
     </main>
 </div>
 </body>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LocalUserStorage.Load();
+            if (LocalUserStorage.UserInfo == null)
+            {
+                NavigationManager.NavigateTo(NavigationManager.BaseUri);
+                return;
+            }
+
+            // currentUser = LocalUserStorage.UserInfo;
+            StateHasChanged();
+
+        }
+    }
+}
