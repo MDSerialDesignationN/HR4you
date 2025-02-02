@@ -4,40 +4,41 @@
     <div class="hr4you_navbar-header">
         <img src="images/HR.png" alt="Logo" class="hr4you_navbar-logo" />
     </div>
-    <hr>
-    @if (currentUser == null)
-    {
-        <span class="text-white">Loading...</span>
-    }
-    else
-    {
-
-
-        @foreach (var section in sections)
+    <div class="navigation">
+        @if (currentUser == null)
         {
-            @if (currentUser.Roles.Contains(section.PermissionLevel))
+            <span class="text-white">Loading...</span>
+        }
+        else
+        {
+
+
+            @foreach (var section in sections)
             {
-                <div class="hr4you_navbar-content">
-                    <div class="hr4you_dropdown active">
-                        <button class="hr4you_dropdown-button">
-                            <i class="@(section.Icon)"></i>@(section.Name)<i class="fa-solid fa-chevron-down"></i>
-                        </button>
-                        <ul class="hr4you_dropdown-menu">
-                            @foreach (var option in section.Options)
-                            {
-                                <li class="hr4you_dropdown-link">
-                                    <a href="@option.Url">
-                                        <i class="@option.Icon"></i><span>@option.Name</span>
-                                    </a>
-                                </li>
-                            }
-                        </ul>
+                @if (currentUser.Roles.Contains(section.PermissionLevel))
+                {
+                    <div class="hr4you_navbar-content">
+                        <div class="hr4you_dropdown active">
+                            <button class="hr4you_dropdown-button">
+                                <i class="@(section.Icon)"></i>@(section.Name)<i class="fa-solid fa-chevron-down"></i>
+                            </button>
+                            <ul class="hr4you_dropdown-menu">
+                                @foreach (var option in section.Options)
+                                {
+                                    <li class="hr4you_dropdown-link">
+                                        <a href="@option.Url">
+                                            <i class="@option.Icon"></i><span>@option.Name</span>
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
                     </div>
-                    <hr>
-                </div>
+                }
             }
         }
-    }
+    </div>
+
 </aside>
 
 @code {

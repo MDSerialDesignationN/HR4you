@@ -1,4 +1,3 @@
-@using HR4You.Model.Base.Pagination
 @rendermode InteractiveServer
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
@@ -8,19 +7,19 @@
 }
 
 <div class="toast-container position-absolute @showClass" data-bs-autohide="true" data-bs-delay="50000"
-    style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
+style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
 
     <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true"
-        style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; background-color:white; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
-            <div class="toast-header">
-                <strong class="me-auto">@HeaderText</strong>
-                <button type="button" class="btn-close" aria-label="Close" @onclick="Close"></button>
-            </div>
+    style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 9999; width: 80%; background-color:white; box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;">
+        <div class="toast-header">
+            <strong class="me-auto">@HeaderText</strong>
+            <button type="button" class="btn-close" aria-label="Close" @onclick="Close"></button>
+        </div>
 
         <EditForm Model="project" OnValidSubmit="Submit">
             <DataAnnotationsValidator />
             <ValidationSummary />
-        
+
             <div class="toast-body" style="padding: 20px;">
                 <div class="container">
                     <div class="row">
@@ -28,7 +27,6 @@
                         <div class="col-sm-4">
                             <label>Project Number</label>
                             <InputNumber @bind-Value="project.ProjectNumber" class="form-control mb-2" />
-                            <ValidationMessage For="(() => project.ProjectNumber)" class="text-red-600 font-light mb-2"/>
 
                             <label>Customer</label>
                             <InputSelect @bind-Value="project.CustomerId" class="form-select">
@@ -48,7 +46,7 @@
                                     }
                                 }
                             </InputSelect>
-                            
+
                         </div>
 
                         <!-- Name and State -->
@@ -56,7 +54,7 @@
                             <label>Name</label>
                             <InputText @bind-Value="project.Name" class="form-control mb-2" />
 
-                             <label>State</label>                        
+                            <label>State</label>                        
                             <InputSelect @bind-Value="project.State" class="form-select">
                                 @foreach (var value in Enum.GetValues(typeof(ProjectState)))
                                 {
@@ -109,7 +107,12 @@
 
     bool isEdit = false;
 
-    async public Task ShowEdit(int givenId, string requestURL, string headerText)
+    public Dictionary<string, string> Parameters;
+    public PagedResponseOffset<Customer>? PagedResponseOffset;
+
+
+
+    public async Task ShowEdit(int givenId, string requestURL, string headerText)
     {
         HeaderText = headerText;
         GivenId = givenId.ToString(); 

@@ -4,7 +4,7 @@
 
 <PopupProject @ref="popupRef" OnProjectUpdated="RefreshTable" />
 
-<table class="Table">
+<table class="blueTable">
     <thead>
         <tr>
             <th>Project Number</th>
@@ -15,13 +15,13 @@
             <th>Creation Date</th>
             <th>Last Modified</th>
             <th>Is Deleted</th>
-            <th> </th>
+            <th>Actions</th>
 
         </tr>
     </thead>
     <tbody>
         @foreach (var entry in entries)
-        {   
+        {
             <tr>
                 <td>@entry.ProjectNumber</td>
                 <td>@(customerNames.TryGetValue(entry.CustomerId, out var customerName) ? customerName : "Unknown Customer")</td>
@@ -31,8 +31,10 @@
                 <td>@entry.CreationDateTime</td>
                 <td>@entry.LastModifiedAt</td>
                 <td>@(entry.Deleted ? "Yes" : "No")</td>
-                <button type="button" class="btn btn-outline-danger" @onclick="(() => DeleteEntry(entry.Id))"><i class="fa fa-trash"></i></button>
-                <button type="button" class="btn btn-outline-info" @onclick="(() => EditEntry(entry.Id))"><i class="fa fa-pencil"></i></button>
+                <td class="table-action">
+                    <button type="button" class="btn btn-danger" @onclick="(() => DeleteEntry(entry.Id))"><i class="fa fa-trash"></i></button>
+                    <button type="button" class="btn btn-primary" @onclick="(() => EditEntry(entry.Id))"><i class="fa fa-pencil"></i></button>
+                </td>
             </tr>
         }
     </tbody>
@@ -65,10 +67,10 @@
             popupRef.OnProjectUpdated = EventCallback.Factory.Create(this, RefreshTable);
         }
     }
-  
-    private void EditEntry(int GivenId)
+
+    private async Task EditEntry(int GivenId)
     {
-        popupRef.ShowEdit(GivenId, RequestURLEdit, "Edit Project");
+        await popupRef.ShowEdit(GivenId, RequestURLEdit, "Edit Project");
     }
 
     private async Task DeleteEntry(int GivenId)

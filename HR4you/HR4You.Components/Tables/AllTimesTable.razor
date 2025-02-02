@@ -4,7 +4,7 @@
 
 <PopupAllTimes @ref="popupRef" OnAllTimesUpdated="RefreshTable" />
 
-<table class="Table">
+<table class="blueTable">
     <thead>
         <tr>
             <th>Date</th>
@@ -21,14 +21,13 @@
             <th>Creation Date</th>
             <th>Last Modified</th>
             <th>Is Deleted</th>
-            <th> </th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-    @foreach (var entry in entries)
+        @foreach (var entry in entries)
         {
             <tr>
-                <td>@entry.UserId</td>
                 <td>@entry.Date</td>
                 <td>@entry.StartTime</td>
                 <td>@entry.EndTime</td>
@@ -36,15 +35,17 @@
                 <td>@entry.WorktimeDiff</td>
                 <td>@entry.Type</td>
                 <td>@(projectNames.TryGetValue(entry.ProjectId, out var projectName) ? projectName : "No Project")</td>
-                <td>@(tagNames.TryGetValue(entry.TagId.GetValueOrDefault(), out var tagName) ? tagName: "No Tag")</td>
+                <td>@(tagNames.TryGetValue(entry.TagId.GetValueOrDefault(), out var tagName) ? tagName : "No Tag")</td>
                 <td>@entry.Description</td>
                 <td>@(entry.IsHoliday ? "Yes" : "No")</td>
                 <td>@(entry.IsBillable ? "Yes" : "No")</td>
                 <td>@entry.CreationDateTime</td>
                 <td>@entry.LastModifiedAt</td>
                 <td>@(entry.Deleted ? "Yes" : "No")</td>
-                <button type="button" class="btn btn-outline-danger" @onclick="(() => DeleteEntry(entry.Id))"><i class="fa fa-trash"></i></button>
-                <button type="button" class="btn btn-outline-info" @onclick="(() => EditEntry(entry.Id))"><i class="fa fa-pencil"></i></button>
+                <td class="table-action">
+                    <button type="button" class="btn btn-danger" @onclick="(() => DeleteEntry(entry.Id))"><i class="fa fa-trash"></i></button>
+                    <button type="button" class="btn btn-primary" @onclick="(() => EditEntry(entry.Id))"><i class="fa fa-pencil"></i></button>
+                </td>
             </tr>
         }
     </tbody>
