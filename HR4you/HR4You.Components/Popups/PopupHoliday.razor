@@ -133,9 +133,14 @@
         }
         else if (isEdit == false)
         {
+            
             var response = await HttpClient.PostAsJsonAsync(createURL, holiday);
             if (response.IsSuccessStatusCode)
             {
+                if (OnHolidayUpdated.HasDelegate)
+                {
+                    await OnHolidayUpdated.InvokeAsync(); // Notify the parent component
+                }
                 Console.WriteLine("Holiday saved successfully.");
 
                 Close();

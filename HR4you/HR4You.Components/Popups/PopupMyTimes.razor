@@ -246,6 +246,10 @@
             var response = await HttpClient.PostAsJsonAsync(createURL, myTimes);
             if (response.IsSuccessStatusCode)
             {
+                if (OnMyTimesUpdated.HasDelegate)
+                {
+                    await OnMyTimesUpdated.InvokeAsync(); // Notify the parent component
+                }
                 Console.WriteLine("Project saved successfully.");
 
                 Close();

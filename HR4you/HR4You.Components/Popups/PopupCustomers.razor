@@ -159,6 +159,10 @@
             var response = await HttpClient.PostAsJsonAsync(createURL, customer);
             if (response.IsSuccessStatusCode)
             {
+                if (OnCustomerUpdated.HasDelegate)
+                {
+                    await OnCustomerUpdated.InvokeAsync(); // Notify the parent component
+                }
                 Console.WriteLine("Customer saved successfully.");
 
                 Close();

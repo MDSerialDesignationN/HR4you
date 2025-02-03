@@ -47,12 +47,13 @@
         // }
     }
 
-    public string RequestURLEdit = "http://localhost:5001/api/tag/get-user?Id="; //replace with correct one
-    public string RequestURLDelete = "http://localhost:5001/api/tag/delete?Id="; //replace with correct one
+    public string RequestURLEdit = "http://localhost:5001/api/master-data/tag/get?Id=";
+    public string RequestURLDelete = "http://localhost:5001/api/master-data/tag/delete?Id="; 
 
     private void EditEntry(int GivenId)
     {
-        // popupRef.Show(GivenId, RequestURLEdit, "Edit Tag");
+        popupRef.ShowEdit(GivenId, RequestURLEdit, "Edit Tag");
+        RefreshTable();
     }
 
     private async Task DeleteEntry(int GivenId)
@@ -61,10 +62,7 @@
         RefreshTable();
     }
 
-    private void CreateUser()
-    {
-        // popupRef.ShowOverview("Add User");
-    }
+   
 
     private async Task RefreshTable()
     {

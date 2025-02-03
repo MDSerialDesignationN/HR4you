@@ -59,8 +59,8 @@
     [Parameter]
     public string? GivenId { get; set; }
 
-    public string editURL = "http://localhost:5001/api/tag/edit"; //replace with correct one
-    public string createURL = "http://localhost:5001/api/tag/create"; //replace with correct one
+    public string editURL = "http://localhost:5001/api/master-data/tag/edit";
+    public string createURL = "http://localhost:5001/api/master-data/tag/create"; 
 
     Tag tag = new Tag();
 
@@ -123,6 +123,10 @@
 
             if (response.IsSuccessStatusCode)
             {
+                if (OnTagUpdated.HasDelegate)
+                {
+                    await OnTagUpdated.InvokeAsync(); // Notify the parent component
+                }
                 Console.WriteLine("Tag created successfully.");
 
                 Close();

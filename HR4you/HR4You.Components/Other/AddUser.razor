@@ -1,24 +1,24 @@
 @using HR4You.Components.Popups
 @rendermode InteractiveServer
 
-<PopupTag @ref="popupRef" OnTagUpdated="RefreshTable"/>
+<PopupUser @ref="popupRef" OnUserUpdated="RefreshTable"/>
 <button type="button" class="btn btn-dark AddTime" @onclick="(() => CreateEntry())"><i class="fa-solid fa-plus"></i></button>
 
 @code {
     [Parameter]
-    public EventCallback OnTagUpdated3 { get; set; }
-    private PopupTag popupRef;
+    public EventCallback OnUserUpdated3 { get; set; }
+    private PopupUser popupRef;
 
     private async Task CreateEntry()
     {
-        await popupRef.ShowCreate("Add Tag");
+        await popupRef.ShowCreate("Add User");
     }
     private async Task RefreshTable()
     {
         Console.WriteLine("RefreshTable() was called");
-        if (OnTagUpdated3.HasDelegate)
+        if (OnUserUpdated3.HasDelegate)
         {
-            await OnTagUpdated3.InvokeAsync(); // Notify the parent component
+            await OnUserUpdated3.InvokeAsync(); // Notify the parent component
         }
         else
         {

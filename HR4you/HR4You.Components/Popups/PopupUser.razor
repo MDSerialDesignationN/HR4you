@@ -159,6 +159,10 @@
 
                 if (response.IsSuccessStatusCode)
                 {
+                    if (OnUserUpdated.HasDelegate)
+                    {
+                        await OnUserUpdated.InvokeAsync(); // Notify the parent component
+                    }
                     Console.WriteLine("User created successfully.");
                     txtPassword = "";
                     Close();

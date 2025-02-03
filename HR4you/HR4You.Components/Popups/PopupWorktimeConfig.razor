@@ -89,7 +89,7 @@
     public EventCallback<bool> IsVisibleChanged { get; set; }
 
     [Parameter]
-    public EventCallback OnCustomerUpdated { get; set; }
+    public EventCallback OnWorktimeUpdated { get; set; }
 
     [Parameter]
     public string? HeaderText { get; set; }
@@ -127,9 +127,9 @@
                 {
                     Console.WriteLine("Worktime saved successfully.");
 
-                    if (OnCustomerUpdated.HasDelegate)
+                    if (OnWorktimeUpdated.HasDelegate)
                     {
-                        await OnCustomerUpdated.InvokeAsync(); // Notify the parent component
+                        await OnWorktimeUpdated.InvokeAsync(); // Notify the parent component
                     }
                     else
                     {
@@ -153,6 +153,10 @@
             var response = await HttpClient.PostAsJsonAsync(createURL, worktime);
             if (response.IsSuccessStatusCode)
             {
+                if (OnWorktimeUpdated.HasDelegate)
+                {
+                    await OnWorktimeUpdated.InvokeAsync(); // Notify the parent component
+                }
                 Console.WriteLine("Worktime saved successfully.");
 
                 Close();

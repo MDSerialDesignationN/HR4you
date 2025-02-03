@@ -178,12 +178,13 @@ style="left: 50%; position: fixed; transform: translate(-50%, 0px); z-index: 999
         else if (isEdit == false)
         {
             var response = await HttpClient.PostAsJsonAsync(createURL, project);
-            if (OnProjectUpdated.HasDelegate)
-            {
-                await OnProjectUpdated.InvokeAsync(); // Notify the parent component
-            }
+            
             if (response.IsSuccessStatusCode)
             {
+                if (OnProjectUpdated.HasDelegate)
+                {
+                    await OnProjectUpdated.InvokeAsync(); // Notify the parent component
+                }
                 Console.WriteLine("Project saved successfully.");
 
                 Close();

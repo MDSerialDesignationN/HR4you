@@ -21,7 +21,7 @@ public class UserController : ControllerBase
 
     [HttpPost("add-new-user")]
     [SwaggerOperation("AddNewUser")]
-    [Authorize(Policy = BuildInUserRoles.SysAdminRole)]
+    //[Authorize(Policy = BuildInUserRoles.SysAdminRole)]
     public IActionResult AddNewUser([FromBody] AddUserRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.UserName) || string.IsNullOrWhiteSpace(request.Password))
@@ -45,7 +45,7 @@ public class UserController : ControllerBase
 
     [HttpPost("change-user-data")]
     [SwaggerOperation("ChangeUserData")]
-    [Authorize(Policy = BuildInUserRoles.SysAdminRole)]
+    //[Authorize(Policy = BuildInUserRoles.SysAdminRole)]
     public IActionResult ChangeUserData([FromBody] ChangeUserRequest request)
     {
         var user = _db.GetUserById(request.Id);
@@ -84,7 +84,7 @@ public class UserController : ControllerBase
 
     [HttpPost("change-user-password")]
     [SwaggerOperation("ChangeUserPwd")]
-    [Authorize(Policy = BuildInUserRoles.SysAdminRole)]
+    //[Authorize(Policy = BuildInUserRoles.SysAdminRole)]
     public IActionResult ChangeUserPwd([FromBody] ChangePasswordRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.NewPw))
@@ -127,7 +127,7 @@ public class UserController : ControllerBase
 
     [HttpPost("override-user-password")]
     [SwaggerOperation("OverrideUserPwd")]
-    [Authorize(Policy = BuildInUserRoles.SysAdminRole)]
+    //[Authorize(Policy = BuildInUserRoles.SysAdminRole)]
     public IActionResult OverrideUserPwd([FromBody] ChangePasswordRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.NewPw))
@@ -158,7 +158,7 @@ public class UserController : ControllerBase
 
     [HttpGet("get-all-users")]
     [SwaggerOperation("GetAllUsers")]
-    [Authorize(Policy = BuildInUserRoles.SysAdminRole)]
+    //[Authorize(Policy = BuildInUserRoles.SysAdminRole)]
     public IActionResult GetAllUsers(bool showDeleted = false)
     {
         var users = _db.GetUsers(showDeleted);
@@ -169,7 +169,7 @@ public class UserController : ControllerBase
     
     [HttpGet("get-user")]
     [SwaggerOperation("GetUser")]
-    [Authorize(Policy = BuildInUserRoles.SysAdminRole)]
+    //[Authorize(Policy = BuildInUserRoles.SysAdminRole)]
     public IActionResult GetUser(string id)
     {
         var user = _db.GetUserById(id);
@@ -186,7 +186,7 @@ public class UserController : ControllerBase
 
     [HttpPost("delete-user")]
     [SwaggerOperation("DeleteUser")]
-    [Authorize(Policy = BuildInUserRoles.SysAdminRole)]
+    //[Authorize(Policy = BuildInUserRoles.SysAdminRole)]
     public IActionResult DeleteUser(string id)
     {
         if (string.IsNullOrWhiteSpace(id))
@@ -222,7 +222,7 @@ public class UserController : ControllerBase
 
     [HttpPost("un-delete-user")]
     [SwaggerOperation("UnDeleteUser")]
-    [Authorize(Policy = BuildInUserRoles.SysAdminRole)]
+    //[Authorize(Policy = BuildInUserRoles.SysAdminRole)]
     public IActionResult UnDeleteUser(string id)
     {
         if (string.IsNullOrWhiteSpace(id))
@@ -249,7 +249,7 @@ public class UserController : ControllerBase
 
     [HttpPost("check-user-name")]
     [SwaggerOperation("CheckUserName")]
-    [Authorize(Policy = BuildInUserRoles.SysAdminRole)]
+    //[Authorize(Policy = BuildInUserRoles.SysAdminRole)]
     public IActionResult CheckUserName(string userName)
     {
         var user = _db.GetUserByName(userName);
