@@ -27,9 +27,9 @@
                         <circle class="opacity-25" cx="25" cy="25" r="20" stroke="currentColor" stroke-width="5" fill="none">
                         </circle>
                         <circle class="opacity-75" cx="25" cy="25" r="20" stroke="currentColor" stroke-width="5"
-                                stroke-linecap="round" fill="none" stroke-dasharray="31.415, 31.415" transform="rotate(90 25 25)">
+                        stroke-linecap="round" fill="none" stroke-dasharray="31.415, 31.415" transform="rotate(90 25 25)">
                             <animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="5s"
-                                              keyTimes="0;1" values="0 25 25;360 25 25"></animateTransform>
+                            keyTimes="0;1" values="0 25 25;360 25 25"></animateTransform>
                         </circle>
                     </svg>
                 </div>
@@ -46,7 +46,7 @@
                 </AllTimesTable>
             </div>
 
-            <KeysetPagination entries="PagedResponseKeySet" OnPageChanged="EventCallback.Factory.Create<PagedResponseKeySet<HourEntry>>(this, UpdateEntries)" ApiEndpoint="http://localhost:5001/api/master-data/hour-entry/get-all-paged" />
+            <KeysetPagination entries="PagedResponseKeySet" OnPageChanged="EventCallback.Factory.Create<PagedResponseKeySet<HourEntry>>(this, UpdateEntries)" ApiEndpoint="http://localhost:5001/api/master-data/hour-entry/get-all-paged" Parameters="Parameters" />
         }
     </div>
 </div>
@@ -58,29 +58,30 @@
     private const string GetAllHourApiEndpoint = $"{ApiHourEndpointRoute}get-all-paged";
     private const string GetProjectApiEndpoint = $"{ApiProjectEndpointRoute}get";
     private const string GetTagApiEndpoint = $"{ApiTagEndpointRoute}get";
-    
+
     public PagedResponseKeySet<HourEntry>? PagedResponseKeySet;
     public Dictionary<string, string> Parameters;
+
 
     public FilterOption[] options1 =
     [
         new() { Icon = "<i class='fa-solid fa-calendar-days'></i>", Name = "Date", InputType = "date" },
-        new() { Icon = "<i class='fa-regular fa-clock'></i>", Name = "StartTime", InputType = "time" },
-        new() { Icon = "<i class='fa-regular fa-clock'></i>", Name = "EndTime", InputType = "time" },
-        new() { Icon = "<i class='fa-solid fa-timeline'></i>", Name = "Duration", InputType = "number" },
-        new() { Icon = "<i class='fa-solid fa-tasks'></i>", Name = "Type", InputType = "select", Options = Enum.GetValues<ActivityType>().Select(e => e.ToString()).ToList() }
+    new() { Icon = "<i class='fa-regular fa-clock'></i>", Name = "StartTime", InputType = "time" },
+    new() { Icon = "<i class='fa-regular fa-clock'></i>", Name = "EndTime", InputType = "time" },
+    new() { Icon = "<i class='fa-solid fa-timeline'></i>", Name = "Duration", InputType = "number" },
+    new() { Icon = "<i class='fa-solid fa-tasks'></i>", Name = "Type", InputType = "select", Options = Enum.GetValues<ActivityType>().Select(e => e.ToString()).ToList() }
     ];
 
     public FilterOption[] options2 =
     [
         new() { Icon = "<i class='fa-solid fa-id-card'></i>", Name = "UserId", InputType = "string" },
-        new() { Icon = "<i class='fa-solid fa-diagram-project'></i>", Name = "ProjectId", InputType = "string" },
-        new() { Icon = "<i class='fa-solid fa-tag'></i>", Name = "TagId", InputType = "string" },
-        new() { Icon = "<i class='fa-solid fa-mug-hot'></i>", Name = "IsHoliday", InputType = "checkbox" },
-        new() { Icon = "<i class='fa-solid fa-money-bill'></i>", Name = "IsBillable", InputType = "checkbox" },
-        new() { Icon = "<i class='fa-solid fa-trash'></i>", Name = "Deleted", InputType = "checkbox" }
+    new() { Icon = "<i class='fa-solid fa-diagram-project'></i>", Name = "ProjectId", InputType = "string" },
+    new() { Icon = "<i class='fa-solid fa-tag'></i>", Name = "TagId", InputType = "string" },
+    new() { Icon = "<i class='fa-solid fa-mug-hot'></i>", Name = "IsHoliday", InputType = "checkbox" },
+    new() { Icon = "<i class='fa-solid fa-money-bill'></i>", Name = "IsBillable", InputType = "checkbox" },
+    new() { Icon = "<i class='fa-solid fa-trash'></i>", Name = "Deleted", InputType = "checkbox" }
     ];
-    
+
     public bool addDeleted;
 
     private AllTimesTable? popupRef2;
@@ -88,16 +89,20 @@
     public Dictionary<int, string> projectNames = new();
 
     public Dictionary<int?, string> tagNames = new();
-    
+
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             addDeleted = false;
+            Parameters = new Dictionary<string, string>
+            {
+                { nameof(addDeleted), addDeleted.ToString() }
+            };
             await LoadAllTimes();
         }
-        
+
         if (firstRender && popupRef2 != null)
         {
             popupRef2.OnAllTimesUpdated2 = EventCallback.Factory.Create(this, RefreshTable2);
@@ -127,10 +132,10 @@
             {
                 { nameof(addDeleted), addDeleted.ToString() }
             };
-            
+
             var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetAllHourApiEndpoint, Parameters, LocalUserStorage.UserInfo.AuthToken);
             var response = await HttpClient.SendAsync(request);
-            
+
             var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
             if (content != null) PagedResponseKeySet = JsonConvert.DeserializeObject<PagedResponseKeySet<HourEntry>>(content);
 
@@ -165,8 +170,8 @@
                     tagNames[tagId] = tag?.Name ?? "No Tag";
                 }
             }
-            
-            StateHasChanged();            
+
+            StateHasChanged();
         }
         catch (Exception ex)
         {
@@ -193,11 +198,11 @@
 
             var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetProjectApiEndpoint, Parameters, LocalUserStorage.UserInfo.AuthToken);
             var response = await HttpClient.SendAsync(request);
-            
+
             var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
             if (content != null) return JsonConvert.DeserializeObject<Project>(content)!;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Console.WriteLine($"Error fetching project id {projectId} Error: {ex.Message}");
             return null;
@@ -225,11 +230,11 @@
 
             var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetTagApiEndpoint, Parameters, LocalUserStorage.UserInfo.AuthToken);
             var response = await HttpClient.SendAsync(request);
-            
+
             var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
             if (content != null) return JsonConvert.DeserializeObject<Tag>(content)!;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Console.WriteLine($"Error fetching project id {tagId} Error: {ex.Message}");
             return null;
@@ -256,7 +261,7 @@
 
         var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetAllHourApiEndpoint, Parameters, LocalUserStorage.UserInfo!.AuthToken);
         var response = await HttpClient.SendAsync(request);
-        
+
         var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
         if (content != null) PagedResponseKeySet = JsonConvert.DeserializeObject<PagedResponseKeySet<HourEntry>>(content);
 

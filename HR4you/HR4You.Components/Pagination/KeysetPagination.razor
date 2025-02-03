@@ -26,10 +26,10 @@
         {
             await LocalUserStorage.Load();
             var reference = (entries.Reference - 1) - pageSize;
-            
+
             var tempParameters = Parameters.ToDictionary(parameter => parameter.Key, parameter => parameter.Value);
             tempParameters.Add(nameof(reference), reference.ToString());
-            
+
             var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, ApiEndpoint, tempParameters, LocalUserStorage.UserInfo!.AuthToken);
             var response = await HttpClient.SendAsync(request);
 
@@ -53,10 +53,10 @@
         {
             await LocalUserStorage.Load();
             var reference = (entries.Reference - 1) + pageSize;
-            
+
             var tempParameters = Parameters.ToDictionary(parameter => parameter.Key, parameter => parameter.Value);
             tempParameters.Add(nameof(reference), reference.ToString());
-            
+
             var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, ApiEndpoint, tempParameters, LocalUserStorage.UserInfo!.AuthToken);
             var response = await HttpClient.SendAsync(request);
 
