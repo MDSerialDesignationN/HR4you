@@ -3,7 +3,7 @@
         <p class="userinfo-username">@_userName</p>
     </div>
     <div class="user-actions">
-        <button class="userinfo-button-logout" @onclick="Logout">Logout</button>
+        <button class="btn btn-danger" @onclick="Logout">Logout</button>
     </div>
 </div>
 @code {
@@ -15,9 +15,12 @@
         if (firstRender)
         {
             await LocalUserStorage.Load();
-            var storedName = LocalUserStorage.UserInfo!.UserName;
-            if (storedName != null) _userName = storedName;
-            StateHasChanged();
+            if (LocalUserStorage.UserInfo != null)
+            {
+                var storedName = LocalUserStorage.UserInfo!.UserName;
+                if (storedName != null) _userName = storedName;
+                StateHasChanged();
+            }
         }
     }
 

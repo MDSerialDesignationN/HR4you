@@ -46,6 +46,8 @@
                 <UserTable entries="entries" @ref="popupRef2" OnUserUpdated2="RefreshTable2">
                 </UserTable>
             </div>
+            @* <OffsetPagination entries="entries" OnPageChanged="EventCallback.Factory.Create<List<UserInfo>>(this, UpdateEntries)" Parameters="Parameters" ApiEndpoint=@GetAllApiEndpoint /> *@
+
         }
     </div>
 </div>
@@ -146,6 +148,11 @@
         await LoadUsers();
 
         StateHasChanged();
+    }
+
+    private void UpdateEntries(List<UserInfo> newEntries)
+    {
+        entries = newEntries;
     }
 
 }

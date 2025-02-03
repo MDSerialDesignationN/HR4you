@@ -41,8 +41,6 @@
                 <WorktimeConfigTable entries="PagedResponseOffsetWorktime.Data" @ref="popupRefWorktime2" OnWorktimeUpdated2="RefreshTable2">
                 </WorktimeConfigTable>
             </div>
-
-            <OffsetPagination entries="PagedResponseOffsetWorktime" OnPageChanged="EventCallback.Factory.Create<PagedResponseOffset<WorkTime>>(this, UpdateEntriesWorktime)" Parameters=@ParametersWorktime ApiEndpoint=@GetAllWorktimeApiEndpoint />
         }
     </div>
 
