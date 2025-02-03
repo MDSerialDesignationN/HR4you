@@ -1,4 +1,4 @@
-﻿table.blueTable {
+table.blueTable {
     border-radius: 10px;
     background-color: #302B63;
     border-collapse: collapse;
@@ -8,7 +8,7 @@
 
     table.blueTable td, table.blueTable th {
         padding: 2px 10px;
-        /*        min-width: 100px;*/
+        min-width: 100px;
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
@@ -36,6 +36,21 @@
                 border-left: none;
             }
 
+    table.blueTable tfoot td {
+        font-size: 15px;
+    }
+
+    table.blueTable tfoot .links {
+        text-align: right;
+    }
+
+        table.blueTable tfoot .links a {
+            display: inline-block;
+            background: #1C6EA4;
+            color: #FFFFFF;
+            padding: 2px 8px;
+            border-radius: 5px;
+        }
 
 .table-action {
     display: flex;

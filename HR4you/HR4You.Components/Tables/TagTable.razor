@@ -4,12 +4,12 @@
 
 <PopupTag @ref="popupRef" OnTagUpdated="RefreshTable" />
 
-<table class="Table">
+<table class="blueTable">
     <thead>
         <tr>
             <th>Name</th>
             <th>Is Deleted</th>
-            <th> </th>
+            <th>Actions</th>
 
         </tr>
     </thead>
@@ -20,8 +20,10 @@
             <tr>
                 <td>@entry.Name</td>
                 <td>@(entry.Deleted ? "Yes" : "No")</td>
-                <button type="button" class="btn btn-outline-danger" @onclick="(() => DeleteEntry(entry.Id))"><i class="fa fa-trash"></i></button>                
-                <button type="button" class="btn btn-outline-info" @onclick="(() => EditEntry(entry.Id))"><i class="fa fa-pencil"></i></button>
+                <td class="table-actions">
+                    <button type="button" class="btn btn-danger" @onclick="(() => DeleteEntry(entry.Id))"><i class="fa fa-trash"></i></button>
+                    <button type="button" class="btn btn-primary" @onclick="(() => EditEntry(entry.Id))"><i class="fa fa-pencil"></i></button>
+                </td>
             </tr>
         }
     </tbody>

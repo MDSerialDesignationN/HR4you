@@ -14,7 +14,7 @@
             <th>Roles</th>
             <th>Role Groups</th>
             <th>Is Deleted</th>
-            <th> </th>
+            <th>Actions</th>
 
         </tr>
     </thead>
@@ -28,16 +28,18 @@
                 <td>@entry.UserName</td>
                 <td>@string.Join(", ", @entry.Roles.Select(role => role.Replace("UserRole_", "")))</td>
                 <td>@string.Join(", ", @entry.RoleGroups.Select(roleGroup => roleGroup.Replace("HR_UserRoleGroup_", "")))</td>
-                <td>@(entry.Deleted ? "Yes" : "No")</td>                
-                @if (entry.Deleted == true)
-                {
-                    <button type="button" class="btn btn-outline-danger" @onclick="(() => Reactivate(entry.Id))"><i class="fa fa-rotate-right"></i></button>
-                }
-                else
-                {
-                    <button type="button" class="btn btn-outline-danger" @onclick="(() => DeleteEntry(entry.Id))"><i class="fa fa-trash"></i></button>
-                }
-                <button type="button" class="btn btn-outline-info" @onclick="(() => EditEntry(entry.Id))"><i class="fa fa-pencil"></i></button>
+                <td>@(entry.Deleted ? "Yes" : "No")</td>
+                <td class="table-action">
+                    @if (entry.Deleted == true)
+                    {
+                        <button type="button" class="btn btn-danger" @onclick="(() => Reactivate(entry.Id))"><i class="fa fa-rotate-right"></i></button>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-danger" @onclick="(() => DeleteEntry(entry.Id))"><i class="fa fa-trash"></i></button>
+                    }
+                    <button type="button" class="btn btn-primary" @onclick="(() => EditEntry(entry.Id))"><i class="fa fa-pencil"></i></button>
+                </td>
             </tr>
         }
     </tbody>
@@ -96,7 +98,7 @@
         if (response.IsSuccessStatusCode)
         {
             Console.WriteLine("User reactivated successfully.");
-            RefreshTable();           
+            RefreshTable();
         }
         else
         {

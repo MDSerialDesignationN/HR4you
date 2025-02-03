@@ -20,8 +20,8 @@
 
 
 
-    @if (PagedResponseOffset == null)
-    {
+        @if (PagedResponseOffset == null)
+        {
             <div class="loading-overlay">
                 <div class="loading-content">
                     <svg class="animate-spin h-20 w-20 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50">
@@ -35,21 +35,21 @@
                     </svg>
                 </div>
             </div>
-    }
-    else
-    {
-        <div class="flex flex-row gap-2 items-center">
-            <SearchComponent Options1="options1" Options2="options2"/>
-            <AddProject></AddProject>
-        </div>
+        }
+        else
+        {
+            <div class="flex flex-row gap-2 items-center">
+                <SearchComponent Options1="options1" Options2="options2" />
+                <AddProject></AddProject>
+            </div>
 
-        <div class="table-wrapper">
-            <ProjectsTable entries="PagedResponseOffset.Data" customerNames="customerNames" @ref="popupRef2" OnProjectUpdated2="RefreshTable2">
-            </ProjectsTable>
-        </div>
+            <div class="table-wrapper">
+                <ProjectsTable entries="PagedResponseOffset.Data" customerNames="customerNames" @ref="popupRef2" OnProjectUpdated2="RefreshTable2">
+                </ProjectsTable>
+            </div>
 
-        <OffsetPagination entries="PagedResponseOffset" OnPageChanged="EventCallback.Factory.Create<PagedResponseOffset<Project>>(this, UpdateEntries)" Parameters="Parameters" ApiEndpoint=@GetAllProjectApiEndpoint/>
-    }
+            <OffsetPagination entries="PagedResponseOffset" OnPageChanged="EventCallback.Factory.Create<PagedResponseOffset<Project>>(this, UpdateEntries)" Parameters="Parameters" ApiEndpoint=@GetAllProjectApiEndpoint />
+        }
     </div>
 </div>
 
@@ -91,7 +91,7 @@
             popupRef2.OnProjectUpdated2 = EventCallback.Factory.Create(this, RefreshTable2);
         }
     }
-    
+
     private void UpdateEntries(PagedResponseOffset<Project> newEntries)
     {
         PagedResponseOffset = newEntries;
@@ -140,7 +140,7 @@
                     customerNames[customerId] = customer?.Name ?? "No Customer";
                 }
             }
-            
+
             StateHasChanged();
         }
         catch (Exception ex)

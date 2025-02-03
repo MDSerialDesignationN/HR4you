@@ -3,24 +3,12 @@
 
 .searchBar {
     position: relative;
-/*    border: 2px solid #0f0c29;*/
+
     display: flex;
     flex-flow: row nowrap;
     border-radius: 10px;
     overflow: hidden;
-    /*    rounded-[5px] w-[fit-content] flex flex-row*/
 }
-
-/*button {
-    border-right: 1px solid #c1c1c1;
-    padding: 5px 20px
-}
-
-    button:last-of-type {
-        border: none;
-    }*/
-
-/*#302b63, #24243e*/
 
 .button-option {
     padding: 10px 30px;
@@ -55,20 +43,40 @@
 .FilterOptions {
     flex-direction: column;
     gap: 10px;
-    z-index: 10;
     display: none;
-    position: absolute;
-    background: whitesmoke;
+    background: #302b63;
     padding: 10px;
-    border: 1px solid #c1c1c1;
+    border: 5px solid #24243e;
     border-radius: 5px;
     width: 350px;
     height: fit-content;
+    color: white;
+    font-weight: bold;
 }
 
-    .FilterOptions.active {
-        display: flex;
-    }
+.filter-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.filter-wrapper {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.FilterOptions.active {
+    display: flex;
+}
 
 .OptionRow {
     display: flex;
@@ -91,4 +99,9 @@
         flex-flow: row nowrap;
         align-items: center;
         gap: 10px;
+    }
+
+
+    .OptionRow > input {
+        color: black;
     }
