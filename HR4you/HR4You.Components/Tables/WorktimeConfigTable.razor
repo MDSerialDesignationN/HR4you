@@ -4,7 +4,7 @@
 
 <PopupWorktimeConfig @ref="popupRef" OnCustomerUpdated="RefreshTable" />
 
-<table class="Table">
+<table class="blueTable">
     <thead>
         <tr>
             <th>Monday (h)</th>
@@ -14,7 +14,7 @@
             <th>Friday (h)</th>
             <th>Saturday (h)</th>
             <th>Sunday (h)</th>
-            <th> </th>
+            <th>Actions</th>
 
         </tr>
     </thead>
@@ -29,7 +29,9 @@
                 <td>@entry.MinFriHours</td>
                 <td>@entry.MinSatHours</td>
                 <td>@entry.MinSunHours</td>
-                <button type="button" class="btn btn-outline-info" @onclick="(() => EditEntry(entry.Id))"><i class="fa fa-pencil"></i></button>
+                <td class="table-action">
+                <button type="button" class="btn btn-primary" @onclick="(() => EditEntry(entry.Id))"><i class="fa fa-pencil"></i></button>
+                </td>
             </tr>
         }       
     </tbody>

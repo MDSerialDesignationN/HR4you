@@ -1,22 +1,45 @@
-﻿.Table {
-    border-collapse: collapse !important;
-    position: relative;
-    margin-top: 20px;
-    padding: 10px;
-    background-color: white;
-    border: 1px solid gainsboro;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+﻿table.blueTable {
+    border-radius: 10px;
+    background-color: #302B63;
+    border-collapse: collapse;
     width: 100%;
-    max-width: 100%;
+    overflow: hidden
 }
 
-    .Table th,
-    .Table td {
-        padding: 8px;
-        text-align: left;
-        border: 1px solid gainsboro;
+    table.blueTable td, table.blueTable th {
+        padding: 2px 10px;
+        /*        min-width: 100px;*/
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 
-    .Table th {
-        background-color: #f4f4f4;
+    table.blueTable tbody td {
+        font-size: 0.8rem;
+        color: #FFFFFF;
     }
+
+    table.blueTable thead {
+        background: #24243E;
+        border-bottom: 2px solid #444444;
+        border-radius: 10px;
+    }
+
+        table.blueTable thead th {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #FFFFFF;
+            border-left: 0px solid #D0E4F5;
+        }
+
+            table.blueTable thead th:first-child {
+                border-left: none;
+            }
+
+
+.table-action {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    gap: 10px;
+}

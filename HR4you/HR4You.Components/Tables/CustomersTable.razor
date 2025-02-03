@@ -4,7 +4,7 @@
 
 <PopupCustomers @ref="popupRef" OnCustomerUpdated="RefreshTable"/> 
 
-<table class="Table">
+<table class="blueTable">
     <thead>
         <tr>
             <th>Customer Number</th>
@@ -17,7 +17,7 @@
             <th>Creation Date</th>
             <th>Last Modified</th>
             <th>Is Deleted</th>
-            <th class="w-[fit-content] p-0"> </th>
+            <th>Actions</th>
 
         </tr>
     </thead>
@@ -36,9 +36,9 @@
                 <td>@entry.CreationDateTime</td>
                 <td>@entry.LastModifiedAt</td>
                 <td>@(entry.Deleted ? "Yes" : "No")</td>
-                <td class="max-w-[fit-content] flex flex-col gap-1 justify-center items-center p-1">
-                    <button type="button" class="border border-2 border-red-500 bg-red-500 bg-opacity-50 rounded-[5px]" @onclick="(() => DeleteEntry(entry.Id))"><i class="fa fa-trash"></i></button>
-                    <button type="button" class="border border-2 border-gray-500 bg-gray-500 bg-opacity-50 rounded-[5px]" @onclick="(() => EditEntry(entry.Id))"><i class="fa fa-pencil"></i></button>
+                <td class="table-action">
+                    <button type="button" class="btn btn-danger" @onclick="(() => DeleteEntry(entry.Id))"><i class="fa fa-trash"></i></button>
+                    <button type="button" class="btn btn-primary" @onclick="(() => EditEntry(entry.Id))"><i class="fa fa-pencil"></i></button>
                 </td>
             </tr>
         }

@@ -1,11 +1,13 @@
 ﻿@using HR4You.Model.Base
 @using Microsoft.JSInterop
 @using HR4You.Model.Base.Pagination
+@using Newtonsoft.Json
 @rendermode InteractiveServer
 
-<div class="component-search">
+<div class="component-search @(Options1.Length == 0 && Options2.Length == 0 ? "d-none" : "")">
+
     <div class="searchBar">
-        @if (Options1 != null)
+        @if (Options1.Length != 0)
         {
             <button class="button-option" @onclick="ToggleFilterOptions">
                 <i class="fa-solid fa-filter"></i>
@@ -21,59 +23,73 @@
     </div>
     @if (Options1 != null)
     {
-        <div class="FilterOptions @(showFilterOptions ? "active" : "")">
-            @foreach (var option in Options1)
-            {
-                <div class="OptionRow">
-                    <span>@((MarkupString)option.Icon)@option.Name</span>
-                    @if (option.InputType == "select" && option.Options != null)
+        <div class="filter-popup @(!showFilterOptions ? "d-none" : "")">
+            <div class="filter-wrapper">
+                <div class="FilterOptions @(showFilterOptions ? "active" : "")">
+                    @foreach (var option in Options1)
                     {
-                        <select name="@option.Name" @ref="values[option.Name]">
-                            <option value="">None</option>
-                            @foreach (var opt in option.Options)
+                        <div class="OptionRow">
+                            <span>@((MarkupString)option.Icon)@option.Name</span>
+                            @if (option.InputType == "select" && option.Options != null)
                             {
-                                <option value="@opt">@opt</option>
+                                <select name="@option.Name" @ref="values[option.Name]">
+                                    <option value="">None</option>
+                                    @foreach (var opt in option.Options)
+                                    {
+                                        <option value="@opt">@opt</option>
+                                    }
+                                </select>
                             }
-                        </select>
-                    }
-                    else
-                    {
-                        <input type="@option.InputType" name="@option.Name" @ref="values[option.Name]" />
+                            else
+                            {
+                                <input type="@option.InputType" name="@option.Name" @ref="values[option.Name]" />
+                            }
+                        </div>
                     }
                 </div>
-            }
+                <button class="btn btn-danger" @onclick="ToggleFilterOptions">Close</button>
+            </div>
+
         </div>
     }
     @if (Options2 != null)
     {
-        <div class="FilterOptions @(showFilterOptionsAdmin ? "active" : "")">
-            @foreach (var option in Options2)
-            {
-                <div class="OptionRow">
-                    <span>@((MarkupString)option.Icon)@option.Name</span>
-                    @if (option.InputType == "select" && option.Options != null)
+        <div class="filter-popup @(!showFilterOptionsAdmin ? "d-none" : "")">
+            <div class="filter-wrapper">
+                <div class="FilterOptions @(showFilterOptionsAdmin ? "active" : "")">
+                    @foreach (var option in Options2)
                     {
-                        <select name="@option.Name" @ref="values[option.Name]" @bind:event="oninput">
-                            <option value="">None</option>
-                            @foreach (var opt in option.Options)
+                        <div class="OptionRow">
+                            <span>@((MarkupString)option.Icon)@option.Name</span>
+                            @if (option.InputType == "select" && option.Options != null)
                             {
-                                <option value="@opt">@opt</option>
+                                <select name="@option.Name" @ref="values[option.Name]">
+                                    <option value="">None</option>
+                                    @foreach (var opt in option.Options)
+                                    {
+                                        <option value="@opt">@opt</option>
+                                    }
+                                </select>
                             }
-                        </select>
-                    }
-                    else
-                    {
-                        <input type="@option.InputType" name="@option.Name" @ref="values[option.Name]" />
+                            else
+                            {
+                                <input type="@option.InputType" name="@option.Name" @ref="values[option.Name]" />
+                            }
+                        </div>
                     }
                 </div>
-            }
+                <button class="btn btn-danger" @onclick="ToggleFilterOptionsAdmin">Close</button>
+            </div>
+
         </div>
     }
+
 </div>
 
 @code {
     [Parameter] public FilterOption[] Options1 { get; set; } = Array.Empty<FilterOption>();
     [Parameter] public FilterOption[] Options2 { get; set; } = Array.Empty<FilterOption>();
+    [Parameter] public string ApiEndpoint { get; set; }
 
     private bool showFilterOptions = false;
     private bool showFilterOptionsAdmin = false;
@@ -85,11 +101,19 @@
     private void ToggleFilterOptions()
     {
         showFilterOptions = !showFilterOptions;
+        if (showFilterOptions)
+        {
+            showFilterOptionsAdmin = false; // Deaktiviert den Admin-Filter
+        }
     }
 
     private void ToggleFilterOptionsAdmin()
     {
         showFilterOptionsAdmin = !showFilterOptionsAdmin;
+        if (showFilterOptionsAdmin)
+        {
+            showFilterOptions = false; // Deaktiviert den Filter 1
+        }
     }
 
     private async Task Filter()
@@ -106,5 +130,39 @@
                 );
             }
         }
+        // var columnFiltersDictionary = ConvertColumnFiltersToDictionary(columnFilters);
+
+        var Parameters = new Dictionary<string, string> {
+            { "columnFilters", JsonConvert.SerializeObject(columnFilters) }
+        };
+
+
+        var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, ApiEndpoint, Parameters, LocalUserStorage.UserInfo.AuthToken);
+        var response = await HttpClient.SendAsync(request);
+
+        var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
     }
+
+    // private List<ColumnFilter> ConvertColumnFilters(List<ColumnFilter> columnFilters)
+    // {
+    //     var filterList = new List<ColumnFilter>();
+    //     try
+    //     {
+    //         foreach(var filter in columnFilters){
+    //             filterList.Add(new ColumnFilter { ColumnName = filter.ColumnName, Value = filter.Value });
+        //         }
+
+
+
+    //     }
+    //     catch (Exception ex)
+    //     {
+
+    //         Console.WriteLine();
+    //     }
+    //     return filterList;
+
+
+    // }
+
 }

@@ -8,35 +8,45 @@
 @inject HttpClient HttpClient
 
 <PageTitle>User</PageTitle>
-<div class="page-content min-h-[100vh] p-3 flex flex-col gap-2 select-none">
+<div class="page">
 
-    <div class="flex flex-row justify-between">
-        <h1 class="text-[2rem] font-bold flex flex-row gap-3 items-center"><i class="fa-solid fa-user"></i>Users</h1>
+    <div class="page-header">
+        <h1><i class="fa-solid fa-user"></i>Users</h1>
+        <UserInfo></UserInfo>
+
     </div>
 
-    <UserInfo></UserInfo>
+    <div class="page-content">
 
-    @if (entries == null)
-    {
-        <p>
-            <em>Loading...</em>
-        </p>
-    }
-    else
-    {
-        <div class="flex flex-row gap-2 items-center">
-            <SearchComponent Options1="options1" Options2="options2"/>
-            <div class="bg-gray-200 p-[5px] rounded-[5px] border border-1 border-[#c1c1c1] flex flex-row gap-1 justify-center items-center">
-                <label for="showDeleted">Show Deleted</label>
-                <input class="h-4 w-4" id="showDeleted" type="checkbox" checked="@addDeleted" @oninput="CheckboxChanged">
+
+        @if (entries == null)
+        {
+            <div class="loading-overlay">
+                <div class="loading-content">
+                    <svg class="animate-spin h-20 w-20 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50">
+                        <circle class="opacity-25" cx="25" cy="25" r="20" stroke="currentColor" stroke-width="5" fill="none">
+                        </circle>
+                        <circle class="opacity-75" cx="25" cy="25" r="20" stroke="currentColor" stroke-width="5"
+                                stroke-linecap="round" fill="none" stroke-dasharray="31.415, 31.415" transform="rotate(90 25 25)">
+                            <animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="5s"
+                                              keyTimes="0;1" values="0 25 25;360 25 25"></animateTransform>
+                        </circle>
+                    </svg>
+                </div>
             </div>
-        </div>
+        }
+        else
+        {
+            <div class="page-actions">
+                <SearchComponent Options1="options1" Options2="options2" />
+            </div>
 
-        <div class="table-wrapper overflow-auto">
-            <UserTable entries="entries" @ref="popupRef2" OnUserUpdated2="RefreshTable2">
-            </UserTable>
-        </div>
-    }
+            <div class="table-wrapper">
+                <UserTable entries="entries" @ref="popupRef2" OnUserUpdated2="RefreshTable2">
+                </UserTable>
+            </div>
+        }
+    </div>
 </div>
 
 
@@ -67,13 +77,13 @@
             addDeleted = false;
             await LoadUsers();
         }
-        
+
         if (firstRender && popupRef2 != null)
         {
             popupRef2.OnUserUpdated2 = EventCallback.Factory.Create(this, RefreshTable2);
         }
     }
-    
+
     private async Task LoadUsers()
     {
         try
@@ -92,7 +102,7 @@
 
             var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetAllApiEndpoint, Parameters, LocalUserStorage.UserInfo.AuthToken);
             var response = await HttpClient.SendAsync(request);
-            
+
             var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
             if (content != null) entries = JsonConvert.DeserializeObject<List<UserInfo>>(content);
 
@@ -122,7 +132,7 @@
 
         var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetAllApiEndpoint, Parameters, LocalUserStorage.UserInfo!.AuthToken);
         var response = await HttpClient.SendAsync(request);
-        
+
         var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
         if (content != null) entries = JsonConvert.DeserializeObject<List<UserInfo>>(content);
 

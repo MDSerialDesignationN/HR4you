@@ -8,70 +8,89 @@
 @inject HttpClient HttpClient
 
 <PageTitle>WorktimeConfig</PageTitle>
-<div class="page-content min-h-[100vh] p-3 flex flex-col gap-2 select-none">
+<div class="page">
 
-    <div class="flex flex-row justify-between">
-        <h1 class="text-[2rem] font-bold flex flex-row gap-3 items-center"><i class="fa-solid fa-calendar-days"></i>Worktime</h1>
+    <div class="page-header">
+        <h1><i class="fa-solid fa-calendar-days"></i>Worktime</h1>
+        <UserInfo></UserInfo>
+
     </div>
 
-    <UserInfo></UserInfo>
+    <div class="page-content">
 
-    @if (PagedResponseOffsetWorktime == null)
-    {
-    <p>
-        <em>Loading...</em>
-    </p>
-    }
-    else
-    {
-        <div class="flex flex-row gap-2 items-center">
-            <div class="bg-gray-200 p-[5px] rounded-[5px] border border-1 border-[#c1c1c1] flex flex-row gap-1 justify-center items-center">
-                <label for="showDeleted">Show Deleted</label>
-                <input class="h-4 w-4" id="showDeleted" type="checkbox" checked="@addDeletedWorktime" @oninput="CheckboxChangedWorktime">
+
+        @if (PagedResponseOffsetWorktime == null)
+        {
+            <div class="loading-overlay">
+                <div class="loading-content">
+                    <svg class="animate-spin h-20 w-20 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50">
+                        <circle class="opacity-25" cx="25" cy="25" r="20" stroke="currentColor" stroke-width="5" fill="none">
+                        </circle>
+                        <circle class="opacity-75" cx="25" cy="25" r="20" stroke="currentColor" stroke-width="5"
+                                stroke-linecap="round" fill="none" stroke-dasharray="31.415, 31.415" transform="rotate(90 25 25)">
+                            <animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="5s"
+                                              keyTimes="0;1" values="0 25 25;360 25 25"></animateTransform>
+                        </circle>
+                    </svg>
+                </div>
             </div>
-        </div>
-        
-    <div class="table-wrapper overflow-auto">
-        <WorktimeConfigTable entries="PagedResponseOffsetWorktime.Data" @ref="popupRefWorktime2" OnWorktimeUpdated2="RefreshTable2">
-        </WorktimeConfigTable>
+        }
+        else
+        {
+            <div class="table-wrapper">
+                <WorktimeConfigTable entries="PagedResponseOffsetWorktime.Data" @ref="popupRefWorktime2" OnWorktimeUpdated2="RefreshTable2">
+                </WorktimeConfigTable>
+            </div>
+
+            <OffsetPagination entries="PagedResponseOffsetWorktime" OnPageChanged="EventCallback.Factory.Create<PagedResponseOffset<WorkTime>>(this, UpdateEntriesWorktime)" Parameters=@ParametersWorktime ApiEndpoint=@GetAllWorktimeApiEndpoint />
+        }
     </div>
 
-    <OffsetPagination entries="PagedResponseOffsetWorktime" OnPageChanged="EventCallback.Factory.Create<PagedResponseOffset<WorkTime>>(this, UpdateEntriesWorktime)" Parameters=@ParametersWorktime ApiEndpoint=@GetAllWorktimeApiEndpoint/>
-    }
+
+
+
+    <div class="page-header">
+        <h1><i class="fa-solid fa-calendar-days"></i>Holiday</h1>
+    </div>
+
+    <div class="page-content">
+
+
+        @if (PagedResponseOffsetHoliday == null)
+        {
+            <div class="loading-overlay">
+                <div class="loading-content">
+                    <svg class="animate-spin h-20 w-20 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50">
+                        <circle class="opacity-25" cx="25" cy="25" r="20" stroke="currentColor" stroke-width="5" fill="none">
+                        </circle>
+                        <circle class="opacity-75" cx="25" cy="25" r="20" stroke="currentColor" stroke-width="5"
+                                stroke-linecap="round" fill="none" stroke-dasharray="31.415, 31.415" transform="rotate(90 25 25)">
+                            <animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="5s"
+                                              keyTimes="0;1" values="0 25 25;360 25 25"></animateTransform>
+                        </circle>
+                    </svg>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="page-actions">
+                <SearchComponent Options1="options1" Options2="options2" />
+                <AddHoliday></AddHoliday>
+
+            </div>
+
+            <div class="table-wrapper">
+                <HolidayTable entriesHoliday="PagedResponseOffsetHoliday.Data" @ref="popupRefHoliday2" OnHolidayUpdated2="RefreshTable2">
+                </HolidayTable>
+            </div>
+
+            <OffsetPagination entries="PagedResponseOffsetHoliday" OnPageChanged="EventCallback.Factory.Create<PagedResponseOffset<Holiday>>(this, UpdateEntriesHoliday)" Parameters=@ParametersHoliday ApiEndpoint=@GetAllHolidayApiEndpoint />
+        }
+    </div>
+
 </div>
 
-
-<div class="page-content min-h-[100vh] p-3 flex flex-col gap-2 select-none">
-
-    <div class="flex flex-row justify-between">
-        <h1 class="text-[2rem] font-bold flex flex-row gap-3 items-center"><i class="fa-solid fa-calendar-days"></i>Holiday</h1>
-    </div>
-    
-    @if (PagedResponseOffsetHoliday == null)
-    {
-        <p>
-            <em>Loading...</em>
-        </p>
-    }
-    else
-    {
-        <div class="flex flex-row gap-2 items-center">
-            <SearchComponent Options1="options1" Options2="options2"/>
-            <div class="bg-gray-200 p-[5px] rounded-[5px] border border-1 border-[#c1c1c1] flex flex-row gap-1 justify-center items-center">
-                <label for="showDeleted">Show Deleted</label>
-                <input class="h-4 w-4" id="showDeleted" type="checkbox" checked="@addDeletedHoliday" @oninput="CheckboxChangedHoliday">
-            </div>
-            <AddHoliday></AddHoliday>
-        </div>
-
-        <div class="table-wrapper overflow-auto">
-            <HolidayTable entriesHoliday="PagedResponseOffsetHoliday.Data" @ref="popupRefHoliday2" OnHolidayUpdated2="RefreshTable2">
-            </HolidayTable>
-        </div>
-
-        <OffsetPagination entries="PagedResponseOffsetHoliday" OnPageChanged="EventCallback.Factory.Create<PagedResponseOffset<Holiday>>(this, UpdateEntriesHoliday)" Parameters=@ParametersHoliday ApiEndpoint=@GetAllHolidayApiEndpoint/>
-    }
-</div>
 
 
 @code {
@@ -84,7 +103,7 @@
     public PagedResponseOffset<Holiday>? PagedResponseOffsetHoliday;
     public Dictionary<string, string> ParametersWorktime;
     public Dictionary<string, string> ParametersHoliday;
-    
+
     //TODO create options
     public FilterOption[] options1 =
     [
@@ -106,23 +125,23 @@
         {
             addDeletedWorktime = false;
             addDeletedHoliday = false;
-            
+
             await LoadWorktime();
             await LoadHoliday();
         }
-        
+
         if (firstRender && popupRefWorktime2 != null && popupRefHoliday2 != null)
         {
             popupRefWorktime2.OnWorktimeUpdated2 = EventCallback.Factory.Create(this, RefreshTable2);
             popupRefHoliday2.OnHolidayUpdated2 = EventCallback.Factory.Create(this, RefreshTable2);
         }
     }
-    
+
     private void UpdateEntriesWorktime(PagedResponseOffset<WorkTime> newEntries)
     {
         PagedResponseOffsetWorktime = newEntries;
     }
-    
+
     private void UpdateEntriesHoliday(PagedResponseOffset<Holiday> newEntries)
     {
         PagedResponseOffsetHoliday = newEntries;
@@ -146,7 +165,7 @@
 
             var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetAllWorktimeApiEndpoint, ParametersWorktime, LocalUserStorage.UserInfo.AuthToken);
             var response = await HttpClient.SendAsync(request);
-            
+
             var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
             if (content != null) PagedResponseOffsetWorktime = JsonConvert.DeserializeObject<PagedResponseOffset<WorkTime>>(content);
 
@@ -157,7 +176,7 @@
             Console.WriteLine($"Error fetching entries: {ex.Message}");
         }
     }
-    
+
     private async Task LoadHoliday()
     {
         try
@@ -176,7 +195,7 @@
 
             var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetAllHolidayApiEndpoint, ParametersHoliday, LocalUserStorage.UserInfo.AuthToken);
             var response = await HttpClient.SendAsync(request);
-            
+
             var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
             if (content != null) PagedResponseOffsetHoliday = JsonConvert.DeserializeObject<PagedResponseOffset<Holiday>>(content);
 
@@ -187,7 +206,7 @@
             Console.WriteLine($"Error fetching entries: {ex.Message}");
         }
     }
-    
+
     private async Task CheckboxChangedWorktime()
     {
         if (addDeletedWorktime == false)
@@ -206,7 +225,7 @@
 
         var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetAllWorktimeApiEndpoint, ParametersWorktime, LocalUserStorage.UserInfo!.AuthToken);
         var response = await HttpClient.SendAsync(request);
-        
+
         var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
         if (content != null) PagedResponseOffsetWorktime = JsonConvert.DeserializeObject<PagedResponseOffset<WorkTime>>(content);
 
@@ -231,7 +250,7 @@
 
         var request = HttpQueryHandler.CreateEndpointRequestWithJwt(HttpMethod.Get, GetAllHolidayApiEndpoint, ParametersHoliday, LocalUserStorage.UserInfo!.AuthToken);
         var response = await HttpClient.SendAsync(request);
-        
+
         var content = await HttpQueryHandler.ProcessHttpResponse(NavigationManager, response);
         if (content != null) PagedResponseOffsetHoliday = JsonConvert.DeserializeObject<PagedResponseOffset<Holiday>>(content);
 

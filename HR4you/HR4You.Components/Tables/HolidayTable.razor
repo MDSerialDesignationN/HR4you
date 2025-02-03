@@ -5,13 +5,13 @@
 
 <PopupHoliday @ref="popupRefHoliday" OnHolidayUpdated="RefreshTable" />
 
-<table class="Table">
+<table class="blueTable">
     <thead>
         <tr>
             <th>Date</th>
             <th>Name</th>
             <th>Half Day</th>
-            <th> </th>
+            <th>Actions</th>
 
         </tr>
     </thead>
@@ -22,8 +22,10 @@
                 <td>@entry.Date</td>
                 <td>@entry.Name</td>
                 <td>@(entry.HalfDay ? "Yes" : "No")</td>
-                <button type="button" class="btn btn-outline-danger" @onclick="(() => DeleteEntry(entry.Id))"><i class="fa fa-trash"></i></button>
-                <button type="button" class="btn btn-outline-info" @onclick="(() => EditEntryHoliday(entry.Id))"><i class="fa fa-pencil"></i></button>
+                <td class="table-action">
+                    <button type="button" class="btn btn-danger" @onclick="(() => DeleteEntry(entry.Id))"><i class="fa fa-trash"></i></button>
+                    <button type="button" class="btn btn-primary" @onclick="(() => EditEntryHoliday(entry.Id))"><i class="fa fa-pencil"></i></button>
+                </td>
             </tr>
         }
     </tbody>
