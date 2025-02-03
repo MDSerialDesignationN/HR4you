@@ -17,7 +17,6 @@
 
         <EditForm Model="worktime" OnValidSubmit="Submit">
             <DataAnnotationsValidator />
-            <ValidationSummary />
 
             <div class="toast-body" style="padding: 20px;">
                 <div class="container">
@@ -133,7 +132,7 @@
                     }
                     else
                     {
-                        Console.WriteLine("OnCustomerUpdated has no delegate assigned.");
+                        Console.WriteLine("OnWorktimeUpdated has no delegate assigned.");
                     }
 
                     Close();
